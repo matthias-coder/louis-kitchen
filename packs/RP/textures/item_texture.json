@@ -1,0 +1,45 @@
+{
+  "resource_pack_name": "kochmod",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "kochmod_bun": {
+      "textures": "textures/items/bun"
+    },
+    "kochmod_burnt_patty": {
+      "textures": "textures/items/burnt_patty"
+    },
+    "kochmod_cheese": {
+      "textures": "textures/items/cheese"
+    },
+    "kochmod_cheeseburger": {
+      "textures": "textures/items/cheeseburger"
+    },
+    "kochmod_cooked_patty": {
+      "textures": "textures/items/cooked_patty"
+    },
+    "kochmod_failed_dish": {
+      "textures": "textures/items/failed_dish"
+    },
+    "kochmod_hamburger": {
+      "textures": "textures/items/hamburger"
+    },
+    "kochmod_knife": {
+      "textures": "textures/items/knife"
+    },
+    "kochmod_lettuce": {
+      "textures": "textures/items/lettuce"
+    },
+    "kochmod_raw_patty": {
+      "textures": "textures/items/raw_patty"
+    },
+    "kochmod_spatula": {
+      "textures": "textures/items/spatula"
+    },
+    "kochmod_tomato": {
+      "textures": "textures/items/tomato"
+    },
+    "kochmod_tomato_slices": {
+      "textures": "textures/items/tomato_slices"
+    }
+  }
+}

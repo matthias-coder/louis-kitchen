@@ -1,1 +1,14 @@
 pack.name=Kochmod
+item.kochmod:bun=Brötchen
+item.kochmod:raw_patty=Rohe Frikadelle
+item.kochmod:cooked_patty=Frikadelle
+item.kochmod:burnt_patty=Angebrannte Frikadelle
+item.kochmod:lettuce=Salat
+item.kochmod:tomato=Tomate
+item.kochmod:tomato_slices=Tomatenscheiben
+item.kochmod:cheese=Käse
+item.kochmod:knife=Messer
+item.kochmod:spatula=Pfannenwender
+item.kochmod:hamburger=Hamburger
+item.kochmod:cheeseburger=Cheeseburger
+item.kochmod:failed_dish=Misslungenes Gericht

@@ -1,0 +1,17 @@
+{
+  "format_version": "1.20.20",
+  "sound_definitions": {
+    "kochmod.sizzle": {
+      "category": "block",
+      "sounds": ["sounds/random/fizz"]
+    },
+    "kochmod.chop": {
+      "category": "block",
+      "sounds": ["sounds/dig/wood1", "sounds/dig/wood2"]
+    },
+    "kochmod.plate": {
+      "category": "block",
+      "sounds": ["sounds/random/pop"]
+    }
+  }
+}

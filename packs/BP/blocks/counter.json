@@ -1,0 +1,54 @@
+{
+  "format_version": "1.21.90",
+  "minecraft:block": {
+    "description": {
+      "identifier": "kochmod:counter",
+      "menu_category": {
+        "category": "construction"
+      },
+      "states": {
+        "kochmod:bun": [false, true],
+        "kochmod:patty": ["none", "raw", "cooked", "burnt"],
+        "kochmod:lettuce": [false, true],
+        "kochmod:tomato": ["none", "whole", "slices"],
+        "kochmod:cheese": [false, true]
+      }
+    },
+    "components": {
+      "minecraft:geometry": {
+        "identifier": "geometry.kochmod.counter",
+        "bone_visibility": {
+          "bun_bottom": "q.block_state('kochmod:bun')",
+          "patty_raw": "q.block_state('kochmod:patty') == 'raw'",
+          "patty_cooked": "q.block_state('kochmod:patty') == 'cooked'",
+          "patty_burnt": "q.block_state('kochmod:patty') == 'burnt'",
+          "cheese": "q.block_state('kochmod:cheese')",
+          "tomato_slices": "q.block_state('kochmod:tomato') == 'slices'",
+          "tomato_whole": "q.block_state('kochmod:tomato') == 'whole'",
+          "lettuce": "q.block_state('kochmod:lettuce')",
+          "bun_top": "q.block_state('kochmod:bun') && (q.block_state('kochmod:patty') != 'none' || q.block_state('kochmod:cheese') || q.block_state('kochmod:lettuce') || q.block_state('kochmod:tomato') == 'slices')"
+        }
+      },
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "kochmod_counter",
+          "render_method": "alpha_test"
+        }
+      },
+      "minecraft:collision_box": {
+        "origin": [-8, 0, -8],
+        "size": [16, 13, 16]
+      },
+      "minecraft:selection_box": {
+        "origin": [-8, 0, -8],
+        "size": [16, 16, 16]
+      },
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 0.5
+      },
+      "minecraft:light_dampening": 0,
+      "minecraft:map_color": "#9c6b3c",
+      "kochmod:counter": {}
+    }
+  }
+}

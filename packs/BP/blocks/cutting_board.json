@@ -1,0 +1,43 @@
+{
+  "format_version": "1.21.90",
+  "minecraft:block": {
+    "description": {
+      "identifier": "kochmod:cutting_board",
+      "menu_category": {
+        "category": "construction"
+      },
+      "states": {
+        "kochmod:content": ["empty", "tomato", "tomato_slices"]
+      }
+    },
+    "components": {
+      "minecraft:geometry": {
+        "identifier": "geometry.kochmod.cutting_board",
+        "bone_visibility": {
+          "tomato": "q.block_state('kochmod:content') == 'tomato'",
+          "tomato_slices": "q.block_state('kochmod:content') == 'tomato_slices'"
+        }
+      },
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "kochmod_cutting_board",
+          "render_method": "alpha_test"
+        }
+      },
+      "minecraft:collision_box": {
+        "origin": [-8, 0, -8],
+        "size": [16, 13, 16]
+      },
+      "minecraft:selection_box": {
+        "origin": [-8, 0, -8],
+        "size": [16, 16, 16]
+      },
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 0.5
+      },
+      "minecraft:light_dampening": 0,
+      "minecraft:map_color": "#a9adb3",
+      "kochmod:cutting_board": {}
+    }
+  }
+}

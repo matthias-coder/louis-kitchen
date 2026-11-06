@@ -27,5 +27,14 @@
   },
   "kochmod:crate_tools": {
     "sound": "metal"
+  },
+  "kochmod:table": {
+    "sound": "wood"
+  },
+  "kochmod:chair": {
+    "sound": "wood"
+  },
+  "kochmod:bell": {
+    "sound": "metal"
   }
 }

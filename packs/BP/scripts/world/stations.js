@@ -1,13 +1,13 @@
-import { BlockPermutation, world } from '@minecraft/server';
+import { BlockPermutation } from '@minecraft/server';
 import {
   INITIAL,
   grillInteract, grillView, grillDrops,
   boardInteract, boardView, boardDrops,
   counterInteract, counterView, counterDrops,
 } from '../logic/stations.js';
-import { locKey, parseLocKey } from '../logic/store.js';
+import { locKey } from '../logic/store.js';
 import { interactStation, breakStation, tickGrills } from '../logic/station-flow.js';
-import { worldStore, applyResult, heldItemId, dropItems } from './effects.js';
+import { worldStore, applyResult, heldItemId, dropItems, loadedBlock } from './effects.js';
 
 /** @typedef {import('@minecraft/server').Block} Block */
 /** @typedef {import('@minecraft/server').BlockComponentRegistry} BlockComponentRegistry */
@@ -146,20 +146,6 @@ export function onBlockExploded({ block, dimension, explodedBlockPermutation }) 
   const entry = BY_TYPE[explodedBlockPermutation.type.id];
   if (!entry) return;
   breakAt(entry[0], entry[1], dimension, block);
-}
-
-/**
- * Loaded block at a registry key, or undefined while its chunk is not loaded.
- * @param {string} key
- * @returns {Block | undefined}
- */
-function loadedBlock(key) {
-  const { dimensionId, x, y, z } = parseLocKey(key);
-  try {
-    return world.getDimension(dimensionId).getBlock({ x, y, z });
-  } catch {
-    return undefined; // LocationInUnloadedChunkError / out of bounds
-  }
 }
 
 /**

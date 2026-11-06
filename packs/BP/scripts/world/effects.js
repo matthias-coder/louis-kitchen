@@ -1,5 +1,5 @@
 import { ItemStack, world } from '@minecraft/server';
-import { createStore } from '../logic/store.js';
+import { createStore, parseLocKey } from '../logic/store.js';
 import { giveOrDrop } from '../logic/give.js';
 
 export { giveOrDrop };
@@ -19,6 +19,20 @@ export const worldStore = createStore({
     world.setDynamicProperty(key, value);
   },
 });
+
+/**
+ * Loaded block at a registry key, or undefined while its chunk is not loaded.
+ * @param {string} key
+ * @returns {Block | undefined}
+ */
+export function loadedBlock(key) {
+  const { dimensionId, x, y, z } = parseLocKey(key);
+  try {
+    return world.getDimension(dimensionId).getBlock({ x, y, z });
+  } catch {
+    return undefined; // LocationInUnloadedChunkError / out of bounds
+  }
+}
 
 /** @param {Player} player */
 function inventory(player) {

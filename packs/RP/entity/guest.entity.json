@@ -1,0 +1,24 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "kochmod:guest",
+      "materials": { "default": "entity_alphatest" },
+      "textures": { "default": "textures/entity/guest" },
+      "geometry": { "default": "geometry.kochmod.guest" },
+      "animations": {
+        "walk": "animation.kochmod.guest.walk",
+        "sit": "animation.kochmod.guest.sit",
+        "eat": "animation.kochmod.guest.eat",
+        "nod": "animation.kochmod.guest.nod",
+        "shake_head": "animation.kochmod.guest.shake_head",
+        "pose": "controller.animation.kochmod.guest.pose",
+        "head": "controller.animation.kochmod.guest.head"
+      },
+      "scripts": {
+        "animate": ["pose", "head"]
+      },
+      "render_controllers": ["controller.render.kochmod.guest"]
+    }
+  }
+}

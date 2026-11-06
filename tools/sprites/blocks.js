@@ -160,6 +160,48 @@ export const layouts = {
     tomato_side: /** @type {Region} */ ([44, 54, 3, 3]),
     stem: /** @type {Region} */ ([48, 54, 1, 1]),
   },
+  table: {
+    top_top: /** @type {Region} */ ([0, 0, 16, 16]),
+    top_bottom: /** @type {Region} */ ([16, 0, 16, 16]),
+    top_side: /** @type {Region} */ ([32, 0, 16, 2]),
+    leg_side: /** @type {Region} */ ([32, 4, 2, 14]),
+    leg_end: /** @type {Region} */ ([36, 4, 2, 2]),
+    plate_top: /** @type {Region} */ ([0, 16, 10, 10]),
+    plate_side: /** @type {Region} */ ([12, 16, 10, 1]),
+    plate_empty_top: /** @type {Region} */ ([0, 28, 10, 10]),
+    bun_cut: /** @type {Region} */ ([24, 16, 8, 8]),
+    bun_side: /** @type {Region} */ ([34, 16, 8, 2]),
+    bun_top: /** @type {Region} */ ([24, 26, 8, 8]),
+    dome_top: /** @type {Region} */ ([34, 20, 6, 6]),
+    patty_top: /** @type {Region} */ ([44, 16, 9, 9]),
+    patty_side: /** @type {Region} */ ([44, 26, 9, 2]),
+    lettuce_top: /** @type {Region} */ ([12, 28, 10, 10]),
+    lettuce_side: /** @type {Region} */ ([12, 40, 10, 1]),
+    cheese_top: /** @type {Region} */ ([0, 42, 11, 11]),
+    cheese_side: /** @type {Region} */ ([12, 42, 11, 1]),
+    blob_top: /** @type {Region} */ ([24, 42, 7, 7]),
+    blob_side: /** @type {Region} */ ([32, 42, 7, 3]),
+    blob_small_top: /** @type {Region} */ ([40, 42, 4, 4]),
+    blob_small_side: /** @type {Region} */ ([46, 42, 4, 2]),
+  },
+  chair: {
+    seat_top: /** @type {Region} */ ([0, 0, 12, 12]),
+    seat_side: /** @type {Region} */ ([16, 0, 12, 2]),
+    seat_bottom: /** @type {Region} */ ([0, 16, 12, 12]),
+    leg_side: /** @type {Region} */ ([16, 4, 2, 6]),
+    leg_end: /** @type {Region} */ ([20, 4, 2, 2]),
+    back_side: /** @type {Region} */ ([32, 0, 12, 10]),
+    back_top: /** @type {Region} */ ([32, 12, 12, 2]),
+  },
+  bell: {
+    base_top: /** @type {Region} */ ([0, 0, 8, 8]),
+    base_side: /** @type {Region} */ ([8, 0, 8, 2]),
+    bell_side: /** @type {Region} */ ([0, 8, 6, 3]),
+    bell_top: /** @type {Region} */ ([8, 8, 6, 6]),
+    cap_side: /** @type {Region} */ ([16, 0, 4, 1]),
+    cap_top: /** @type {Region} */ ([16, 4, 4, 4]),
+    knob: /** @type {Region} */ ([24, 0, 2, 2]),
+  },
 };
 
 // ---- Grill: dark metal box, red knobs, silver grate over glowing coals
@@ -466,3 +508,161 @@ const CRATE_PICTURES = {
 /** @type {Sprite} */ export const crate_dairy_top = crateFace('crate_dairy_top', CRATE_PICTURES.crate_dairy.mat, CRATE_PICTURES.crate_dairy.pics, true);
 /** @type {Sprite} */ export const crate_tools = crateFace('crate_tools', CRATE_PICTURES.crate_tools.mat, CRATE_PICTURES.crate_tools.pics, false);
 /** @type {Sprite} */ export const crate_tools_top = crateFace('crate_tools_top', CRATE_PICTURES.crate_tools.mat, CRATE_PICTURES.crate_tools.pics, true);
+
+// ---- Table: light wooden four-leg table; plate with dish variants
+
+function drawTable() {
+  const L = layouts.table;
+  const c = canvas();
+  c.fill(L.top_top, 'A');
+  for (const y of [3, 7, 11]) c.row(L.top_top, y, 'C');
+  c.speckle(L.top_top, 'A', 'B', 0.15, 61);
+  c.border(L.top_top, 'D');
+  c.fill(L.top_bottom, 'C');
+  c.row(L.top_side, 0, 'B');
+  c.row(L.top_side, 1, 'D');
+  c.fill(L.leg_side, 'A');
+  for (let y = 0; y < 14; y++) c.px(L.leg_side, 1, y, 'C');
+  c.fill(L.leg_end, 'C');
+
+  for (const r of [L.plate_top, L.plate_empty_top]) {
+    c.fill(r, 'P');
+    c.border(r, 'Q');
+    for (const [x, y] of [[0, 0], [9, 0], [0, 9], [9, 9]]) c.px(r, x, y, 'O');
+    for (let i = 2; i < 8; i++) { c.px(r, i, 1, 'R'); c.px(r, 1, i, 'R'); }
+  }
+  c.fill(L.plate_side, 'Q');
+  // the empty plate: crumbs and a ketchup smear
+  for (const [x, y] of [[3, 3], [6, 4], [4, 6], [7, 7], [2, 7]]) c.px(L.plate_empty_top, x, y, 'F');
+  for (const [x, y] of [[5, 5], [6, 5], [6, 6]]) c.px(L.plate_empty_top, x, y, 't');
+
+  c.fill(L.bun_cut, 'I');
+  c.border(L.bun_cut, 'M');
+  c.fill(L.bun_side, 'F');
+  c.row(L.bun_side, 1, 'N');
+  c.fill(L.bun_top, 'F');
+  c.speckle(L.bun_top, 'F', 'M', 0.3, 62);
+  c.border(L.bun_top, 'N');
+  for (const [x, y] of [[2, 2], [5, 2], [3, 4], [6, 5], [2, 6]]) c.px(L.bun_top, x, y, 'J');
+  c.fill(L.dome_top, 'M');
+  for (const [x, y] of [[1, 1], [4, 2], [2, 4]]) c.px(L.dome_top, x, y, 'J');
+
+  c.fill(L.patty_top, 'm');
+  c.speckle(L.patty_top, 'm', 'h', 0.3, 63);
+  for (let y = 0; y < 9; y++) for (let x = 0; x < 9; x++) if ((x + y) % 4 === 1) c.px(L.patty_top, x, y, 'z');
+  c.border(L.patty_top, 'n');
+  c.row(L.patty_side, 0, 'm');
+  c.row(L.patty_side, 1, 'n');
+
+  c.fill(L.lettuce_top, 'l');
+  c.speckle(L.lettuce_top, 'l', 'g', 0.25, 64);
+  for (let i = 0; i < 10; i++) {
+    const ch = i % 2 === 0 ? '.' : 'L';
+    c.px(L.lettuce_top, i, 0, ch); c.px(L.lettuce_top, i, 9, ch);
+    c.px(L.lettuce_top, 0, i, ch); c.px(L.lettuce_top, 9, i, ch);
+  }
+  for (let i = 0; i < 10; i++) c.px(L.lettuce_side, i, 0, i % 2 === 0 ? 'g' : 'L');
+
+  c.fill(L.cheese_top, 'E');
+  c.speckle(L.cheese_top, 'E', 'G', 0.2, 65);
+  c.border(L.cheese_top, 'K');
+  c.fill(L.cheese_side, 'K');
+
+  // failed dish: grey-green blob with bubbles
+  c.fill(L.blob_top, 'b');
+  c.speckle(L.blob_top, 'b', 'c', 0.3, 66);
+  for (const [x, y] of [[2, 2], [4, 4], [5, 1]]) c.px(L.blob_top, x, y, 'e');
+  for (const [x, y] of [[0, 0], [6, 0], [0, 6], [6, 6]]) c.px(L.blob_top, x, y, '.');
+  c.fill(L.blob_side, 'b');
+  c.speckle(L.blob_side, 'b', 'c', 0.3, 67);
+  c.row(L.blob_side, 2, 'd');
+  c.fill(L.blob_small_top, 'c');
+  c.px(L.blob_small_top, 1, 1, 'e');
+  c.fill(L.blob_small_side, 'c');
+  c.row(L.blob_small_side, 1, 'd');
+  return c.rows();
+}
+
+/** @type {Sprite} */
+export const table = {
+  name: 'table',
+  palette: {
+    A: '#c28a52', B: '#d9a46a', C: '#8a5a2e', D: '#6b4423',
+    P: '#f6f6f2', Q: '#d4d4cc', O: '#b4b4ac', R: '#ffffff',
+    F: '#d28a36', M: '#edb85a', N: '#a8631f', I: '#f7e2b0', J: '#fff6dc',
+    m: '#844622', h: '#b0703e', n: '#5e3016', z: '#2e1408',
+    l: '#5cbf3a', L: '#2f7f22', g: '#9be86a',
+    E: '#f7c531', G: '#ffe680', K: '#d49a14',
+    t: '#d23a28',
+    b: '#7d8a6a', c: '#5b6b4c', d: '#3f4a34', e: '#a3ad8c',
+  },
+  rows: drawTable(),
+};
+
+// ---- Chair: darker wood, backrest with a red heart
+
+function drawChair() {
+  const L = layouts.chair;
+  const c = canvas();
+  c.fill(L.seat_top, 'A');
+  for (const y of [3, 7]) c.row(L.seat_top, y, 'C');
+  c.speckle(L.seat_top, 'A', 'B', 0.15, 71);
+  c.border(L.seat_top, 'D');
+  c.fill(L.seat_bottom, 'C');
+  c.row(L.seat_side, 0, 'B');
+  c.row(L.seat_side, 1, 'D');
+  c.fill(L.leg_side, 'A');
+  for (let y = 0; y < 6; y++) c.px(L.leg_side, 1, y, 'C');
+  c.fill(L.leg_end, 'C');
+  c.fill(L.back_side, 'A');
+  for (const x of [3, 8]) for (let y = 0; y < 10; y++) c.px(L.back_side, x, y, 'C');
+  c.border(L.back_side, 'D');
+  const heart = [[4, 3], [5, 3], [7, 3], [8, 3], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [4, 5], [5, 5], [6, 5], [7, 5], [5, 6], [6, 6]];
+  for (const [x, y] of heart) c.px(L.back_side, x, y, 'H');
+  c.px(L.back_side, 4, 3, 'W');
+  c.row(L.back_top, 0, 'B');
+  c.row(L.back_top, 1, 'D');
+  return c.rows();
+}
+
+/** @type {Sprite} */
+export const chair = {
+  name: 'chair',
+  palette: { A: '#9c6534', B: '#b97c45', C: '#734520', D: '#4f2e14', H: '#e0303a', W: '#ff8a8f' },
+  rows: drawChair(),
+};
+
+// ---- Bell: brass counter bell on a dark wooden base
+
+function drawBell() {
+  const L = layouts.bell;
+  const c = canvas();
+  c.fill(L.base_top, 'w');
+  c.border(L.base_top, 'v');
+  c.row(L.base_side, 0, 'w');
+  c.row(L.base_side, 1, 'v');
+  c.row(L.bell_side, 0, 'G');
+  c.row(L.bell_side, 1, 'g');
+  c.row(L.bell_side, 2, 'd');
+  c.px(L.bell_side, 1, 0, 'Y'); c.px(L.bell_side, 1, 1, 'G');
+  c.fill(L.bell_top, 'g');
+  c.border(L.bell_top, 'd');
+  c.px(L.bell_top, 2, 2, 'Y'); c.px(L.bell_top, 3, 2, 'G'); c.px(L.bell_top, 2, 3, 'G');
+  c.fill(L.cap_side, 'G');
+  c.fill(L.cap_top, 'G');
+  c.px(L.cap_top, 1, 1, 'Y');
+  c.fill(L.knob, 's');
+  c.px(L.knob, 0, 0, 'S');
+  return c.rows();
+}
+
+/** @type {Sprite} */
+export const bell = {
+  name: 'bell',
+  palette: {
+    w: '#5a3a22', v: '#3a2412',
+    g: '#e0b040', G: '#f2cc5c', Y: '#fff2a8', d: '#a07020',
+    s: '#b8bcc4', S: '#eef0f4',
+  },
+  rows: drawBell(),
+};

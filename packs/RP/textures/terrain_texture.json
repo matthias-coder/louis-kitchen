@@ -4,6 +4,12 @@
   "padding": 8,
   "num_mip_levels": 4,
   "texture_data": {
+    "kochmod_bell": {
+      "textures": "textures/blocks/bell"
+    },
+    "kochmod_chair": {
+      "textures": "textures/blocks/chair"
+    },
     "kochmod_counter": {
       "textures": "textures/blocks/counter"
     },
@@ -42,6 +48,9 @@
     },
     "kochmod_grill": {
       "textures": "textures/blocks/grill"
+    },
+    "kochmod_table": {
+      "textures": "textures/blocks/table"
     }
   }
 }

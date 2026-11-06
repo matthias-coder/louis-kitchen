@@ -1,0 +1,16 @@
+{
+  "format_version": "1.8.0",
+  "render_controllers": {
+    "controller.render.kochmod.guest": {
+      "geometry": "Geometry.default",
+      "materials": [{ "*": "Material.default" }],
+      "textures": ["Texture.default"],
+      "part_visibility": [
+        { "*": true },
+        { "bubble": "q.property('kochmod:wish') != 'none'" },
+        { "bubble_hamburger": "q.property('kochmod:wish') == 'hamburger'" },
+        { "bubble_cheeseburger": "q.property('kochmod:wish') == 'cheeseburger'" }
+      ]
+    }
+  }
+}

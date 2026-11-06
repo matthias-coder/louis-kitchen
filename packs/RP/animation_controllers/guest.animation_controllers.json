@@ -1,0 +1,42 @@
+{
+  "format_version": "1.10.0",
+  "animation_controllers": {
+    "controller.animation.kochmod.guest.pose": {
+      "initial_state": "stand",
+      "states": {
+        "stand": {
+          "animations": ["walk"],
+          "transitions": [{ "sit": "q.property('kochmod:pose') == 'sit'" }]
+        },
+        "sit": {
+          "animations": ["sit"],
+          "transitions": [{ "stand": "q.property('kochmod:pose') != 'sit'" }]
+        }
+      }
+    },
+    "controller.animation.kochmod.guest.head": {
+      "initial_state": "idle",
+      "states": {
+        "idle": {
+          "transitions": [
+            { "nod": "q.property('kochmod:mood') == 'happy'" },
+            { "shake_head": "q.property('kochmod:mood') == 'grumpy'" },
+            { "eat": "q.property('kochmod:pose') == 'sit' && q.property('kochmod:wish') == 'none'" }
+          ]
+        },
+        "eat": {
+          "animations": ["eat"],
+          "transitions": [{ "idle": "q.property('kochmod:pose') != 'sit' || q.property('kochmod:wish') != 'none' || q.property('kochmod:mood') != 'neutral'" }]
+        },
+        "nod": {
+          "animations": ["nod"],
+          "transitions": [{ "idle": "q.property('kochmod:mood') != 'happy'" }]
+        },
+        "shake_head": {
+          "animations": ["shake_head"],
+          "transitions": [{ "idle": "q.property('kochmod:mood') != 'grumpy'" }]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.kochmod.guest.walk": {
+      "loop": true,
+      "bones": {
+        "leg_left": { "rotation": ["math.cos(q.modified_distance_moved * 38.17) * 40.0 * q.modified_move_speed", 0, 0] },
+        "leg_right": { "rotation": ["-math.cos(q.modified_distance_moved * 38.17) * 40.0 * q.modified_move_speed", 0, 0] },
+        "arm_left": { "rotation": ["-math.cos(q.modified_distance_moved * 38.17) * 30.0 * q.modified_move_speed", 0, 0] },
+        "arm_right": { "rotation": ["math.cos(q.modified_distance_moved * 38.17) * 30.0 * q.modified_move_speed", 0, 0] }
+      }
+    },
+    "animation.kochmod.guest.sit": {
+      "loop": true,
+      "bones": {
+        "root": { "position": [0, -8, 0] },
+        "leg_left": { "rotation": [-90, -8, 0] },
+        "leg_right": { "rotation": [-90, 8, 0] },
+        "arm_left": { "rotation": [-30, 0, 0] },
+        "arm_right": { "rotation": [-30, 0, 0] }
+      }
+    },
+    "animation.kochmod.guest.eat": {
+      "loop": true,
+      "bones": {
+        "head": { "rotation": ["10 + math.sin(q.anim_time * 720) * 12", 0, 0] },
+        "arm_right": { "rotation": ["-60 + math.sin(q.anim_time * 720) * 15", 0, 0] }
+      }
+    },
+    "animation.kochmod.guest.nod": {
+      "loop": true,
+      "bones": {
+        "head": { "rotation": ["math.sin(q.anim_time * 540) * 18", 0, 0] }
+      }
+    },
+    "animation.kochmod.guest.shake_head": {
+      "loop": true,
+      "bones": {
+        "head": { "rotation": [0, "math.sin(q.anim_time * 720) * 30", 0] }
+      }
+    }
+  }
+}

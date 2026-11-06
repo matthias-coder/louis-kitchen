@@ -1,0 +1,75 @@
+{
+  "format_version": "1.21.90",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "kochmod:guest",
+      "is_spawnable": false,
+      "is_summonable": true,
+      "properties": {
+        "kochmod:wish": {
+          "type": "enum",
+          "values": ["none", "hamburger", "cheeseburger"],
+          "default": "none",
+          "client_sync": true
+        },
+        "kochmod:pose": {
+          "type": "enum",
+          "values": ["stand", "sit"],
+          "default": "stand",
+          "client_sync": true
+        },
+        "kochmod:mood": {
+          "type": "enum",
+          "values": ["neutral", "happy", "grumpy"],
+          "default": "neutral",
+          "client_sync": true
+        }
+      }
+    },
+    "component_groups": {
+      "kochmod:walking": {
+        "minecraft:movement": { "value": 0.5 },
+        "minecraft:movement.basic": {},
+        "minecraft:jump.static": {},
+        "minecraft:navigation.walk": {
+          "can_walk": true,
+          "avoid_water": true,
+          "can_pass_doors": true,
+          "can_open_doors": true
+        },
+        "minecraft:behavior.move_to_block": {
+          "priority": 1,
+          "speed_multiplier": 1.0,
+          "search_range": 16,
+          "search_height": 4,
+          "tick_interval": 1,
+          "goal_radius": 1.0,
+          "target_blocks": ["kochmod:chair"]
+        }
+      },
+      "kochmod:seated": {
+        "minecraft:movement": { "value": 0 }
+      }
+    },
+    "components": {
+      "minecraft:type_family": { "family": ["kochmod_guest"] },
+      "minecraft:collision_box": { "width": 0.6, "height": 1.8 },
+      "minecraft:physics": {},
+      "minecraft:pushable": { "is_pushable": false, "is_pushable_by_piston": false },
+      "minecraft:health": { "value": 20, "max": 20 },
+      "minecraft:damage_sensor": {
+        "triggers": [{ "cause": "all", "deals_damage": "no" }]
+      },
+      "minecraft:persistent": {}
+    },
+    "events": {
+      "minecraft:entity_spawned": {
+        "add": { "component_groups": ["kochmod:walking"] }
+      },
+      "kochmod:sit": {
+        "remove": { "component_groups": ["kochmod:walking"] },
+        "add": { "component_groups": ["kochmod:seated"] }
+      }
+    }
+  }
+}

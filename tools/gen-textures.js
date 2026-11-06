@@ -3,7 +3,8 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { encodePng } from './png.js';
 import { spriteToRgba } from './sprites/util.js';
-import { writeBlockGeometry } from './geometry.js';
+import { writeBlockGeometry, writeEntityGeometry } from './geometry.js';
+import { guestLayout, GUEST_TEXTURE } from './sprites/entity.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const spritesDir = path.join(root, 'tools', 'sprites');
@@ -47,4 +48,5 @@ const terrainTextureJson = {
 };
 fs.writeFileSync(path.join(textureDir, 'terrain_texture.json'), `${JSON.stringify(terrainTextureJson, null, 2)}\n`);
 const geoCount = writeBlockGeometry(root);
-console.log(`gen-textures: wrote ${count} PNGs and ${geoCount} block geometries`);
+writeEntityGeometry(root, guestLayout, GUEST_TEXTURE);
+console.log(`gen-textures: wrote ${count} PNGs, ${geoCount} block geometries and the guest geometry`);

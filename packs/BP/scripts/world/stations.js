@@ -1,11 +1,12 @@
 import { BlockPermutation, world } from '@minecraft/server';
 import {
   INITIAL,
-  grillInteract, grillTick, grillView, grillDrops,
+  grillInteract, grillView, grillDrops,
   boardInteract, boardView, boardDrops,
   counterInteract, counterView, counterDrops,
 } from '../logic/stations.js';
 import { locKey, parseLocKey } from '../logic/store.js';
+import { interactStation, breakStation, tickGrills } from '../logic/station-flow.js';
 import { worldStore, applyResult, heldItemId, dropItems } from './effects.js';
 
 /** @typedef {import('@minecraft/server').Block} Block */
@@ -68,6 +69,26 @@ function setStates(block, typeId, states) {
 }
 
 /**
+ * @template S
+ * @param {string} kind registry name
+ * @param {StationDef<S>} def
+ * @param {import('@minecraft/server').Dimension} dimension
+ * @param {Block} block
+ */
+function breakAt(kind, def, dimension, block) {
+  const key = locKey(dimension.id, block.location);
+  /** @type {S} */
+  const state = worldStore.load(key) ?? def.initial;
+  breakStation(def.drops, state, {
+    drop: (ids) => dropItems(dimension, block.center(), ids),
+    forget: () => {
+      worldStore.remove(key);
+      worldStore.registryRemove(kind, key);
+    },
+  });
+}
+
+/**
  * One custom component per station kind; `kind` is also the registry name.
  * @template S
  * @param {string} kind
@@ -76,7 +97,9 @@ function setStates(block, typeId, states) {
  */
 function stationComponent(kind, def) {
   return {
-    onPlace({ block }) {
+    onPlace({ block, previousBlock }) {
+      // Guard: if onPlace also fired on our own permutation changes, it must not reset the state.
+      if (previousBlock.type.id === def.typeId) return;
       const key = keyOf(block);
       worldStore.registryAdd(kind, key);
       worldStore.save(key, def.initial);
@@ -86,28 +109,43 @@ function stationComponent(kind, def) {
       const key = keyOf(block);
       /** @type {S} */
       const state = worldStore.load(key) ?? def.initial;
-      const result = def.interact(state, heldItemId(player));
-      worldStore.save(key, result.state);
-      worldStore.registryAdd(kind, key);
-      setStates(block, def.typeId, def.states(result.state));
-      applyResult(result, player, block);
+      interactStation(def.interact, def.states, state, heldItemId(player), {
+        setView: (states) => setStates(block, def.typeId, states),
+        save: (next) => {
+          worldStore.save(key, next);
+          worldStore.registryAdd(kind, key);
+        },
+        apply: (result) => applyResult(result, player, block),
+      });
     },
     onPlayerBreak({ block, dimension }) {
-      const key = locKey(dimension.id, block.location);
-      /** @type {S} */
-      const state = worldStore.load(key) ?? def.initial;
-      dropItems(dimension, block.center(), def.drops(state));
-      worldStore.remove(key);
-      worldStore.registryRemove(kind, key);
+      breakAt(kind, def, dimension, block);
     },
   };
 }
 
+/** @type {Record<string, [string, StationDef<any>]>} */
+const BY_TYPE = {
+  [grill.typeId]: ['grill', grill],
+  [cuttingBoard.typeId]: ['cutting_board', cuttingBoard],
+  [counter.typeId]: ['counter', counter],
+};
+
 /** @param {BlockComponentRegistry} blockComponentRegistry */
 export function registerStations(blockComponentRegistry) {
-  blockComponentRegistry.registerCustomComponent('kochmod:grill', stationComponent('grill', grill));
-  blockComponentRegistry.registerCustomComponent('kochmod:cutting_board', stationComponent('cutting_board', cuttingBoard));
-  blockComponentRegistry.registerCustomComponent('kochmod:counter', stationComponent('counter', counter));
+  for (const [typeId, [kind, def]] of Object.entries(BY_TYPE)) {
+    blockComponentRegistry.registerCustomComponent(typeId, stationComponent(kind, def));
+  }
+}
+
+/**
+ * Exploded stations drop their contents and are forgotten, like a player break.
+ * @param {import('@minecraft/server').BlockExplodeAfterEvent} event
+ */
+export function onBlockExploded({ block, dimension, explodedBlockPermutation }) {
+  const entry = BY_TYPE[explodedBlockPermutation.type.id];
+  if (!entry) return;
+  breakAt(entry[0], entry[1], dimension, block);
 }
 
 /**
@@ -129,20 +167,18 @@ function loadedBlock(key) {
  * @param {number} dt
  */
 export function tickStations(dt) {
-  for (const key of worldStore.registryList('grill')) {
-    const block = loadedBlock(key);
-    if (!block) continue;
-    if (block.typeId !== GRILL_ID) {
+  tickGrills(worldStore.registryList('grill'), dt, {
+    blockTypeAt: (key) => loadedBlock(key)?.typeId,
+    load: (key) => worldStore.load(key),
+    save: (key, state) => worldStore.save(key, state),
+    forget: (key) => {
       worldStore.remove(key);
       worldStore.registryRemove('grill', key);
-      continue;
-    }
-    /** @type {import('../logic/stations.js').GrillState | undefined} */
-    const state = worldStore.load(key);
-    if (!state) continue;
-    const next = grillTick(state, dt);
-    if (next.ticks === state.ticks) continue;
-    worldStore.save(key, next);
-    if (grillView(next) !== grillView(state)) setStates(block, GRILL_ID, grillStates(next));
-  }
+    },
+    setView: (key, view) => {
+      const block = loadedBlock(key);
+      if (block) setStates(block, GRILL_ID, { 'kochmod:content': view });
+    },
+    warn: (message) => console.warn(message),
+  }, GRILL_ID);
 }

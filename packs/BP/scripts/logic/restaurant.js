@@ -103,8 +103,8 @@ export function seatStillValid(s) {
  */
 export function tableInteract(state, held, guestWaiting) {
   const isDish = held !== null && DISH_IDS.includes(held);
-  if (state.plate === 'empty') return { state: { plate: 'none' } };
-  if (state.plate === 'none') {
+  if (state.plate === 'empty' && !(isDish && guestWaiting)) return { state: { plate: 'none' } };
+  if (state.plate === 'none' || state.plate === 'empty') {
     if (!isDish) return { state };
     if (!guestWaiting) return { state, hint: 'kochmod.hint.no_guest' };
     return {

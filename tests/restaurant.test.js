@@ -94,11 +94,19 @@ test('tableInteract: non-dish on empty table does nothing', () => {
   assert.deepEqual(tableInteract(state, null, true), { state });
 });
 
-test('tableInteract: empty plate is cleared', () => {
+test('tableInteract: empty plate is cleared by any other tap', () => {
   const state = { plate: /** @type {const} */ ('empty') };
-  for (const held of [null, HAM, 'kochmod:bun']) {
+  for (const held of [null, 'kochmod:bun']) {
     assert.deepEqual(tableInteract(state, held, true), { state: { plate: 'none' } });
   }
+  assert.deepEqual(tableInteract(state, HAM, false), { state: { plate: 'none' } });
+});
+
+test('tableInteract: a dish on an empty plate with a waiting guest is served', () => {
+  const state = { plate: /** @type {const} */ ('empty') };
+  assert.deepEqual(tableInteract(state, HAM, true), {
+    state: { plate: 'hamburger' }, take: true, serve: HAM, sound: 'kochmod.plate',
+  });
 });
 
 test('tableInteract: busy table with another dish gives hint', () => {

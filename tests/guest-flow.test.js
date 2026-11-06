@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   BELL, CHAIR, TABLE, RETRY_TICKS, MISSING_GRACE,
-  tickBells, serveTable, findWaitingGuest, releaseBell, sweepOrphans,
+  tickBells, guestAvailability, serveTable, findWaitingGuest, releaseBell, sweepOrphans,
 } from '../packs/BP/scripts/logic/guest-flow.js';
 import { WALK_TIMEOUT, EAT_TICKS, LEAVE_TICKS, SPAWN_MIN } from '../packs/BP/scripts/logic/restaurant.js';
 import { locKey } from '../packs/BP/scripts/logic/store.js';
@@ -143,6 +143,48 @@ test('at 0 a guest spawns walking to the chair with a wish the kitchen can cook'
     phase: 'walking', seat: CHAIR_KEY, table: TABLE_KEY, bell: BELL_KEY, timer: WALK_TIMEOUT, served: '', wish: HAM,
   });
   assert.deepEqual(w.bells[BELL_KEY], { guestId: 'g1', cooldown: 0, seat: CHAIR_KEY, table: TABLE_KEY });
+});
+
+test('guestAvailability: ok with a seat at a table and all three stations', () => {
+  const w = fakeWorld();
+  assert.equal(guestAvailability(BELL_KEY, w.io), 'ok');
+});
+
+test('guestAvailability: no chair next to a table gives no_seat', () => {
+  assert.equal(guestAvailability(BELL_KEY, fakeWorld({ registries: { chair: [] } }).io), 'no_seat');
+  assert.equal(guestAvailability(BELL_KEY, fakeWorld({ blocks: { [TABLE_KEY]: undefined } }).io), 'no_seat');
+  assert.equal(guestAvailability(BELL_KEY, fakeWorld({ registries: { chair: [K(40, 64, 0)] } }).io), 'no_seat');
+});
+
+test('guestAvailability: a seat taken by another bell gives no_seat', () => {
+  const other = K(1, 64, 0);
+  const w = fakeWorld({
+    blocks: { [other]: BELL },
+    registries: { bell: [BELL_KEY, other] },
+    bells: { [other]: { guestId: 'x', cooldown: 0, seat: CHAIR_KEY, table: TABLE_KEY } },
+  });
+  assert.equal(guestAvailability(BELL_KEY, w.io), 'no_seat');
+});
+
+test('guestAvailability: a missing station gives no_kitchen', () => {
+  for (const kind of ['grill', 'cutting_board', 'counter']) {
+    assert.equal(guestAvailability(BELL_KEY, fakeWorld({ registries: { [kind]: [] } }).io), 'no_kitchen', kind);
+  }
+  assert.equal(guestAvailability(BELL_KEY, fakeWorld({ registries: { grill: [K(50, 64, 5)] } }).io), 'no_kitchen');
+});
+
+test('guestAvailability: the seat is checked before the kitchen', () => {
+  const w = fakeWorld({ registries: { chair: [], grill: [] } });
+  assert.equal(guestAvailability(BELL_KEY, w.io), 'no_seat');
+});
+
+test('the spawn step spawns nothing unless availability is ok', () => {
+  for (const registries of [{ chair: [] }, { grill: [] }]) {
+    const w = fakeWorld({ registries, bells: { [BELL_KEY]: { guestId: null, cooldown: 0 } } });
+    tick(w);
+    assert.equal(Object.keys(w.guests).length, 0);
+    assert.deepEqual(w.bells[BELL_KEY], { guestId: null, cooldown: RETRY_TICKS });
+  }
 });
 
 test('the wish is picked from the available dishes', () => {

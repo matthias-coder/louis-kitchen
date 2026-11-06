@@ -1,47 +1,66 @@
 # Testbogen Kochmod, Etappe 1
 
-Für Papa und Sohn. Haken setzen, wenn es klappt: `- [x]`.
+Für Papa und Sohn. Hake ab, was klappt.
 
 ## Teil 1: Installieren (PC)
 
-- [ ] Die Datei `dist/kochmod.mcaddon` doppelklicken. Minecraft öffnet sich.
-- [ ] Neue Welt im Kreativmodus anlegen.
-- [ ] Unter „Verhaltenspakete" Kochmod anschalten.
-- [ ] In den Einstellungen unter „Ersteller" das Inhaltsprotokoll einschalten.
+- [ ] Öffne den Ordner `dist` im Projekt. Dort liegt die Datei `kochmod.mcaddon`.
+- [ ] Doppelklick auf `kochmod.mcaddon`. Minecraft öffnet sich und installiert das Paket.
+- [ ] Lege eine NEUE Welt im Kreativmodus an. Eine ältere Testwelt hat noch die alte Version.
+- [ ] Schalte in der neuen Welt das Verhaltenspaket „Kochmod" an. Das Ressourcenpaket kommt automatisch mit.
+- [ ] Schalte das Inhaltsprotokoll ein: „Einstellungen → Ersteller → Inhaltsprotokoll-GUI aktivieren".
 
 ## Teil 2: Kochen
 
-- [ ] Im Kreativ-Inventar gibt es alle 13 Gegenstände, 3 Stationen, 5 Kisten, Tisch, Stuhl und Glocke. Alle haben einen deutschen Namen und ein Bild.
-- [ ] Kiste antippen: Es kommt ein Menü mit Bildknöpfen. Man bekommt 4 Zutaten oder 1 Werkzeug.
-- [ ] Rohe Frikadelle auf den Grill legen. Sie liegt sichtbar da. Nach ca. 8 Sekunden ist sie braun. Nach weiteren ca. 30 Sekunden ist sie schwarz.
-- [ ] Grill mit leerer Hand antippen: Der Hinweis „Nimm den Pfannenwender!" erscheint.
-- [ ] Grill mit Pfannenwender antippen: Man bekommt die Frikadelle.
-- [ ] Tomate aufs Schneidebrett legen. Mit dem Messer antippen: Es gibt Tomatenscheiben. Mit leerer Hand nehmen.
-- [ ] Anrichte: Brötchen, Frikadelle, Salat, Tomatenscheiben drauflegen. Dann mit leerer Hand antippen: Es entsteht ein Hamburger.
-- [ ] Dasselbe mit Käse dazu: Es entsteht ein Cheeseburger.
-- [ ] Dasselbe mit angebrannter Frikadelle: Es entsteht ein Misslungenes Gericht.
-- [ ] Eine belegte Station abbauen: Die Zutaten fallen heraus.
-- [ ] Welt verlassen und neu laden, während eine Frikadelle grillt: Sie liegt noch da.
+- [ ] Im Kreativ-Inventar gibt es alle 13 Gegenstände, 3 Stationen, 5 Kisten, Tisch, Stuhl und Glocke.
+- [ ] Alle haben einen deutschen Namen und ein Bild.
+- [ ] Tippe eine Kiste an. Ein Menü mit Bildknöpfen erscheint.
+- [ ] Wähle etwas im Kistenmenü. Man bekommt 4 Zutaten oder 1 Werkzeug.
+- [ ] Lege eine rohe Frikadelle auf den Grill. Sie liegt sichtbar da.
+- [ ] Nach ca. 8 Sekunden ist die Frikadelle braun.
+- [ ] Nach weiteren ca. 30 Sekunden ist sie schwarz.
+- [ ] Tippe den Grill mit leerer Hand an. Der Hinweis „Nimm den Pfannenwender!" erscheint.
+- [ ] Tippe den Grill mit dem Pfannenwender an. Man bekommt die Frikadelle.
+- [ ] Lege eine Tomate aufs Schneidebrett.
+- [ ] Tippe das Schneidebrett mit dem Messer an. Es gibt Tomatenscheiben.
+- [ ] Nimm die Tomatenscheiben mit leerer Hand.
+- [ ] Lege Brötchen, Frikadelle, Salat und Tomatenscheiben auf die Anrichte.
+- [ ] Tippe die Anrichte mit leerer Hand an. Es entsteht ein Hamburger.
+- [ ] Lege zusätzlich Käse dazu. Es entsteht ein Cheeseburger.
+- [ ] Nimm statt der guten eine angebrannte Frikadelle. Es entsteht ein Misslungenes Gericht.
+- [ ] Baue eine belegte Station ab. Die Zutaten fallen heraus.
+- [ ] Verlasse die Welt, während eine Frikadelle grillt, und lade sie neu. Die Frikadelle liegt noch da.
 
 ## Teil 3: Restaurant
 
-- [ ] Tisch aufstellen, Stuhl daneben, dazu Glocke und die drei Stationen. Der Stuhl dreht sich zum Tisch.
-- [ ] Glocke antippen: Ein Gast erscheint und geht zum Stuhl. Spätestens nach 15 Sekunden sitzt er dort.
+- [ ] Stelle einen Tisch auf, einen Stuhl daneben, eine Glocke und die drei Stationen.
+- [ ] Der Stuhl dreht sich zum Tisch.
+- [ ] Tippe die Glocke an. Der Hinweis „Ein Gast ist unterwegs!" erscheint.
+- [ ] Ein Gast erscheint und geht zum Stuhl. Spätestens nach 15 Sekunden sitzt er dort.
 - [ ] Über dem Kopf des Gastes ist ein Burger-Bild.
-- [ ] Den gewünschten Burger kochen und auf den Tisch tippen. Ein Teller steht da, der Gast isst, Herzchen erscheinen, 1 bis 3 Smaragde liegen auf dem Tisch, der Gast verschwindet, ein leerer Teller bleibt.
-- [ ] Den leeren Teller antippen: Er ist weg.
-- [ ] Beim nächsten Gast den falschen Burger oder ein Misslungenes Gericht servieren: Er schüttelt den Kopf, grummelt und es gibt keine Smaragde.
-- [ ] Einen Gast 2 Minuten warten lassen: Er bleibt sitzen.
-- [ ] Welt neu laden: Der Gast sitzt noch da, mit demselben Wunsch.
-- [ ] Den Stuhl abbauen, während ein Gast sitzt: Der Gast verschwindet. Nach dem Wiederaufbau kommt ein neuer.
+- [ ] Koche den gewünschten Burger und tippe damit auf den Tisch. Ein Teller steht da.
+- [ ] Der Gast isst, Herzchen erscheinen.
+- [ ] 1 bis 3 Smaragde liegen auf dem Tisch.
+- [ ] Der Gast verschwindet. Ein leerer Teller bleibt.
+- [ ] Tippe den leeren Teller an. Er ist weg.
+- [ ] Serviere beim nächsten Gast den falschen Burger oder ein Misslungenes Gericht. Er schüttelt den Kopf und grummelt.
+- [ ] Bei einem falschen Gericht gibt es keine Smaragde.
+- [ ] Lass einen Gast 2 Minuten warten. Er bleibt sitzen.
+- [ ] Lade die Welt neu. Der Gast sitzt noch da, mit demselben Wunsch.
+- [ ] Baue den Stuhl ab, während ein Gast sitzt. Der Gast verschwindet.
+- [ ] Baue den Stuhl wieder auf. Es kommt ein neuer Gast.
 - [ ] Ohne Grill in der Nähe kommt kein Gast.
+- [ ] Läute die Glocke, wenn kein Stuhl direkt an einem Tisch steht. Der Hinweis „Stell einen Stuhl direkt an einen Tisch." erscheint.
+- [ ] Läute die Glocke, wenn kein Grill in der Nähe steht. Der Hinweis „Grill, Schneidebrett und Anrichte müssen in der Nähe stehen." erscheint.
+- [ ] Läute die Glocke, wenn alles da ist. Der Hinweis „Ein Gast ist unterwegs!" erscheint.
 
 ## Teil 4: Aufs Tablet bringen
 
-- [ ] Die Datei `dist/kochmod.mcaddon` aufs Tablet schicken, zum Beispiel über einen Cloud-Ordner oder per E-Mail an sich selbst.
-- [ ] Auf dem Tablet die Datei antippen und mit Minecraft öffnen.
-- [ ] In der Welt beide Pakete anschalten.
-- [ ] Antippen einer Station baut sie nicht aus Versehen ab.
+- [ ] Schicke die Datei `kochmod.mcaddon` aus dem Ordner `dist` aufs Tablet. Zum Beispiel über einen Cloud-Ordner oder per E-Mail an dich selbst.
+- [ ] Tippe auf dem Tablet die Datei an und öffne sie mit Minecraft.
+- [ ] Lege eine NEUE Welt an.
+- [ ] Schalte das Verhaltenspaket „Kochmod" an. Das Ressourcenpaket kommt automatisch mit.
+- [ ] Wenn man eine Station antippt, wird sie nicht aus Versehen abgebaut.
 - [ ] Die Hinweise sind gut lesbar.
 - [ ] Das Kistenmenü lässt sich gut antippen.
 

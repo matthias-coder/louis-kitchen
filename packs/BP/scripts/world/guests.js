@@ -1,7 +1,7 @@
 import { BlockPermutation, ItemStack, world } from '@minecraft/server';
 import { DIRECTIONS, offset } from '../logic/restaurant.js';
 import { parseLocKey } from '../logic/store.js';
-import { TABLE, tickBells, serveTable, findWaitingGuest, releaseBell, sweepOrphans } from '../logic/guest-flow.js';
+import { TABLE, tickBells, guestAvailability, serveTable, findWaitingGuest, releaseBell, sweepOrphans } from '../logic/guest-flow.js';
 import { worldStore, loadedBlock } from './effects.js';
 
 /** @typedef {import('@minecraft/server').Entity} Entity */
@@ -209,4 +209,13 @@ export function hasWaitingGuest(tableKey) {
 /** Bell broken or exploded: its guest leaves, the bell is forgotten. @param {string} bellKey */
 export function forgetBell(bellKey) {
   releaseBell(bellKey, io, Math.random);
+}
+
+/**
+ * Can a guest come to this bell, and if not, why not.
+ * @param {string} bellKey
+ * @returns {import('../logic/guest-flow.js').GuestAvailability}
+ */
+export function bellAvailability(bellKey) {
+  return guestAvailability(bellKey, io);
 }

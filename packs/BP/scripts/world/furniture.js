@@ -4,7 +4,7 @@ import { BELL, CHAIR, TABLE } from '../logic/guest-flow.js';
 import { locKey } from '../logic/store.js';
 import { interactStation } from '../logic/station-flow.js';
 import { worldStore, applyResult, heldItemId } from './effects.js';
-import { forgetBell, hasWaitingGuest, onTableServed, setPlate } from './guests.js';
+import { bellAvailability, forgetBell, hasWaitingGuest, onTableServed, setPlate } from './guests.js';
 
 /** @typedef {import('@minecraft/server').Block} Block */
 /** @typedef {import('@minecraft/server').Dimension} Dimension */
@@ -14,6 +14,11 @@ import { forgetBell, hasWaitingGuest, onTableServed, setPlate } from './guests.j
 /** @typedef {import('../logic/restaurant.js').TableState} TableState */
 
 const BELL_SOUND = 'note.bell';
+const BELL_HINTS = {
+  ok: 'kochmod.hint.bell_guest_coming',
+  no_seat: 'kochmod.hint.bell_no_seat',
+  no_kitchen: 'kochmod.hint.bell_no_kitchen',
+};
 
 /** @param {Dimension} dimension @param {Vector3} loc */
 const keyAt = (dimension, loc) => locKey(dimension.id, loc);
@@ -123,12 +128,18 @@ const bellComponent = {
     worldStore.registryAdd('bell', key);
     worldStore.save(key, { guestId: null, cooldown: spawnDelay(Math.random) });
   },
-  onPlayerInteract({ block, dimension }) {
+  onPlayerInteract({ block, dimension, player }) {
     dimension.playSound(BELL_SOUND, block.center());
     const key = keyAt(dimension, block.location);
     /** @type {import('../logic/guest-flow.js').BellState | undefined} */
     const state = worldStore.load(key);
     if (state?.guestId) return;
+    const hint = BELL_HINTS[bellAvailability(key)];
+    try {
+      player?.onScreenDisplay.setActionBar({ translate: hint });
+    } catch (error) {
+      console.warn(`kochmod bell: hint failed: ${error}`);
+    }
     // ringing calls the next guest right away
     worldStore.save(key, { guestId: null, cooldown: 0 });
     worldStore.registryAdd('bell', key);

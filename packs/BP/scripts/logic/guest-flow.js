@@ -63,6 +63,8 @@ const PREFIX = 'kochmod:';
  * }} GuestIo blockTypeAt returns undefined while the chunk is not loaded
  */
 
+/** @typedef {'ok' | 'no_seat' | 'no_kitchen'} GuestAvailability */
+
 /** @param {string} dishId @returns {string} the `kochmod:wish` property value */
 const wishLook = (dishId) => (dishId.startsWith(PREFIX) ? dishId.slice(PREFIX.length) : 'none');
 
@@ -102,6 +104,47 @@ function occupied(bellKey, io) {
 }
 
 /**
+ * Whether a guest could come to this bell right now, and what the pick would be.
+ * The seat is checked first, then the kitchen.
+ * @param {string} bellKey
+ * @param {GuestIo} io
+ * @param {() => number} rnd
+ * @returns {{ status: GuestAvailability, seat?: string, table?: string, wish?: string }}
+ */
+function assess(bellKey, io, rnd) {
+  const bell = parseLocKey(bellKey);
+  const near = (/** @type {string} */ key) => {
+    const p = parseLocKey(key);
+    return p.dimensionId === bell.dimensionId && withinRadius(bell, p);
+  };
+  const taken = occupied(bellKey, io);
+  const dist2 = (/** @type {string} */ key) => {
+    const p = parseLocKey(key);
+    return (p.x - bell.x) ** 2 + (p.y - bell.y) ** 2 + (p.z - bell.z) ** 2;
+  };
+  const seats = io.registryList('chair')
+    .filter((seat) => near(seat) && !taken.has(seat))
+    .map((seat) => ({ seat, table: tableOf(seat, io) }))
+    .filter((s) => s.table !== null && !taken.has(s.table))
+    .sort((a, b) => dist2(a.seat) - dist2(b.seat));
+  if (seats.length === 0) return { status: 'no_seat' };
+  const kinds = new Set(STATION_KINDS.filter((kind) => io.registryList(kind).some(near)));
+  const wish = pickWish(availableDishes(kinds), rnd);
+  if (wish === null) return { status: 'no_kitchen' };
+  return { status: 'ok', seat: seats[0].seat, table: /** @type {string} */ (seats[0].table), wish };
+}
+
+/**
+ * Can a guest come to this bell, and if not, why not.
+ * @param {string} bellKey
+ * @param {GuestIo} io
+ * @returns {GuestAvailability}
+ */
+export function guestAvailability(bellKey, io) {
+  return assess(bellKey, io, () => 0).status;
+}
+
+/**
  * Counts down; at 0 spawns a guest if a free seat and a cookable dish exist.
  * @param {string} bellKey
  * @param {BellState} state
@@ -113,29 +156,12 @@ function occupied(bellKey, io) {
 function trySpawn(bellKey, state, dt, io, rnd) {
   const cooldown = state.cooldown - dt;
   if (cooldown > 0) return { guestId: null, cooldown };
-  const bell = parseLocKey(bellKey);
-  const near = (/** @type {string} */ key) => {
-    const p = parseLocKey(key);
-    return p.dimensionId === bell.dimensionId && withinRadius(bell, p);
-  };
-  const kinds = new Set(STATION_KINDS.filter((kind) => io.registryList(kind).some(near)));
-  const dishes = availableDishes(kinds);
-  const taken = occupied(bellKey, io);
-  const dist2 = (/** @type {string} */ key) => {
-    const p = parseLocKey(key);
-    return (p.x - bell.x) ** 2 + (p.y - bell.y) ** 2 + (p.z - bell.z) ** 2;
-  };
-  const seats = io.registryList('chair')
-    .filter((seat) => near(seat) && !taken.has(seat))
-    .map((seat) => ({ seat, table: tableOf(seat, io) }))
-    .filter((s) => s.table !== null && !taken.has(s.table))
-    .sort((a, b) => dist2(a.seat) - dist2(b.seat));
-  const wish = pickWish(dishes, rnd);
-  if (seats.length === 0 || wish === null) return { guestId: null, cooldown: RETRY_TICKS };
-  const { seat } = seats[0];
-  const table = /** @type {string} */ (seats[0].table);
+  const found = assess(bellKey, io, rnd);
+  if (found.status !== 'ok') return { guestId: null, cooldown: RETRY_TICKS };
+  const seat = /** @type {string} */ (found.seat);
+  const table = /** @type {string} */ (found.table);
   const guest = io.spawnGuest(bellKey, {
-    phase: 'walking', seat, table, bell: bellKey, timer: WALK_TIMEOUT, served: '', wish,
+    phase: 'walking', seat, table, bell: bellKey, timer: WALK_TIMEOUT, served: '', wish: /** @type {string} */ (found.wish),
   });
   return { guestId: guest.id, cooldown: 0, seat, table };
 }

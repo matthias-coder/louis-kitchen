@@ -1,0 +1,58 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Kochmod",
+    "description": "Kochmod: Kochen und Restaurant",
+    "uuid": "20777f2f-ee48-4ad7-b58b-284d1e857556",
+    "version": [
+      0,
+      1,
+      0
+    ],
+    "min_engine_version": [
+      1,
+      26,
+      0
+    ]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "dfaccdc0-a3b1-461f-844a-f23cab739f1e",
+      "version": [
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "type": "script",
+      "language": "javascript",
+      "uuid": "3417f174-22ca-48d2-a737-2c4961fecd9e",
+      "entry": "scripts/main.js",
+      "version": [
+        0,
+        1,
+        0
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "module_name": "@minecraft/server",
+      "version": "2.0.0"
+    },
+    {
+      "module_name": "@minecraft/server-ui",
+      "version": "2.0.0"
+    },
+    {
+      "uuid": "6891c3bc-3375-4c46-9a93-9c85413adcd6",
+      "version": [
+        0,
+        1,
+        0
+      ]
+    }
+  ]
+}

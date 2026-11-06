@@ -1,0 +1,190 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { findComMojang } from '../tools/deploy.js';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const BP = path.join(root, 'packs', 'BP');
+const RP = path.join(root, 'packs', 'RP');
+const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+
+/** @param {string} dir @returns {string[]} */
+function walk(dir) {
+  if (!fs.existsSync(dir)) return [];
+  return fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
+    const p = path.join(dir, e.name);
+    return e.isDirectory() ? walk(p) : [p];
+  });
+}
+
+/** Strips // comments that are outside of string literals. */
+function stripComments(/** @type {string} */ text) {
+  let out = '';
+  let inStr = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inStr) {
+      out += c;
+      if (c === '\\') out += text[++i];
+      else if (c === '"') inStr = false;
+    } else if (c === '"') {
+      inStr = true;
+      out += c;
+    } else if (c === '/' && text[i + 1] === '/') {
+      while (i < text.length && text[i] !== '\n') i++;
+      out += '\n';
+    } else {
+      out += c;
+    }
+  }
+  return out;
+}
+
+/** @param {string} file @returns {any} */
+function readJson(file) {
+  return JSON.parse(stripComments(fs.readFileSync(file, 'utf8').replace(/^\uFEFF/, '')));
+}
+
+/** @param {string} file @returns {Map<string,string>} */
+function readLang(file) {
+  const map = new Map();
+  for (const raw of fs.readFileSync(file, 'utf8').split(/\r?\n/)) {
+    const line = raw.trim();
+    if (!line || line.startsWith('##')) continue;
+    const eq = line.indexOf('=');
+    assert.ok(eq > 0, `bad lang line in ${file}: ${line}`);
+    map.set(line.slice(0, eq), line.slice(eq + 1));
+  }
+  return map;
+}
+
+const bp = () => readJson(path.join(BP, 'manifest.json'));
+const rp = () => readJson(path.join(RP, 'manifest.json'));
+
+test('every .json under packs/ parses', () => {
+  const files = walk(path.join(root, 'packs')).filter((f) => f.endsWith('.json'));
+  assert.ok(files.length >= 3);
+  for (const f of files) {
+    assert.doesNotThrow(() => readJson(f), f);
+  }
+});
+
+test('BP manifest declares script module with entry scripts/main.js and dependencies @minecraft/server 2.0.0, @minecraft/server-ui 2.0.0, and the RP uuid', () => {
+  const m = bp();
+  const script = m.modules.find((/** @type {any} */ x) => x.type === 'script');
+  assert.ok(script, 'script module missing');
+  assert.equal(script.language, 'javascript');
+  assert.equal(script.entry, 'scripts/main.js');
+  assert.ok(m.modules.some((/** @type {any} */ x) => x.type === 'data'), 'data module missing');
+  const dep = (/** @type {string} */ name) =>
+    m.dependencies.find((/** @type {any} */ d) => d.module_name === name)?.version;
+  assert.equal(dep('@minecraft/server'), '2.0.0');
+  assert.equal(dep('@minecraft/server-ui'), '2.0.0');
+  assert.ok(
+    m.dependencies.some((/** @type {any} */ d) => d.uuid === rp().header.uuid),
+    'RP dependency missing',
+  );
+});
+
+test('RP manifest depends on the BP header uuid; all five uuids are distinct valid v4 uuids', () => {
+  const b = bp();
+  const r = rp();
+  assert.ok(r.dependencies.some((/** @type {any} */ d) => d.uuid === b.header.uuid));
+  const ids = [
+    b.header.uuid,
+    ...b.modules.map((/** @type {any} */ x) => x.uuid),
+    r.header.uuid,
+    ...r.modules.map((/** @type {any} */ x) => x.uuid),
+  ];
+  assert.equal(ids.length, 5);
+  for (const id of ids) assert.match(id, UUID_V4);
+  assert.equal(new Set(ids).size, 5);
+});
+
+test('min_engine_version is [1, 26, 0] in both', () => {
+  assert.deepEqual(bp().header.min_engine_version, [1, 26, 0]);
+  assert.deepEqual(rp().header.min_engine_version, [1, 26, 0]);
+});
+
+test('de_DE.lang and en_US.lang have identical key sets', () => {
+  const de = [...readLang(path.join(RP, 'texts', 'de_DE.lang')).keys()].sort();
+  const en = [...readLang(path.join(RP, 'texts', 'en_US.lang')).keys()].sort();
+  assert.deepEqual(en, de);
+});
+
+test('every item/block/entity identifier defined in BP has a name key in de_DE.lang', () => {
+  const lang = readLang(path.join(RP, 'texts', 'de_DE.lang'));
+  /** @type {[string, string, (id: string) => string][]} */
+  const kinds = [
+    ['items', 'minecraft:item', (id) => `item.${id}`],
+    ['blocks', 'minecraft:block', (id) => `tile.${id}.name`],
+    ['entities', 'minecraft:entity', (id) => `entity.${id}.name`],
+  ];
+  for (const [dir, key, langKey] of kinds) {
+    const files = walk(path.join(BP, dir)).filter((f) => f.endsWith('.json'));
+    for (const f of files) {
+      const id = readJson(f)[key]?.description?.identifier;
+      assert.ok(id, `no identifier in ${f}`);
+      assert.ok(id.startsWith('kochmod:'), `${id} is not in the kochmod namespace`);
+      assert.ok(lang.has(langKey(id)), `missing lang key ${langKey(id)} for ${f}`);
+    }
+  }
+});
+
+test('every texture path referenced from RP item_texture.json, terrain_texture.json and entity files exists as .png', () => {
+  /** @type {string[]} */
+  const refs = [];
+  /** @param {any} node */
+  const collectTextures = (node) => {
+    if (Array.isArray(node)) node.forEach(collectTextures);
+    else if (node && typeof node === 'object') {
+      for (const [k, v] of Object.entries(node)) {
+        if (k === 'textures') {
+          for (const t of [v].flat()) {
+            if (typeof t === 'string') refs.push(t);
+            else if (t && typeof t === 'object' && typeof t.path === 'string') refs.push(t.path);
+          }
+        } else collectTextures(v);
+      }
+    }
+  };
+  for (const f of ['item_texture.json', 'terrain_texture.json']) {
+    const p = path.join(RP, 'textures', f);
+    if (fs.existsSync(p)) collectTextures(readJson(p).texture_data);
+  }
+  for (const f of walk(path.join(RP, 'entity')).filter((x) => x.endsWith('.json'))) {
+    const textures = readJson(f)['minecraft:client_entity']?.description?.textures ?? {};
+    refs.push(...Object.values(textures).filter((t) => typeof t === 'string'));
+  }
+  for (const ref of refs) {
+    assert.ok(fs.existsSync(path.join(RP, `${ref}.png`)), `missing texture ${ref}.png`);
+  }
+});
+
+test('findComMojang prefers env, then APPDATA, then LOCALAPPDATA, else null', () => {
+  const env = {
+    KOCHMOD_COM_MOJANG: 'E:\\custom',
+    APPDATA: 'C:\\Users\\x\\AppData\\Roaming',
+    LOCALAPPDATA: 'C:\\Users\\x\\AppData\\Local',
+  };
+  const appData = path.join(env.APPDATA, 'Minecraft Bedrock', 'Users', 'Shared', 'games', 'com.mojang');
+  const localData = path.join(
+    env.LOCALAPPDATA,
+    'Packages',
+    'Microsoft.MinecraftUWP_8wekyb3d8bbwe',
+    'LocalState',
+    'games',
+    'com.mojang',
+  );
+  const all = new Set([env.KOCHMOD_COM_MOJANG, appData, localData]);
+  assert.equal(findComMojang(env, (p) => all.has(p)), env.KOCHMOD_COM_MOJANG);
+  all.delete(env.KOCHMOD_COM_MOJANG);
+  assert.equal(findComMojang(env, (p) => all.has(p)), appData);
+  all.delete(appData);
+  assert.equal(findComMojang(env, (p) => all.has(p)), localData);
+  all.delete(localData);
+  assert.equal(findComMojang(env, (p) => all.has(p)), null);
+  assert.equal(findComMojang({}, () => true), null);
+});

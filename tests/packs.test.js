@@ -188,3 +188,23 @@ test('findComMojang prefers env, then APPDATA, then LOCALAPPDATA, else null', ()
   assert.equal(findComMojang(env, (p) => all.has(p)), null);
   assert.equal(findComMojang({}, () => true), null);
 });
+
+test('BP and RP manifest versions are equal', () => {
+  assert.deepEqual(bp().header.version, rp().header.version);
+  assert.deepEqual(bp().header.version, [1, 0, 0]);
+  for (const m of [bp(), rp()]) {
+    for (const mod of m.modules) assert.deepEqual(mod.version, [1, 0, 0]);
+  }
+  const bpDep = bp().dependencies.find((/** @type {any} */ d) => d.uuid);
+  const rpDep = rp().dependencies.find((/** @type {any} */ d) => d.uuid);
+  assert.deepEqual(bpDep.version, rp().header.version);
+  assert.deepEqual(rpDep.version, bp().header.version);
+});
+
+test('pack_icon.png exists in both packs', () => {
+  for (const dir of [BP, RP]) {
+    const file = path.join(dir, 'pack_icon.png');
+    assert.ok(fs.existsSync(file), file);
+    assert.equal(fs.readFileSync(file).subarray(1, 4).toString(), 'PNG');
+  }
+});

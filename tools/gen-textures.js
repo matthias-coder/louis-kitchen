@@ -47,6 +47,23 @@ const terrainTextureJson = {
   texture_data: terrainTextures,
 };
 fs.writeFileSync(path.join(textureDir, 'terrain_texture.json'), `${JSON.stringify(terrainTextureJson, null, 2)}\n`);
+// Pack icon: hamburger sprite scaled x4 on a plain background
+const { hamburger } = await import(pathToFileURL(path.join(spritesDir, 'items.js')).href);
+const icon = spriteToRgba(hamburger);
+const iconBg = [143, 199, 232];
+const iconRgba = new Uint8Array(64 * 64 * 4);
+for (let y = 0; y < 64; y++) {
+  for (let x = 0; x < 64; x++) {
+    const s = ((y >> 2) * icon.width + (x >> 2)) * 4;
+    const solid = icon.rgba[s + 3] > 0;
+    const o = (y * 64 + x) * 4;
+    for (let c = 0; c < 3; c++) iconRgba[o + c] = solid ? icon.rgba[s + c] : iconBg[c];
+    iconRgba[o + 3] = 255;
+  }
+}
+for (const pack of ['BP', 'RP']) {
+  fs.writeFileSync(path.join(root, 'packs', pack, 'pack_icon.png'), encodePng(64, 64, iconRgba));
+}
 const geoCount = writeBlockGeometry(root);
 writeEntityGeometry(root, guestLayout, GUEST_TEXTURE);
 console.log(`gen-textures: wrote ${count} PNGs, ${geoCount} block geometries and the guest geometry`);

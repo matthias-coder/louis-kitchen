@@ -1,0 +1,33 @@
+{
+  "format_version": "1.21.90",
+  "minecraft:block": {
+    "description": {
+      "identifier": "kochmod:crate_dairy",
+      "menu_category": {
+        "category": "construction"
+      }
+    },
+    "components": {
+      "minecraft:geometry": "minecraft:geometry.full_block",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "kochmod_crate_dairy",
+          "render_method": "opaque"
+        },
+        "up": {
+          "texture": "kochmod_crate_dairy_top",
+          "render_method": "opaque"
+        },
+        "down": {
+          "texture": "kochmod_crate_dairy_top",
+          "render_method": "opaque"
+        }
+      },
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 1
+      },
+      "minecraft:map_color": "#a8763e",
+      "kochmod:crate": {}
+    }
+  }
+}

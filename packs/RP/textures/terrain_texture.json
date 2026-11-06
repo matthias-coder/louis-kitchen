@@ -7,6 +7,36 @@
     "kochmod_counter": {
       "textures": "textures/blocks/counter"
     },
+    "kochmod_crate_bread": {
+      "textures": "textures/blocks/crate_bread"
+    },
+    "kochmod_crate_bread_top": {
+      "textures": "textures/blocks/crate_bread_top"
+    },
+    "kochmod_crate_dairy": {
+      "textures": "textures/blocks/crate_dairy"
+    },
+    "kochmod_crate_dairy_top": {
+      "textures": "textures/blocks/crate_dairy_top"
+    },
+    "kochmod_crate_meat": {
+      "textures": "textures/blocks/crate_meat"
+    },
+    "kochmod_crate_meat_top": {
+      "textures": "textures/blocks/crate_meat_top"
+    },
+    "kochmod_crate_tools": {
+      "textures": "textures/blocks/crate_tools"
+    },
+    "kochmod_crate_tools_top": {
+      "textures": "textures/blocks/crate_tools_top"
+    },
+    "kochmod_crate_vegetables": {
+      "textures": "textures/blocks/crate_vegetables"
+    },
+    "kochmod_crate_vegetables_top": {
+      "textures": "textures/blocks/crate_vegetables_top"
+    },
     "kochmod_cutting_board": {
       "textures": "textures/blocks/cutting_board"
     },

@@ -1,5 +1,9 @@
 {
-  "format_version": [1, 1, 0],
+  "format_version": [
+    1,
+    1,
+    0
+  ],
   "kochmod:grill": {
     "sound": "metal"
   },
@@ -8,5 +12,20 @@
   },
   "kochmod:counter": {
     "sound": "wood"
+  },
+  "kochmod:crate_vegetables": {
+    "sound": "wood"
+  },
+  "kochmod:crate_meat": {
+    "sound": "wood"
+  },
+  "kochmod:crate_bread": {
+    "sound": "wood"
+  },
+  "kochmod:crate_dairy": {
+    "sound": "wood"
+  },
+  "kochmod:crate_tools": {
+    "sound": "metal"
   }
 }

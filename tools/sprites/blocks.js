@@ -1,3 +1,5 @@
+import * as items from './items.js';
+
 /**
  * Block atlases (64x64, 16 texels per block). Each block has one texture; the
  * geometry (tools/geometry.js) maps cube faces onto the regions in `layouts`.
@@ -345,3 +347,122 @@ export const counter = {
   },
   rows: drawCounter(),
 };
+
+// ---- Supply crates (16x16 plain cubes; each shows its content on the sides and the top)
+
+/** @typedef {(string | null)[][]} Pixels */
+
+/** @param {import('./util.js').Sprite} s @returns {Pixels} */
+function pixelsOf(s) {
+  return s.rows.map((row) => [...row].map((ch) => (ch === '.' ? null : s.palette[ch])));
+}
+
+/**
+ * Halves a 16x16 picture to 8x8, preferring an opaque pixel of each 2x2 block.
+ * @param {Pixels} p
+ * @returns {Pixels}
+ */
+function half(p) {
+  return Array.from({ length: 8 }, (_, y) => Array.from({ length: 8 }, (_, x) => (
+    p[2 * y + 1][2 * x + 1] ?? p[2 * y][2 * x + 1] ?? p[2 * y + 1][2 * x] ?? p[2 * y][2 * x]
+  )));
+}
+
+/** @param {Pixels} base @param {Pixels} pic @param {number} ox @param {number} oy */
+function stamp(base, pic, ox, oy) {
+  pic.forEach((row, y) => row.forEach((c, x) => { if (c) base[oy + y][ox + x] = c; }));
+}
+
+/** @returns {Pixels} */
+function emptyPixels() {
+  return Array.from({ length: 16 }, () => Array(16).fill(null));
+}
+
+/**
+ * @param {string} name
+ * @param {Pixels} px
+ * @returns {import('./util.js').Sprite}
+ */
+function toSprite(name, px) {
+  /** @type {Record<string, string>} */
+  const palette = {};
+  /** @type {Map<string, string>} */
+  const chars = new Map();
+  const alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const rows = px.map((row) => row.map((c) => {
+    if (!c) return '.';
+    let ch = chars.get(c);
+    if (!ch) {
+      ch = alphabet[chars.size];
+      chars.set(c, ch);
+      palette[ch] = c;
+    }
+    return ch;
+  }).join(''));
+  return { name, palette, rows };
+}
+
+const WOOD = { frame: '#6b4423', plank: '#a8763e', plankLight: '#c08a4c', plankDark: '#8d5f2f', nail: '#3e2810' };
+const METAL = { frame: '#5a1010', plank: '#b32424', plankLight: '#d44a4a', plankDark: '#8e1a1a', nail: '#e8e8e8' };
+const LABEL = { fill: '#f4ead2', edge: '#7a5a30' };
+
+/**
+ * A crate face: wooden (or metal) planks with a framed cream label holding the pictures.
+ * @param {string} name
+ * @param {typeof WOOD} mat
+ * @param {{ pic: Pixels, x: number, y: number }[]} pics pictures in label coordinates (label is 12x12 at 2,2)
+ * @param {boolean} top the top face has plank lines running the other way
+ */
+function crateFace(name, mat, pics, top) {
+  const px = emptyPixels();
+  for (let y = 0; y < 16; y++) {
+    for (let x = 0; x < 16; x++) {
+      const line = top ? x % 5 === 4 : y % 5 === 4;
+      px[y][x] = line ? mat.plankDark : ((top ? y : x) % 7 === 0 ? mat.plankLight : mat.plank);
+    }
+  }
+  for (let i = 0; i < 16; i++) {
+    px[0][i] = mat.frame; px[15][i] = mat.frame; px[i][0] = mat.frame; px[i][15] = mat.frame;
+  }
+  for (const [x, y] of [[1, 1], [14, 1], [1, 14], [14, 14]]) px[y][x] = mat.nail;
+  for (let y = 2; y < 14; y++) {
+    for (let x = 2; x < 14; x++) {
+      const edge = x === 2 || x === 13 || y === 2 || y === 13;
+      px[y][x] = edge ? LABEL.edge : LABEL.fill;
+    }
+  }
+  for (const { pic, x, y } of pics) stamp(px, pic, 3 + x, 3 + y);
+  return toSprite(name, px);
+}
+
+/** @param {Pixels} p @returns {Pixels} */
+function flip(p) {
+  return p.map((row) => [...row].reverse());
+}
+
+/** @param {string} item @returns {Pixels} */
+function icon(item) {
+  return half(pixelsOf(/** @type {import('./util.js').Sprite} */ (/** @type {any} */ (items)[item])));
+}
+
+/** @typedef {{ pic: Pixels, x: number, y: number }} Pic */
+/** @type {Record<string, { mat: typeof WOOD, pics: Pic[], topPics?: Pic[] }>} */
+const CRATE_PICTURES = {
+  crate_vegetables: { mat: WOOD, pics: [{ pic: icon('lettuce'), x: 2, y: 0 }, { pic: icon('tomato'), x: 0, y: 2 }],
+    topPics: [{ pic: icon('tomato'), x: 0, y: 0 }, { pic: icon('lettuce'), x: 2, y: 2 }] },
+  crate_meat: { mat: WOOD, pics: [{ pic: icon('raw_patty'), x: 1, y: 1 }] },
+  crate_bread: { mat: WOOD, pics: [{ pic: icon('bun'), x: 1, y: 1 }] },
+  crate_dairy: { mat: WOOD, pics: [{ pic: icon('cheese'), x: 1, y: 1 }] },
+  crate_tools: { mat: METAL, pics: [{ pic: icon('spatula'), x: 2, y: 2 }, { pic: flip(icon('knife')), x: 0, y: 0 }] },
+};
+
+/** @type {Sprite} */ export const crate_vegetables = crateFace('crate_vegetables', CRATE_PICTURES.crate_vegetables.mat, CRATE_PICTURES.crate_vegetables.pics, false);
+/** @type {Sprite} */ export const crate_vegetables_top = crateFace('crate_vegetables_top', CRATE_PICTURES.crate_vegetables.mat, CRATE_PICTURES.crate_vegetables.topPics ?? [], true);
+/** @type {Sprite} */ export const crate_meat = crateFace('crate_meat', CRATE_PICTURES.crate_meat.mat, CRATE_PICTURES.crate_meat.pics, false);
+/** @type {Sprite} */ export const crate_meat_top = crateFace('crate_meat_top', CRATE_PICTURES.crate_meat.mat, CRATE_PICTURES.crate_meat.pics, true);
+/** @type {Sprite} */ export const crate_bread = crateFace('crate_bread', CRATE_PICTURES.crate_bread.mat, CRATE_PICTURES.crate_bread.pics, false);
+/** @type {Sprite} */ export const crate_bread_top = crateFace('crate_bread_top', CRATE_PICTURES.crate_bread.mat, CRATE_PICTURES.crate_bread.pics, true);
+/** @type {Sprite} */ export const crate_dairy = crateFace('crate_dairy', CRATE_PICTURES.crate_dairy.mat, CRATE_PICTURES.crate_dairy.pics, false);
+/** @type {Sprite} */ export const crate_dairy_top = crateFace('crate_dairy_top', CRATE_PICTURES.crate_dairy.mat, CRATE_PICTURES.crate_dairy.pics, true);
+/** @type {Sprite} */ export const crate_tools = crateFace('crate_tools', CRATE_PICTURES.crate_tools.mat, CRATE_PICTURES.crate_tools.pics, false);
+/** @type {Sprite} */ export const crate_tools_top = crateFace('crate_tools_top', CRATE_PICTURES.crate_tools.mat, CRATE_PICTURES.crate_tools.pics, true);

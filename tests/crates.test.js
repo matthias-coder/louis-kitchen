@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { CRATES } from '../packs/BP/scripts/logic/crates.js';
+import { CRATES, BUSY_RETRIES, shouldRetryBusy } from '../packs/BP/scripts/logic/crates.js';
 
 const lang = fs.readFileSync(new URL('../packs/RP/texts/de_DE.lang', import.meta.url), 'utf8');
 const SUPPLIED = ['raw_patty', 'bun', 'lettuce', 'tomato', 'cheese', 'knife', 'spatula'].map((i) => `kochmod:${i}`);
@@ -35,5 +35,20 @@ test('each crate has a block file using the kochmod:crate component', () => {
     const json = JSON.parse(fs.readFileSync(new URL(`../packs/BP/blocks/${id}.json`, import.meta.url), 'utf8'));
     assert.equal(json['minecraft:block'].description.identifier, `kochmod:${id}`);
     assert.ok('kochmod:crate' in json['minecraft:block'].components);
+  }
+});
+
+test('shouldRetryBusy retries only UserBusy, at most BUSY_RETRIES times', () => {
+  assert.equal(shouldRetryBusy('UserBusy', 0), true);
+  assert.equal(shouldRetryBusy('UserBusy', BUSY_RETRIES - 1), true);
+  assert.equal(shouldRetryBusy('UserBusy', BUSY_RETRIES), false);
+  assert.equal(shouldRetryBusy('UserClosed', 0), false);
+  assert.equal(shouldRetryBusy(undefined, 0), false);
+});
+
+test('crate_failed hint exists in both lang files', () => {
+  for (const f of ['de_DE', 'en_US']) {
+    const t = fs.readFileSync(new URL(`../packs/RP/texts/${f}.lang`, import.meta.url), 'utf8');
+    assert.ok(t.includes('\nkochmod.hint.crate_failed=Das hat nicht geklappt. Tippe die Kiste noch einmal an.'), f);
   }
 });

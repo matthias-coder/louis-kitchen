@@ -24,3 +24,17 @@ export const CRATES = {
     ],
   },
 };
+
+export const BUSY_RETRIES = 5;
+export const BUSY_RETRY_TICKS = 10;
+
+/**
+ * Whether a cancelled crate form should be opened again: only while the player was busy
+ * (chat or another screen open) and fewer than BUSY_RETRIES retries were made.
+ * @param {string | undefined} reason cancelationReason of the response
+ * @param {number} retriesDone
+ * @returns {boolean}
+ */
+export function shouldRetryBusy(reason, retriesDone) {
+  return reason === 'UserBusy' && retriesDone < BUSY_RETRIES;
+}

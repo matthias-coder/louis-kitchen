@@ -45,7 +45,10 @@ test('exactly one of each station, cabinet and crate, one bell, four tables and 
 
 test('the kitchen has every station kind: every timed station and every station a dish needs', () => {
   const kinds = new Set([...Object.keys(TIMED), ...RECIPES.flatMap((r) => r.stations)]);
-  for (const kind of kinds) assert.equal(ofId(kind).length, 1, kind);
+  for (const kind of kinds) {
+    assert.equal(ofId(kind).length, 1, kind);
+    assert.ok(STATIONS.includes(kind), `${kind} is covered by the bell-radius and walkability checks`);
+  }
 });
 
 test('the oven stands on the back row between counter and dishwasher', () => {

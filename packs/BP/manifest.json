@@ -1,12 +1,12 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Louis Kitchen 1.2.0",
+    "name": "Louis Kitchen 2.0.0",
     "description": "Louis Kitchen: Kochen und Restaurant",
     "uuid": "20777f2f-ee48-4ad7-b58b-284d1e857556",
     "version": [
-      1,
       2,
+      0,
       0
     ],
     "min_engine_version": [
@@ -20,8 +20,8 @@
       "type": "data",
       "uuid": "dfaccdc0-a3b1-461f-844a-f23cab739f1e",
       "version": [
-        1,
         2,
+        0,
         0
       ]
     },
@@ -31,8 +31,8 @@
       "uuid": "3417f174-22ca-48d2-a737-2c4961fecd9e",
       "entry": "scripts/main.js",
       "version": [
-        1,
         2,
+        0,
         0
       ]
     }
@@ -49,8 +49,8 @@
     {
       "uuid": "6891c3bc-3375-4c46-9a93-9c85413adcd6",
       "version": [
-        1,
         2,
+        0,
         0
       ]
     }

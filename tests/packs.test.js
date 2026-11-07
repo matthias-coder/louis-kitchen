@@ -191,9 +191,9 @@ test('findComMojang prefers env, then APPDATA, then LOCALAPPDATA, else null', ()
 
 test('BP and RP manifest versions are equal', () => {
   assert.deepEqual(bp().header.version, rp().header.version);
-  assert.deepEqual(bp().header.version, [1, 2, 0]);
+  assert.deepEqual(bp().header.version, [2, 0, 0]);
   for (const m of [bp(), rp()]) {
-    for (const mod of m.modules) assert.deepEqual(mod.version, [1, 2, 0]);
+    for (const mod of m.modules) assert.deepEqual(mod.version, [2, 0, 0]);
   }
   const bpDep = bp().dependencies.find((/** @type {any} */ d) => d.uuid);
   const rpDep = rp().dependencies.find((/** @type {any} */ d) => d.uuid);

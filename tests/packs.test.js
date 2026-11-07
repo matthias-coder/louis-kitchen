@@ -211,10 +211,10 @@ test('pack_icon.png exists in both packs', () => {
 
 test('pack names carry the version so Minecraft lists versions apart', () => {
   const v = bp().header.version.join('.');
-  assert.equal(bp().header.name, `Kochmod ${v}`);
-  assert.equal(rp().header.name, `Kochmod ${v}`);
+  assert.equal(bp().header.name, `Louis Kitchen ${v}`);
+  assert.equal(rp().header.name, `Louis Kitchen ${v}`);
   for (const lang of ['de_DE', 'en_US']) {
     const text = fs.readFileSync(path.join(root, 'packs/RP/texts', `${lang}.lang`), 'utf8');
-    assert.match(text, new RegExp(`^pack\.name=Kochmod ${v.replaceAll('.', '\.')}$`, 'm'));
+    assert.match(text, new RegExp(`^pack\.name=Louis Kitchen ${v.replaceAll('.', '\.')}$`, 'm'));
   }
 });

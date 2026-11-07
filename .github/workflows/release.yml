@@ -1,0 +1,36 @@
+name: Release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Tag must match the pack version
+        run: |
+          PACK=$(node -p "require('./packs/BP/manifest.json').header.version.join('.')")
+          TAG="${GITHUB_REF_NAME#v}"
+          echo "pack=$PACK tag=$TAG"
+          test "$PACK" = "$TAG"
+          echo "VERSION=$PACK" >> "$GITHUB_ENV"
+      - run: npm test
+      - run: npm run build
+      - name: Stable file name for the latest-download link
+        run: cp "dist/LouisKitchen_${VERSION}.mcaddon" dist/LouisKitchen.mcaddon
+      - name: Create GitHub release with the add-on attached
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            "dist/LouisKitchen_${VERSION}.mcaddon" \
+            dist/LouisKitchen.mcaddon \
+            --title "Louis Kitchen $VERSION" \
+            --generate-notes

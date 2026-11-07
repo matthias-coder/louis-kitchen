@@ -13,9 +13,11 @@ if (fs.existsSync(textures)) {
 }
 
 const zip = new AdmZip();
-zip.addLocalFolder(path.join(root, 'packs', 'BP'), 'Kochmod_BP');
-zip.addLocalFolder(path.join(root, 'packs', 'RP'), 'Kochmod_RP');
-const out = path.join(root, 'dist', 'kochmod.mcaddon');
+zip.addLocalFolder(path.join(root, 'packs', 'BP'), 'LouisKitchen_BP');
+zip.addLocalFolder(path.join(root, 'packs', 'RP'), 'LouisKitchen_RP');
+const manifest = JSON.parse(fs.readFileSync(path.join(root, 'packs', 'BP', 'manifest.json'), 'utf8'));
+const version = manifest.header.version.join('.');
+const out = path.join(root, 'dist', `LouisKitchen_${version}.mcaddon`);
 fs.mkdirSync(path.dirname(out), { recursive: true });
 zip.writeZip(out);
 console.log(`built ${out}`);

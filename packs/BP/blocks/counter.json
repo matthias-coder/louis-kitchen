@@ -7,26 +7,38 @@
         "category": "construction"
       },
       "states": {
-        "kochmod:bun": [false, true],
-        "kochmod:patty": ["none", "raw", "cooked", "burnt"],
-        "kochmod:lettuce": [false, true],
-        "kochmod:tomato": ["none", "whole", "slices"],
-        "kochmod:cheese": [false, true]
+        "kochmod:family": ["none", "burger", "pizza", "doner", "sushi"],
+        "kochmod:layers": [0, 1, 2, 3, 4, 5, 6]
       }
     },
     "components": {
       "minecraft:geometry": {
         "identifier": "geometry.kochmod.counter",
         "bone_visibility": {
-          "bun_bottom": "q.block_state('kochmod:bun')",
-          "patty_raw": "q.block_state('kochmod:patty') == 'raw'",
-          "patty_cooked": "q.block_state('kochmod:patty') == 'cooked'",
-          "patty_burnt": "q.block_state('kochmod:patty') == 'burnt'",
-          "cheese": "q.block_state('kochmod:cheese')",
-          "tomato_slices": "q.block_state('kochmod:tomato') == 'slices'",
-          "tomato_whole": "q.block_state('kochmod:tomato') == 'whole'",
-          "lettuce": "q.block_state('kochmod:lettuce')",
-          "bun_top": "q.block_state('kochmod:bun') && (q.block_state('kochmod:patty') != 'none' || q.block_state('kochmod:cheese') || q.block_state('kochmod:lettuce') || q.block_state('kochmod:tomato') == 'slices')"
+          "burger_1": "q.block_state('kochmod:family') == 'burger' && q.block_state('kochmod:layers') >= 1",
+          "burger_2": "q.block_state('kochmod:family') == 'burger' && q.block_state('kochmod:layers') >= 2",
+          "burger_3": "q.block_state('kochmod:family') == 'burger' && q.block_state('kochmod:layers') >= 3",
+          "burger_4": "q.block_state('kochmod:family') == 'burger' && q.block_state('kochmod:layers') >= 4",
+          "burger_5": "q.block_state('kochmod:family') == 'burger' && q.block_state('kochmod:layers') >= 5",
+          "burger_6": "q.block_state('kochmod:family') == 'burger' && q.block_state('kochmod:layers') >= 6",
+          "pizza_1": "q.block_state('kochmod:family') == 'pizza' && q.block_state('kochmod:layers') >= 1",
+          "pizza_2": "q.block_state('kochmod:family') == 'pizza' && q.block_state('kochmod:layers') >= 2",
+          "pizza_3": "q.block_state('kochmod:family') == 'pizza' && q.block_state('kochmod:layers') >= 3",
+          "pizza_4": "q.block_state('kochmod:family') == 'pizza' && q.block_state('kochmod:layers') >= 4",
+          "pizza_5": "q.block_state('kochmod:family') == 'pizza' && q.block_state('kochmod:layers') >= 5",
+          "pizza_6": "q.block_state('kochmod:family') == 'pizza' && q.block_state('kochmod:layers') >= 6",
+          "doner_1": "q.block_state('kochmod:family') == 'doner' && q.block_state('kochmod:layers') >= 1",
+          "doner_2": "q.block_state('kochmod:family') == 'doner' && q.block_state('kochmod:layers') >= 2",
+          "doner_3": "q.block_state('kochmod:family') == 'doner' && q.block_state('kochmod:layers') >= 3",
+          "doner_4": "q.block_state('kochmod:family') == 'doner' && q.block_state('kochmod:layers') >= 4",
+          "doner_5": "q.block_state('kochmod:family') == 'doner' && q.block_state('kochmod:layers') >= 5",
+          "doner_6": "q.block_state('kochmod:family') == 'doner' && q.block_state('kochmod:layers') >= 6",
+          "sushi_1": "q.block_state('kochmod:family') == 'sushi' && q.block_state('kochmod:layers') >= 1",
+          "sushi_2": "q.block_state('kochmod:family') == 'sushi' && q.block_state('kochmod:layers') >= 2",
+          "sushi_3": "q.block_state('kochmod:family') == 'sushi' && q.block_state('kochmod:layers') >= 3",
+          "sushi_4": "q.block_state('kochmod:family') == 'sushi' && q.block_state('kochmod:layers') >= 4",
+          "sushi_5": "q.block_state('kochmod:family') == 'sushi' && q.block_state('kochmod:layers') >= 5",
+          "sushi_6": "q.block_state('kochmod:family') == 'sushi' && q.block_state('kochmod:layers') >= 6"
         }
       },
       "minecraft:material_instances": {

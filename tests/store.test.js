@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createStore, locKey, parseLocKey } from '../packs/BP/scripts/logic/store.js';
-import { grillInteract, grillTick, grillView } from '../packs/BP/scripts/logic/stations.js';
+import { grillInteract, grillTick, grillView, migrateStationState } from '../packs/BP/scripts/logic/stations.js';
 
 /** @returns {{ map: Map<string, string>, backend: { get(key: string): string | undefined, set(key: string, value: string | undefined): void } }} */
 function mapBackend() {
@@ -74,14 +74,23 @@ test('parseLocKey(locKey(...)) round-trips, including negative coordinates', () 
 test('a saved grill reloaded through a new store continues cooking from the saved ticks', () => {
   const { backend } = mapBackend();
   const key = locKey('minecraft:overworld', { x: 1, y: 2, z: 3 });
-  let state = grillInteract({ occupied: false, ticks: 0 }, 'kochmod:raw_patty').state;
+  let state = grillInteract({ item: null, ticks: 0 }, 'kochmod:raw_patty').state;
   for (let i = 0; i < 10; i++) state = grillTick(state, 10);
   createStore(backend).save(key, state);
 
   const reloaded = createStore(backend).load(key);
-  assert.deepEqual(reloaded, { occupied: true, ticks: 100 });
+  assert.deepEqual(reloaded, { item: 'kochmod:raw_patty', ticks: 100 });
   let next = reloaded;
   for (let i = 0; i < 6; i++) next = grillTick(next, 10);
   assert.equal(next.ticks, 160);
   assert.equal(grillView(next), 'cooked');
+});
+
+test('a stage 1 grill saved before the update keeps cooking after migration', () => {
+  const { backend } = mapBackend();
+  const key = locKey('minecraft:overworld', { x: 1, y: 2, z: 3 });
+  createStore(backend).save(key, { occupied: true, ticks: 100 });
+  const migrated = migrateStationState('grill', createStore(backend).load(key));
+  assert.deepEqual(migrated, { item: 'kochmod:raw_patty', ticks: 100 });
+  assert.equal(grillView(grillTick(migrated, 60)), 'cooked');
 });

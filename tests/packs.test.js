@@ -219,12 +219,53 @@ test('pack names carry the version so Minecraft lists versions apart', () => {
   }
 });
 
-test('guest wish enum and table plate states follow the dish catalog', async () => {
+test('guest wish enum follows the dish catalog', async () => {
   const { DISHES } = await import('../packs/BP/scripts/logic/recipes.js');
   const { plateName } = await import('../packs/BP/scripts/logic/catalog.js');
-  const { DISH_PLATES } = await import('../packs/BP/scripts/logic/guest-flow.js');
   const guest = JSON.parse(fs.readFileSync(path.join(BP, 'entities', 'guest.json'), 'utf8'));
   assert.deepEqual(guest['minecraft:entity'].description.properties['kochmod:wish'].values, ['none', ...DISHES.map(plateName)]);
-  const table = JSON.parse(fs.readFileSync(path.join(BP, 'blocks', 'table.json'), 'utf8'));
-  assert.deepEqual(table['minecraft:block'].description.states['kochmod:plate'], ['none', ...DISH_PLATES, 'empty']);
+});
+
+/** @param {string} id */
+function blockWithGeometry(id) {
+  const block = JSON.parse(fs.readFileSync(path.join(BP, 'blocks', `${id}.json`), 'utf8'))['minecraft:block'];
+  const geo = JSON.parse(fs.readFileSync(path.join(root, 'packs', 'RP', 'models', 'blocks', `${id}.geo.json`), 'utf8'))['minecraft:geometry'][0];
+  const vis = block.components['minecraft:geometry'].bone_visibility;
+  const bones = geo.bones.map((/** @type {any} */ b) => b.name);
+  for (const bone of Object.keys(vis)) assert.ok(bones.includes(bone), `${id}: bone ${bone} exists`);
+  return { block, geo, vis, bones };
+}
+
+test('table: generic plate states (dish ids map to food / failed), one bone per plate look', async () => {
+  const { DISH_PLATES } = await import('../packs/BP/scripts/logic/guest-flow.js');
+  const { tableView } = await import('../packs/BP/scripts/logic/restaurant.js');
+  const { block, vis } = blockWithGeometry('table');
+  const states = block.description.states['kochmod:plate'];
+  assert.deepEqual(states, ['none', 'food', 'failed', 'empty']);
+  for (const plate of [...DISH_PLATES, 'none', 'empty']) assert.ok(states.includes(tableView(plate)), plate);
+  assert.deepEqual(Object.keys(vis).sort(), ['failed', 'food', 'plate', 'plate_empty']);
+  assert.equal(vis.food, "q.block_state('kochmod:plate') == 'food'");
+  assert.equal(vis.failed, "q.block_state('kochmod:plate') == 'failed'");
+  assert.equal(vis.plate_empty, "q.block_state('kochmod:plate') == 'empty'");
+});
+
+test('counter: family enum and layer count, one stack of 6 layer bones per family, nothing above 23 px', async () => {
+  const { COUNTER_FAMILIES, COUNTER_LAYERS } = await import('../packs/BP/scripts/logic/stations.js');
+  const { block, geo, vis } = blockWithGeometry('counter');
+  assert.deepEqual(block.description.states, {
+    'kochmod:family': ['none', 'burger', 'pizza', 'doner', 'sushi'],
+    'kochmod:layers': [0, 1, 2, 3, 4, 5, 6],
+  });
+  assert.deepEqual(COUNTER_FAMILIES, block.description.states['kochmod:family']);
+  /** @type {Record<string, string>} */
+  const expected = {};
+  for (const family of COUNTER_FAMILIES.slice(1)) {
+    for (let n = 1; n <= COUNTER_LAYERS; n++) {
+      expected[`${family}_${n}`] = `q.block_state('kochmod:family') == '${family}' && q.block_state('kochmod:layers') >= ${n}`;
+    }
+  }
+  assert.deepEqual(vis, expected);
+  for (const bone of geo.bones) {
+    for (const cube of bone.cubes) assert.ok(cube.origin[1] + cube.size[1] <= 23, `${bone.name} reaches above 23 px`);
+  }
 });

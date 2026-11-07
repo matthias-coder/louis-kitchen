@@ -1,6 +1,6 @@
 import { BlockPermutation, system } from '@minecraft/server';
 import {
-  INITIAL,
+  INITIAL, migrateStationState,
   grillInteract, grillView, grillDrops,
   boardInteract, boardView, boardDrops,
   counterInteract, counterView, counterDrops,
@@ -24,8 +24,10 @@ import { worldStore, applyResult, heldItemId, dropItems, loadedBlock } from './e
  *   interact: (state: S, held: string | null) => import('../logic/stations.js').Result<S>,
  *   states: (state: S) => BlockStates,
  *   drops: (state: S) => string[],
+ *   migrate: (saved: unknown) => S,
  *   syncOnPlace?: boolean,
- * }} StationDef syncOnPlace: set the block states from `initial` right after placing
+ * }} StationDef migrate: turns a loaded saved state into the current shape (stage 1 states, garbage).
+ * syncOnPlace: set the block states from `initial` right after placing
  * (for stations whose initial view differs from the block's default states)
  */
 
@@ -35,7 +37,14 @@ const GRILL_ID = 'kochmod:grill';
 const grillStates = (s) => ({ 'kochmod:content': grillView(s) });
 
 /** @type {StationDef<import('../logic/stations.js').GrillState>} */
-const grill = { typeId: GRILL_ID, initial: INITIAL.grill, interact: grillInteract, states: grillStates, drops: grillDrops };
+const grill = {
+  typeId: GRILL_ID,
+  initial: INITIAL.grill,
+  interact: grillInteract,
+  states: grillStates,
+  drops: grillDrops,
+  migrate: (saved) => migrateStationState('grill', saved),
+};
 
 /** @type {StationDef<import('../logic/stations.js').BoardState>} */
 const cuttingBoard = {
@@ -44,6 +53,7 @@ const cuttingBoard = {
   interact: boardInteract,
   states: (s) => ({ 'kochmod:content': boardView(s) }),
   drops: boardDrops,
+  migrate: (saved) => migrateStationState('board', saved),
 };
 
 /** @type {StationDef<import('../logic/stations.js').CounterState>} */
@@ -53,15 +63,10 @@ const counter = {
   interact: counterInteract,
   states: (s) => {
     const v = counterView(s);
-    return {
-      'kochmod:bun': v.bun,
-      'kochmod:patty': v.patty,
-      'kochmod:lettuce': v.lettuce,
-      'kochmod:tomato': v.tomato,
-      'kochmod:cheese': v.cheese,
-    };
+    return { 'kochmod:family': v.family, 'kochmod:layers': v.layers };
   },
   drops: counterDrops,
+  migrate: (saved) => migrateStationState('counter', saved),
 };
 
 const DISHWASHER_ID = 'kochmod:dishwasher';
@@ -76,6 +81,7 @@ const dishwasher = {
   interact: dishwasherInteract,
   states: dishwasherStates,
   drops: dishwasherDrops,
+  migrate: (saved) => migrateStationState('dishwasher', saved),
 };
 
 /** @type {StationDef<import('../logic/stations.js').CabinetState>} */
@@ -85,6 +91,7 @@ const dishCabinet = {
   interact: cabinetInteract,
   states: (s) => ({ 'kochmod:plates': cabinetView(s) }),
   drops: cabinetDrops,
+  migrate: (saved) => migrateStationState('cabinet', saved),
   syncOnPlace: true,
 };
 
@@ -100,6 +107,23 @@ function setStates(block, typeId, states) {
 }
 
 /**
+ * Loads a station's saved state in the current shape. A state that had to be migrated
+ * (e.g. a stage 1 grill) is saved back right away.
+ * @template S
+ * @param {StationDef<S>} def
+ * @param {string} key
+ * @returns {{ state: S | undefined, migrated: boolean }} state undefined: nothing saved yet
+ */
+function loadState(def, key) {
+  const saved = worldStore.load(key);
+  if (saved === undefined) return { state: undefined, migrated: false };
+  const state = def.migrate(saved);
+  if (state === saved) return { state, migrated: false };
+  worldStore.save(key, state);
+  return { state, migrated: true };
+}
+
+/**
  * @template S
  * @param {string} kind registry name
  * @param {StationDef<S>} def
@@ -108,8 +132,7 @@ function setStates(block, typeId, states) {
  */
 function breakAt(kind, def, dimension, block) {
   const key = locKey(dimension.id, block.location);
-  /** @type {S} */
-  const state = worldStore.load(key) ?? def.initial;
+  const state = loadState(def, key).state ?? def.initial;
   breakStation(def.drops, state, {
     drop: (ids) => dropItems(dimension, block.center(), ids),
     forget: () => {
@@ -132,8 +155,7 @@ function syncViewLater(def, dimension, location, key) {
     try {
       const block = dimension.getBlock(location);
       if (block?.typeId !== def.typeId) return;
-      /** @type {S} */
-      const state = worldStore.load(key) ?? def.initial;
+      const state = loadState(def, key).state ?? def.initial;
       setStates(block, def.typeId, def.states(state));
     } catch (e) {
       console.warn(`kochmod: showing ${def.typeId} failed: ${e}`);
@@ -172,8 +194,8 @@ function stationComponent(kind, def) {
     onPlayerInteract({ block, player }) {
       if (!player) return;
       const key = keyOf(block);
-      /** @type {S} */
-      const state = worldStore.load(key) ?? def.initial;
+      // a migrated state needs no extra view refresh: interactStation sets the view anyway
+      const state = loadState(def, key).state ?? def.initial;
       interactStation(def.interact, def.states, state, heldItemId(player), {
         setView: (states) => setStates(block, def.typeId, states),
         save: (next) => {
@@ -229,17 +251,22 @@ export function onBlockExploded({ block, dimension, explodedBlockPermutation }) 
 }
 
 /**
- * World io for the tick loop of one station kind.
+ * World io for the tick loop of one station kind. A migrated state gets its block view refreshed.
  * @template S, V
  * @param {string} kind registry name
- * @param {string} typeId
+ * @param {StationDef<S>} def
  * @param {(view: V) => BlockStates} statesOf
  * @returns {import('../logic/station-flow.js').TickIo<S, V>}
  */
-function tickIo(kind, typeId, statesOf) {
+function tickIo(kind, def, statesOf) {
   return {
     blockTypeAt: (key) => loadedBlock(key)?.typeId,
-    load: (key) => worldStore.load(key),
+    load: (key) => {
+      const { state, migrated } = loadState(def, key);
+      const block = migrated ? loadedBlock(key) : undefined;
+      if (block) syncViewLater(def, block.dimension, block.location, key);
+      return state;
+    },
     save: (key, state) => worldStore.save(key, state),
     forget: (key) => {
       worldStore.remove(key);
@@ -247,7 +274,7 @@ function tickIo(kind, typeId, statesOf) {
     },
     setView: (key, view) => {
       const block = loadedBlock(key);
-      if (block) setStates(block, typeId, statesOf(view));
+      if (block) setStates(block, def.typeId, statesOf(view));
     },
     warn: (message) => console.warn(message),
   };
@@ -258,9 +285,9 @@ function tickIo(kind, typeId, statesOf) {
  * @param {number} dt
  */
 export function tickStations(dt) {
-  tickGrills(worldStore.registryList('grill'), dt, tickIo('grill', GRILL_ID, (view) => ({ 'kochmod:content': view })), GRILL_ID);
+  tickGrills(worldStore.registryList('grill'), dt, tickIo('grill', grill, (view) => ({ 'kochmod:content': view })), GRILL_ID);
   tickDishwashers(
     worldStore.registryList('dishwasher'), dt,
-    tickIo('dishwasher', DISHWASHER_ID, (view) => ({ 'kochmod:state': view })), DISHWASHER_ID,
+    tickIo('dishwasher', dishwasher, (view) => ({ 'kochmod:state': view })), DISHWASHER_ID,
   );
 }

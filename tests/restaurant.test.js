@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   RADIUS, SPAWN_MIN, SPAWN_MAX, DIRECTIONS,
   withinRadius, offset, seatDirection, availableDishes, pickWish,
-  spawnDelay, rate, seatStillValid, tableInteract,
+  spawnDelay, rate, seatStillValid, tableInteract, tableView,
 } from '../packs/BP/scripts/logic/restaurant.js';
 
 const HAM = 'kochmod:hamburger';
@@ -131,4 +131,13 @@ test('tableInteract: busy table with non-dish does nothing', () => {
   const state = { plate: /** @type {const} */ ('hamburger') };
   assert.deepEqual(tableInteract(state, 'kochmod:bun', false, true), { state });
   assert.deepEqual(tableInteract(state, null, false, false), { state });
+});
+
+test('tableView: any served dish shows as food, the failed dish as failed', () => {
+  assert.equal(tableView('hamburger'), 'food');
+  assert.equal(tableView('cheeseburger'), 'food');
+  assert.equal(tableView('failed_dish'), 'failed');
+  assert.equal(tableView('empty'), 'empty');
+  assert.equal(tableView('none'), 'none');
+  assert.equal(tableView('no_such_dish'), 'none', 'unknown stored values show no plate');
 });

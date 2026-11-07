@@ -1,9 +1,9 @@
 import { RECIPES, FAILED } from './recipes.js';
-import { isDish } from './catalog.js';
+import { isDish, plateName } from './catalog.js';
 
 /** @typedef {{ x: number, y: number, z: number }} Loc */
 /** @typedef {'north' | 'east' | 'south' | 'west'} Direction */
-/** @typedef {{ plate: 'none' | 'hamburger' | 'cheeseburger' | 'failed_dish' | 'empty' }} TableState */
+/** plate: 'none', 'empty' (eaten, dirty plate left) or the plateName of the served dish. @typedef {{ plate: string }} TableState */
 /**
  * serve: dish id handed to the waiting guest. consumePlate: remove one clean plate from the player's inventory.
  * @typedef {import('./stations.js').Result<TableState> & { serve?: string, consumePlate?: boolean }} TableResult
@@ -19,7 +19,6 @@ export const LEAVE_TICKS = 40;
 /** @type {Direction[]} */
 export const DIRECTIONS = ['north', 'east', 'south', 'west'];
 
-const PREFIX = 'kochmod:';
 export const CLEAN_PLATE = 'kochmod:clean_plate';
 export const DIRTY_PLATE = 'kochmod:dirty_plate';
 
@@ -101,6 +100,18 @@ export function seatStillValid(s) {
 }
 
 /**
+ * What the table shows (block state `kochmod:plate`) for a stored plate value: every served dish
+ * looks like the same plated meal, the failed dish like a grey heap. Unknown values show no plate.
+ * @param {string} plate stored TableState plate
+ * @returns {'none' | 'food' | 'failed' | 'empty'}
+ */
+export function tableView(plate) {
+  if (plate === 'empty') return 'empty';
+  if (plate === plateName(FAILED)) return 'failed';
+  return isDish(`kochmod:${plate}`) ? 'food' : 'none';
+}
+
+/**
  * Serving needs a clean plate in the player's inventory; an empty plate left on the
  * table comes back as a dirty plate.
  * @param {TableState} state
@@ -117,7 +128,7 @@ export function tableInteract(state, held, guestWaiting, hasPlate) {
     if (!guestWaiting) return { state, hint: 'kochmod.hint.no_guest' };
     if (!hasPlate) return { state, hint: 'kochmod.hint.need_plate' };
     return {
-      state: { plate: /** @type {TableState['plate']} */ (/** @type {string} */ (held).slice(PREFIX.length)) },
+      state: { plate: plateName(/** @type {string} */ (held)) },
       take: true,
       serve: /** @type {string} */ (held),
       sound: 'kochmod.plate',

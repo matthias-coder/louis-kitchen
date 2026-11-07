@@ -1,5 +1,5 @@
 import { BlockPermutation, ItemStack, world } from '@minecraft/server';
-import { DIRECTIONS, offset } from '../logic/restaurant.js';
+import { DIRECTIONS, offset, tableView } from '../logic/restaurant.js';
 import { parseLocKey } from '../logic/store.js';
 import { TABLE, tickBells, guestAvailability, serveTable, findWaitingGuest, releaseBell, sweepOrphans } from '../logic/guest-flow.js';
 import { worldStore, loadedBlock } from './effects.js';
@@ -121,7 +121,7 @@ function spawnSpot(bellKey) {
   return { x: x + 0.5, y: y + 1, z: z + 0.5 };
 }
 
-/** Plate state of a table: worldStore is the truth, the block state `kochmod:plate` the view. */
+/** Plate state of a table: worldStore holds the dish's plate name (the truth), the block state `kochmod:plate` its tableView. */
 /** @param {string} tableKey */
 function getPlate(tableKey) {
   const state = worldStore.load(tableKey);
@@ -134,7 +134,7 @@ function getPlate(tableKey) {
  */
 export function setPlate(tableKey, plate) {
   const block = loadedBlock(tableKey);
-  if (block?.typeId === TABLE) block.setPermutation(BlockPermutation.resolve(TABLE, { 'kochmod:plate': plate }));
+  if (block?.typeId === TABLE) block.setPermutation(BlockPermutation.resolve(TABLE, { 'kochmod:plate': tableView(plate) }));
   worldStore.save(tableKey, { plate });
 }
 

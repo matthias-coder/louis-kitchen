@@ -5,6 +5,7 @@ import { INITIAL, WASH_TICKS, boardInteract, boardView, boardDrops, grillView } 
 
 const GRILL = 'kochmod:grill';
 const WASHER = 'kochmod:dishwasher';
+const RAW = 'kochmod:raw_patty';
 
 test('interactStation sets the view, then saves, then applies', () => {
   /** @type {string[]} */
@@ -72,28 +73,28 @@ function fakeWorld(blocks, states) {
 test('tickGrills: one failing key does not stop the grills after it', () => {
   const w = fakeWorld(
     { a: GRILL, b: GRILL, c: GRILL },
-    { a: new Error('corrupt'), b: { occupied: true, ticks: 150 }, c: { occupied: true, ticks: 0 } },
+    { a: new Error('corrupt'), b: { item: RAW, ticks: 150 }, c: { item: RAW, ticks: 0 } },
   );
   tickGrills(['a', 'b', 'c'], 10, w.io, GRILL);
   assert.equal(w.warnings.length, 1);
   assert.match(w.warnings[0], /a/);
-  assert.deepEqual(w.states.b, { occupied: true, ticks: 160 });
+  assert.deepEqual(w.states.b, { item: RAW, ticks: 160 });
   assert.equal(w.views.b, 'cooked');
-  assert.deepEqual(w.states.c, { occupied: true, ticks: 10 });
+  assert.deepEqual(w.states.c, { item: RAW, ticks: 10 });
   assert.equal('c' in w.views, false, 'view unchanged, no permutation update');
 });
 
 test('tickGrills: a throwing block lookup is isolated too', () => {
-  const w = fakeWorld({ a: new Error('unloaded'), b: GRILL }, { b: { occupied: true, ticks: 0 } });
+  const w = fakeWorld({ a: new Error('unloaded'), b: GRILL }, { b: { item: RAW, ticks: 0 } });
   tickGrills(['a', 'b'], 10, w.io, GRILL);
   assert.equal(w.warnings.length, 1);
   assert.equal(w.states.b.ticks, 10);
 });
 
 test('tickGrills: unloaded grills pause, replaced grills are forgotten', () => {
-  const w = fakeWorld({ a: undefined, b: 'minecraft:air' }, { a: { occupied: true, ticks: 5 }, b: { occupied: true, ticks: 5 } });
+  const w = fakeWorld({ a: undefined, b: 'minecraft:air' }, { a: { item: RAW, ticks: 5 }, b: { item: RAW, ticks: 5 } });
   tickGrills(['a', 'b'], 10, w.io, GRILL);
-  assert.deepEqual(w.states.a, { occupied: true, ticks: 5 });
+  assert.deepEqual(w.states.a, { item: RAW, ticks: 5 });
   assert.deepEqual(w.forgotten, ['b']);
 });
 
@@ -105,7 +106,7 @@ test('tickGrills: a loaded grill without saved state is initialised', () => {
 });
 
 test('tickGrills: empty and fully burnt grills are not rewritten', () => {
-  const burnt = { occupied: true, ticks: 760 };
+  const burnt = { item: RAW, ticks: 760 };
   const w = fakeWorld({ a: GRILL, b: GRILL }, { a: INITIAL.grill, b: burnt });
   let saves = 0;
   const save = w.io.save;

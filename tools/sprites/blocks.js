@@ -162,31 +162,50 @@ export const layouts = {
     slice_top: /** @type {Region} */ ([0, 40, 4, 4]),
     slice_side: /** @type {Region} */ ([8, 40, 4, 1]),
   },
+  // counter: body, plate and the layer pictures of the four stack families (tools/geometry.js COUNTER_STACKS)
   counter: {
     body_side: /** @type {Region} */ ([0, 0, 16, 12]),
     body_top: /** @type {Region} */ ([16, 0, 16, 16]),
     body_bottom: /** @type {Region} */ ([32, 0, 16, 16]),
     plate_top: /** @type {Region} */ ([0, 16, 10, 10]),
-    plate_side: /** @type {Region} */ ([16, 16, 10, 1]),
-    bun_cut: /** @type {Region} */ ([32, 16, 8, 8]),
-    bun_side: /** @type {Region} */ ([48, 16, 8, 2]),
-    bun_top: /** @type {Region} */ ([0, 28, 8, 8]),
-    dome_top: /** @type {Region} */ ([16, 28, 6, 6]),
-    patty_raw_top: /** @type {Region} */ ([0, 40, 10, 10]),
-    patty_raw_side: /** @type {Region} */ ([0, 50, 10, 2]),
-    patty_cooked_top: /** @type {Region} */ ([16, 40, 10, 10]),
-    patty_cooked_side: /** @type {Region} */ ([16, 50, 10, 2]),
-    patty_burnt_top: /** @type {Region} */ ([32, 40, 10, 10]),
-    patty_burnt_side: /** @type {Region} */ ([32, 50, 10, 2]),
-    cheese_top: /** @type {Region} */ ([48, 40, 10, 10]),
-    cheese_side: /** @type {Region} */ ([48, 50, 10, 1]),
-    slices_top: /** @type {Region} */ ([0, 54, 8, 8]),
-    slices_side: /** @type {Region} */ ([8, 54, 8, 1]),
-    lettuce_top: /** @type {Region} */ ([16, 54, 10, 10]),
-    lettuce_side: /** @type {Region} */ ([28, 54, 10, 1]),
-    tomato_top: /** @type {Region} */ ([40, 54, 3, 3]),
-    tomato_side: /** @type {Region} */ ([44, 54, 3, 3]),
-    stem: /** @type {Region} */ ([48, 54, 1, 1]),
+    patty_top: /** @type {Region} */ ([10, 16, 10, 10]),
+    lettuce_top: /** @type {Region} */ ([20, 16, 10, 10]),
+    cheese_top: /** @type {Region} */ ([30, 16, 10, 10]),
+    dough_top: /** @type {Region} */ ([40, 16, 10, 10]),
+    nori_top: /** @type {Region} */ ([50, 16, 10, 10]),
+    rice_top: /** @type {Region} */ ([0, 26, 9, 9]),
+    salmon_top: /** @type {Region} */ ([10, 26, 8, 8]),
+    sauce_top: /** @type {Region} */ ([20, 26, 9, 9]),
+    pizza_cheese_top: /** @type {Region} */ ([30, 26, 8, 8]),
+    pita_top: /** @type {Region} */ ([40, 26, 10, 6]),
+    meat_top: /** @type {Region} */ ([50, 26, 9, 5]),
+    bun_cut: /** @type {Region} */ ([0, 36, 8, 8]),
+    bun_top: /** @type {Region} */ ([8, 36, 8, 8]),
+    slices_top: /** @type {Region} */ ([16, 36, 8, 8]),
+    dome_top: /** @type {Region} */ ([24, 36, 6, 6]),
+    doner_sauce_top: /** @type {Region} */ ([32, 36, 8, 4]),
+    maki_top: /** @type {Region} */ ([42, 36, 3, 3]),
+    maki_side: /** @type {Region} */ ([46, 36, 3, 3]),
+    salami: /** @type {Region} */ ([50, 36, 2, 2]),
+    pepper: /** @type {Region} */ ([54, 36, 2, 2]),
+    olive: /** @type {Region} */ ([58, 36, 1, 1]),
+    plate_side: /** @type {Region} */ ([0, 44, 10, 1]),
+    lettuce_side: /** @type {Region} */ ([10, 44, 10, 1]),
+    cheese_side: /** @type {Region} */ ([20, 44, 10, 1]),
+    slices_side: /** @type {Region} */ ([30, 44, 8, 1]),
+    dough_side: /** @type {Region} */ ([40, 44, 10, 1]),
+    nori_side: /** @type {Region} */ ([50, 44, 10, 1]),
+    patty_side: /** @type {Region} */ ([0, 46, 10, 2]),
+    bun_side: /** @type {Region} */ ([10, 46, 8, 2]),
+    pita_side: /** @type {Region} */ ([20, 46, 10, 2]),
+    meat_side: /** @type {Region} */ ([30, 46, 9, 2]),
+    rice_side: /** @type {Region} */ ([40, 46, 9, 1]),
+    salmon_side: /** @type {Region} */ ([50, 46, 8, 1]),
+    sauce_side: /** @type {Region} */ ([0, 49, 9, 1]),
+    pizza_cheese_side: /** @type {Region} */ ([10, 49, 8, 1]),
+    doner_sauce_side: /** @type {Region} */ ([20, 49, 8, 1]),
+    salami_side: /** @type {Region} */ ([30, 49, 2, 1]),
+    pepper_side: /** @type {Region} */ ([33, 49, 2, 1]),
   },
   table: {
     top_top: /** @type {Region} */ ([0, 0, 16, 16]),
@@ -197,20 +216,15 @@ export const layouts = {
     plate_top: /** @type {Region} */ ([0, 16, 10, 10]),
     plate_side: /** @type {Region} */ ([12, 16, 10, 1]),
     plate_empty_top: /** @type {Region} */ ([0, 28, 10, 10]),
-    bun_cut: /** @type {Region} */ ([24, 16, 8, 8]),
-    bun_side: /** @type {Region} */ ([34, 16, 8, 2]),
-    bun_top: /** @type {Region} */ ([24, 26, 8, 8]),
-    dome_top: /** @type {Region} */ ([34, 20, 6, 6]),
-    patty_top: /** @type {Region} */ ([44, 16, 9, 9]),
-    patty_side: /** @type {Region} */ ([44, 26, 9, 2]),
-    lettuce_top: /** @type {Region} */ ([12, 28, 10, 10]),
-    lettuce_side: /** @type {Region} */ ([12, 40, 10, 1]),
-    cheese_top: /** @type {Region} */ ([0, 42, 11, 11]),
-    cheese_side: /** @type {Region} */ ([12, 42, 11, 1]),
-    blob_top: /** @type {Region} */ ([24, 42, 7, 7]),
-    blob_side: /** @type {Region} */ ([32, 42, 7, 3]),
-    blob_small_top: /** @type {Region} */ ([40, 42, 4, 4]),
-    blob_small_side: /** @type {Region} */ ([46, 42, 4, 2]),
+    food_top: /** @type {Region} */ ([24, 20, 7, 7]),
+    food_side: /** @type {Region} */ ([32, 20, 7, 2]),
+    food_small_top: /** @type {Region} */ ([40, 20, 4, 4]),
+    food_small_side: /** @type {Region} */ ([46, 20, 4, 2]),
+    garnish: /** @type {Region} */ ([52, 20, 2, 2]),
+    failed_top: /** @type {Region} */ ([24, 30, 7, 7]),
+    failed_side: /** @type {Region} */ ([32, 30, 7, 2]),
+    failed_small_top: /** @type {Region} */ ([40, 30, 3, 3]),
+    failed_small_side: /** @type {Region} */ ([46, 30, 3, 2]),
   },
   chair: {
     seat_top: /** @type {Region} */ ([0, 0, 12, 12]),
@@ -356,6 +370,7 @@ function drawCounter() {
   for (let i = 2; i < 8; i++) { c.px(L.plate_top, i, 1, 'R'); c.px(L.plate_top, 1, i, 'R'); }
   c.fill(L.plate_side, 'Q');
 
+  // ---- burger: bun bottom, patty, lettuce, tomato, cheese, top bun
   c.fill(L.bun_cut, 'I');
   c.border(L.bun_cut, 'M');
   c.fill(L.bun_side, 'F');
@@ -369,9 +384,7 @@ function drawCounter() {
   c.speckle(L.dome_top, 'M', 'F', 0.25, 44);
   for (const [x, y] of [[1, 1], [4, 2], [2, 4]]) c.px(L.dome_top, x, y, 'J');
 
-  drawPatty(c, L.patty_raw_top, L.patty_raw_side, 'raw', 51);
-  drawPatty(c, L.patty_cooked_top, L.patty_cooked_side, 'cooked', 52);
-  drawPatty(c, L.patty_burnt_top, L.patty_burnt_side, 'burnt', 53);
+  drawPatty(c, L.patty_top, L.patty_side, 'cooked', 52);
 
   c.fill(L.cheese_top, 'E');
   c.speckle(L.cheese_top, 'E', 'G', 0.2, 45);
@@ -394,12 +407,59 @@ function drawCounter() {
   }
   for (let i = 0; i < 10; i++) c.px(L.lettuce_side, i, 0, i % 2 === 0 ? 'g' : 'L');
 
-  c.fill(L.tomato_top, 't');
-  c.px(L.tomato_top, 1, 1, 'l');
-  c.fill(L.tomato_side, 't');
-  c.px(L.tomato_side, 0, 0, 'i');
-  c.row(L.tomato_side, 2, 'j');
-  c.fill(L.stem, 'L');
+  // ---- pizza: light dough with a golden crust, red sauce, yellow cheese, salami, pepper, olives
+  c.fill(L.dough_top, '1');
+  c.speckle(L.dough_top, '1', '2', 0.15, 71);
+  c.border(L.dough_top, '3');
+  for (const [x, y] of [[0, 0], [9, 0], [0, 9], [9, 9]]) c.px(L.dough_top, x, y, '.');
+  c.fill(L.dough_side, '3');
+  c.fill(L.sauce_top, '4');
+  c.speckle(L.sauce_top, '4', '5', 0.25, 72);
+  for (const [x, y] of [[0, 0], [8, 0], [0, 8], [8, 8]]) c.px(L.sauce_top, x, y, '.');
+  c.fill(L.sauce_side, '5');
+  c.fill(L.pizza_cheese_top, 'E');
+  c.speckle(L.pizza_cheese_top, 'E', 'G', 0.35, 73);
+  c.speckle(L.pizza_cheese_top, 'E', '6', 0.08, 74);
+  for (const [x, y] of [[0, 0], [7, 0], [0, 7], [7, 7]]) c.px(L.pizza_cheese_top, x, y, '.');
+  c.fill(L.pizza_cheese_side, 'K');
+  c.fill(L.salami, '7');
+  c.px(L.salami, 0, 0, '8');
+  c.fill(L.salami_side, '9');
+  c.fill(L.pepper, 'l');
+  c.px(L.pepper, 1, 1, 'L');
+  c.fill(L.pepper_side, 'L');
+  c.fill(L.olive, '0');
+
+  // ---- doner: pale pita, brown meat strips, white garlic sauce
+  c.fill(L.pita_top, 'a');
+  c.speckle(L.pita_top, 'a', 'b', 0.25, 75);
+  c.border(L.pita_top, 'c');
+  c.fill(L.pita_side, 'a');
+  c.row(L.pita_side, 1, 'c');
+  c.fill(L.meat_top, 'm');
+  for (let y = 0; y < 5; y++) for (let x = 0; x < 9; x++) if ((x + 2 * y) % 3 === 0) c.px(L.meat_top, x, y, 'n');
+  c.speckle(L.meat_top, 'm', 'h', 0.2, 76);
+  c.fill(L.meat_side, 'h');
+  c.row(L.meat_side, 1, 'n');
+  c.fill(L.doner_sauce_top, 'W');
+  c.speckle(L.doner_sauce_top, 'W', 'V', 0.25, 77);
+  c.fill(L.doner_sauce_side, 'W');
+
+  // ---- sushi: dark nori, white rice, pink salmon with fat stripes, maki rolls
+  c.fill(L.nori_top, 'd');
+  c.speckle(L.nori_top, 'd', 'e', 0.25, 78);
+  c.fill(L.nori_side, 'd');
+  c.fill(L.rice_top, 'W');
+  c.speckle(L.rice_top, 'W', 'V', 0.3, 79);
+  c.fill(L.rice_side, 'V');
+  c.fill(L.salmon_top, 'o');
+  for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) if ((x + y) % 3 === 0) c.px(L.salmon_top, x, y, 'r');
+  c.fill(L.salmon_side, 'Y');
+  c.fill(L.maki_top, 'W');
+  c.border(L.maki_top, 'd');
+  c.px(L.maki_top, 1, 1, 'o');
+  c.fill(L.maki_side, 'd');
+  c.speckle(L.maki_side, 'd', 'e', 0.3, 80);
   return c.rows();
 }
 
@@ -414,6 +474,13 @@ export const counter = {
     E: '#f7c531', G: '#ffe680', K: '#d49a14',
     t: '#e23a28', i: '#ff8a6a', j: '#a8231a', S: '#f6d36b',
     l: '#5cbf3a', L: '#2f7f22', g: '#9be86a',
+    // pizza
+    1: '#f2d9a0', 2: '#e8c47c', 3: '#c98a3a', 4: '#d42a1a', 5: '#a81c10', 6: '#f9a03a',
+    7: '#b8242c', 8: '#e8606a', 9: '#7a1218', 0: '#2a2a2a',
+    // doner
+    a: '#f0dcae', b: '#e2c48a', c: '#c49a5a', W: '#fafaf4', V: '#dedcd2',
+    // sushi
+    d: '#1f3324', e: '#33503a', o: '#ff8c78', r: '#ffd2c6', Y: '#e8684f',
   },
   rows: drawCounter(),
 };
@@ -588,50 +655,35 @@ function drawTable() {
   for (const [x, y] of [[3, 3], [6, 4], [4, 6], [7, 7], [2, 7]]) c.px(L.plate_empty_top, x, y, 'F');
   for (const [x, y] of [[5, 5], [6, 5], [6, 6]]) c.px(L.plate_empty_top, x, y, 't');
 
-  c.fill(L.bun_cut, 'I');
-  c.border(L.bun_cut, 'M');
-  c.fill(L.bun_side, 'F');
-  c.row(L.bun_side, 1, 'N');
-  c.fill(L.bun_top, 'F');
-  c.speckle(L.bun_top, 'F', 'M', 0.3, 62);
-  c.border(L.bun_top, 'N');
-  for (const [x, y] of [[2, 2], [5, 2], [3, 4], [6, 5], [2, 6]]) c.px(L.bun_top, x, y, 'J');
-  c.fill(L.dome_top, 'M');
-  for (const [x, y] of [[1, 1], [4, 2], [2, 4]]) c.px(L.dome_top, x, y, 'J');
+  // plated meal (any served dish): brown heap with green, red and yellow bits, a green garnish leaf
+  c.fill(L.food_top, 'm');
+  c.speckle(L.food_top, 'm', 'h', 0.3, 63);
+  c.speckle(L.food_top, 'm', 'l', 0.12, 64);
+  c.speckle(L.food_top, 'm', 't', 0.1, 65);
+  c.speckle(L.food_top, 'm', 'E', 0.08, 66);
+  for (const [x, y] of [[0, 0], [6, 0], [0, 6], [6, 6]]) c.px(L.food_top, x, y, '.');
+  c.fill(L.food_side, 'h');
+  c.speckle(L.food_side, 'h', 'm', 0.3, 67);
+  c.row(L.food_side, 1, 'n');
+  c.fill(L.food_small_top, 'h');
+  c.speckle(L.food_small_top, 'h', 'E', 0.2, 68);
+  c.fill(L.food_small_side, 'h');
+  c.row(L.food_small_side, 1, 'm');
+  c.fill(L.garnish, 'l');
+  c.px(L.garnish, 1, 1, 'L');
 
-  c.fill(L.patty_top, 'm');
-  c.speckle(L.patty_top, 'm', 'h', 0.3, 63);
-  for (let y = 0; y < 9; y++) for (let x = 0; x < 9; x++) if ((x + y) % 4 === 1) c.px(L.patty_top, x, y, 'z');
-  c.border(L.patty_top, 'n');
-  c.row(L.patty_side, 0, 'm');
-  c.row(L.patty_side, 1, 'n');
-
-  c.fill(L.lettuce_top, 'l');
-  c.speckle(L.lettuce_top, 'l', 'g', 0.25, 64);
-  for (let i = 0; i < 10; i++) {
-    const ch = i % 2 === 0 ? '.' : 'L';
-    c.px(L.lettuce_top, i, 0, ch); c.px(L.lettuce_top, i, 9, ch);
-    c.px(L.lettuce_top, 0, i, ch); c.px(L.lettuce_top, 9, i, ch);
-  }
-  for (let i = 0; i < 10; i++) c.px(L.lettuce_side, i, 0, i % 2 === 0 ? 'g' : 'L');
-
-  c.fill(L.cheese_top, 'E');
-  c.speckle(L.cheese_top, 'E', 'G', 0.2, 65);
-  c.border(L.cheese_top, 'K');
-  c.fill(L.cheese_side, 'K');
-
-  // failed dish: grey-green blob with bubbles
-  c.fill(L.blob_top, 'b');
-  c.speckle(L.blob_top, 'b', 'c', 0.3, 66);
-  for (const [x, y] of [[2, 2], [4, 4], [5, 1]]) c.px(L.blob_top, x, y, 'e');
-  for (const [x, y] of [[0, 0], [6, 0], [0, 6], [6, 6]]) c.px(L.blob_top, x, y, '.');
-  c.fill(L.blob_side, 'b');
-  c.speckle(L.blob_side, 'b', 'c', 0.3, 67);
-  c.row(L.blob_side, 2, 'd');
-  c.fill(L.blob_small_top, 'c');
-  c.px(L.blob_small_top, 1, 1, 'e');
-  c.fill(L.blob_small_side, 'c');
-  c.row(L.blob_small_side, 1, 'd');
+  // failed dish: grey-black burnt heap with ash
+  c.fill(L.failed_top, 'b');
+  c.speckle(L.failed_top, 'b', 'c', 0.35, 69);
+  c.speckle(L.failed_top, 'b', 'e', 0.15, 70);
+  for (const [x, y] of [[0, 0], [6, 0], [0, 6], [6, 6]]) c.px(L.failed_top, x, y, '.');
+  c.fill(L.failed_side, 'b');
+  c.speckle(L.failed_side, 'b', 'c', 0.3, 71);
+  c.row(L.failed_side, 1, 'd');
+  c.fill(L.failed_small_top, 'c');
+  c.px(L.failed_small_top, 1, 1, 'e');
+  c.fill(L.failed_small_side, 'c');
+  c.row(L.failed_small_side, 1, 'd');
   return c.rows();
 }
 
@@ -641,12 +693,12 @@ export const table = {
   palette: {
     A: '#c28a52', B: '#d9a46a', C: '#8a5a2e', D: '#6b4423',
     P: '#f6f6f2', Q: '#d4d4cc', O: '#b4b4ac', R: '#ffffff',
-    F: '#d28a36', M: '#edb85a', N: '#a8631f', I: '#f7e2b0', J: '#fff6dc',
-    m: '#844622', h: '#b0703e', n: '#5e3016', z: '#2e1408',
-    l: '#5cbf3a', L: '#2f7f22', g: '#9be86a',
-    E: '#f7c531', G: '#ffe680', K: '#d49a14',
+    F: '#d28a36',
+    m: '#844622', h: '#b0703e', n: '#5e3016',
+    l: '#5cbf3a', L: '#2f7f22',
+    E: '#f7c531',
     t: '#d23a28',
-    b: '#7d8a6a', c: '#5b6b4c', d: '#3f4a34', e: '#a3ad8c',
+    b: '#3a3836', c: '#1c1a19', d: '#0c0b0a', e: '#7a7672',
   },
   rows: drawTable(),
 };

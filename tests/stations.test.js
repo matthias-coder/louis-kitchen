@@ -7,7 +7,9 @@ import {
   cabinetInteract, cabinetView, cabinetDrops,
   boardInteract, boardView, boardDrops,
   counterInteract, counterView, counterDrops,
+  timedStation, grill, migrateStationState, COUNTER_LAYERS,
 } from '../packs/BP/scripts/logic/stations.js';
+import { BURNT_AT, COOKED_AT } from '../packs/BP/scripts/logic/cooking.js';
 
 const k = (/** @type {string} */ id) => `kochmod:${id}`;
 const ING = ['bun', 'raw_patty', 'cooked_patty', 'burnt_patty', 'lettuce', 'tomato', 'tomato_slices', 'cheese'].map(k);
@@ -17,30 +19,31 @@ const noFields = (r) => {
   for (const f of ['take', 'give', 'count', 'hint', 'sound']) assert.equal(f in r, false, `${f} should be absent`);
 };
 
-// ---- Grill
+// ---- Grill (timed-station factory with the stage 1 grill rules, through the aliases)
+const RAW = k('raw_patty');
 test('grill: empty + raw_patty starts cooking', () => {
-  const r = grillInteract(INITIAL.grill, k('raw_patty'));
-  assert.deepEqual(r.state, { occupied: true, ticks: 0 });
+  const r = grillInteract(INITIAL.grill, RAW);
+  assert.deepEqual(r.state, { item: RAW, ticks: 0 });
   assert.equal(r.take, true);
   assert.equal(r.sound, 'kochmod.sizzle');
 });
 test('grill: occupied + raw_patty is full', () => {
-  const s = { occupied: true, ticks: 5 };
-  const r = grillInteract(s, k('raw_patty'));
+  const s = { item: RAW, ticks: 5 };
+  const r = grillInteract(s, RAW);
   assert.deepEqual(r.state, s);
   assert.equal(r.hint, 'kochmod.hint.grill_full');
   assert.equal(r.take, undefined);
 });
-for (const [ticks, out] of [[0, 'raw_patty'], [200, 'cooked_patty'], [800, 'burnt_patty']]) {
+for (const [ticks, out] of /** @type {const} */ ([[0, 'raw_patty'], [200, 'cooked_patty'], [800, 'burnt_patty']])) {
   test(`grill: spatula at ${ticks} gives ${out}`, () => {
-    const r = grillInteract({ occupied: true, ticks }, k('spatula'));
+    const r = grillInteract({ item: RAW, ticks }, k('spatula'));
     assert.equal(r.give, k(out));
-    assert.deepEqual(r.state, { occupied: false, ticks: 0 });
+    assert.deepEqual(r.state, { item: null, ticks: 0 });
   });
 }
 test('grill: occupied + other or empty hand needs spatula', () => {
   for (const held of [k('knife'), k('bun'), null]) {
-    const s = { occupied: true, ticks: 9 };
+    const s = { item: RAW, ticks: 9 };
     const r = grillInteract(s, held);
     assert.deepEqual(r.state, s);
     assert.equal(r.hint, 'kochmod.hint.need_spatula');
@@ -54,21 +57,56 @@ test('grill: empty + anything else is unchanged with no fields', () => {
     noFields(r);
   }
 });
-test('grill: tick only when occupied, caps at BURNT_AT, 16x10 is cooked', () => {
-  assert.deepEqual(grillTick({ occupied: false, ticks: 0 }, 50), { occupied: false, ticks: 0 });
-  assert.equal(grillTick({ occupied: true, ticks: 700 }, 500).ticks, 760);
-  let s = { occupied: true, ticks: 0 };
+test('grill: tick only while an item is on it, caps at BURNT_AT, 16x10 is cooked', () => {
+  assert.deepEqual(grillTick({ item: null, ticks: 0 }, 50), { item: null, ticks: 0 });
+  assert.deepEqual(grillTick({ item: RAW, ticks: 700 }, 500), { item: RAW, ticks: BURNT_AT });
+  /** @type {import('../packs/BP/scripts/logic/stations.js').TimedState} */
+  let s = { item: RAW, ticks: 0 };
   for (let i = 0; i < 10; i++) s = grillTick(s, 16);
   assert.equal(grillView(s), 'cooked');
 });
 test('grill: view', () => {
   assert.equal(grillView(INITIAL.grill), 'empty');
-  assert.equal(grillView({ occupied: true, ticks: 0 }), 'raw');
-  assert.equal(grillView({ occupied: true, ticks: 760 }), 'burnt');
+  assert.equal(grillView({ item: RAW, ticks: 0 }), 'raw');
+  assert.equal(grillView({ item: RAW, ticks: 160 }), 'cooked');
+  assert.equal(grillView({ item: RAW, ticks: 760 }), 'burnt');
 });
 test('grill: drops', () => {
   assert.deepEqual(grillDrops(INITIAL.grill), []);
-  assert.deepEqual(grillDrops({ occupied: true, ticks: 200 }), [k('cooked_patty')]);
+  assert.deepEqual(grillDrops({ item: RAW, ticks: 0 }), [RAW]);
+  assert.deepEqual(grillDrops({ item: RAW, ticks: 200 }), [k('cooked_patty')]);
+  assert.deepEqual(grillDrops({ item: RAW, ticks: 760 }), [k('burnt_patty')]);
+});
+test('grill: initial state and aliases come from the factory', () => {
+  assert.deepEqual(INITIAL.grill, { item: null, ticks: 0 });
+  assert.deepEqual(grill.INITIAL, INITIAL.grill);
+  assert.equal(grillInteract, grill.interact);
+  assert.equal(grillTick, grill.tick);
+  assert.equal(grillView, grill.view);
+  assert.equal(grillDrops, grill.drops);
+});
+test('grill: an unknown stored item is tolerated (view raw, given back and dropped as is)', () => {
+  const s = { item: 'kochmod:mystery', ticks: 500 };
+  assert.equal(grillView(s), 'raw');
+  assert.deepEqual(grillDrops(s), ['kochmod:mystery']);
+  assert.deepEqual(grillInteract(s, k('spatula')), { state: { item: null, ticks: 0 }, give: 'kochmod:mystery' });
+  assert.equal(grillTick(s, 500).ticks, BURNT_AT);
+});
+test('timedStation: works for any TIMED-shaped row', () => {
+  const pot = timedStation({
+    accepts: { 'kochmod:rice': { cooked: 'kochmod:cooked_rice', burnt: 'kochmod:burnt_rice' } },
+    tool: 'kochmod:ladle', hintTool: 'kochmod.hint.need_ladle', hintFull: 'kochmod.hint.pot_full', sound: 'kochmod.bubble',
+  });
+  assert.deepEqual(pot.INITIAL, { item: null, ticks: 0 });
+  const placed = pot.interact(pot.INITIAL, 'kochmod:rice');
+  assert.deepEqual(placed, { state: { item: 'kochmod:rice', ticks: 0 }, take: true, sound: 'kochmod.bubble' });
+  assert.deepEqual(pot.interact(pot.INITIAL, RAW), { state: pot.INITIAL });
+  const done = pot.tick(placed.state, COOKED_AT);
+  assert.equal(pot.view(done), 'cooked');
+  assert.equal(pot.interact(done, 'kochmod:rice').hint, 'kochmod.hint.pot_full');
+  assert.equal(pot.interact(done, null).hint, 'kochmod.hint.need_ladle');
+  assert.deepEqual(pot.interact(done, 'kochmod:ladle'), { state: { item: null, ticks: 0 }, give: 'kochmod:cooked_rice' });
+  assert.deepEqual(pot.drops(pot.tick(done, BURNT_AT)), ['kochmod:burnt_rice']);
 });
 
 // ---- Board
@@ -143,13 +181,20 @@ test('counter: empty hand assembles', () => {
 test('counter: empty hand with 0 items unchanged', () => {
   assert.deepEqual(counterInteract(INITIAL.counter, null), { state: INITIAL.counter });
 });
-test('counter: view', () => {
-  assert.deepEqual(counterView(INITIAL.counter), { bun: false, patty: 'none', lettuce: false, tomato: 'none', cheese: false });
-  const v = counterView({ items: ['bun', 'raw_patty', 'cooked_patty', 'tomato', 'tomato_slices', 'lettuce', 'cheese'].map(k) });
-  assert.deepEqual(v, { bun: true, patty: 'cooked', lettuce: true, tomato: 'slices', cheese: true });
-  assert.equal(counterView({ items: [k('tomato')] }).tomato, 'whole');
-  assert.equal(counterView({ items: [k('burnt_patty')] }).patty, 'burnt');
-  assert.equal(counterView({ items: [k('raw_patty')] }).patty, 'raw');
+test('counter: view is empty without items', () => {
+  assert.deepEqual(counterView(INITIAL.counter), { family: 'none', layers: 0 });
+});
+test('counter: view family from the base item, layers grow with the items up to 6', () => {
+  assert.deepEqual(counterView({ items: [k('bun')] }), { family: 'burger', layers: 1 });
+  assert.deepEqual(counterView({ items: ['bun', 'cooked_patty', 'lettuce', 'tomato_slices', 'cheese'].map(k) }), { family: 'burger', layers: 5 });
+  assert.deepEqual(counterView({ items: ['cheese', 'dough', 'tomato_slices'].map(k) }), { family: 'pizza', layers: 3 });
+  assert.deepEqual(counterView({ items: ['pita', 'cooked_patty'].map(k) }), { family: 'doner', layers: 2 });
+  assert.deepEqual(counterView({ items: ['nori', 'cheese', 'lettuce', 'tomato', 'bun', 'cheese', 'cheese', 'cheese'].map(k) }), { family: 'sushi', layers: COUNTER_LAYERS });
+  assert.equal(COUNTER_LAYERS, 6);
+});
+test('counter: without a base item the stack shows as a burger', () => {
+  assert.deepEqual(counterView({ items: [k('cheese'), k('tomato')] }), { family: 'burger', layers: 2 });
+  assert.deepEqual(counterView({ items: ['kochmod:unknown_thing'] }), { family: 'burger', layers: 1 });
 });
 test('counter: drops', () => {
   assert.deepEqual(counterDrops({ items: [k('bun'), k('cheese')] }), [k('bun'), k('cheese')]);
@@ -248,6 +293,28 @@ test('cabinet: view is the plate count, drops are the plates', () => {
   assert.equal(cabinetView({ plates: 8 }), 8);
   assert.deepEqual(cabinetDrops({ plates: 0 }), []);
   assert.deepEqual(cabinetDrops({ plates: 2 }), [CLEAN, CLEAN]);
+});
+
+// ---- Migration of stage 1 saved states
+test('migrateStationState: stage 1 grill shapes', () => {
+  assert.deepEqual(migrateStationState('grill', { occupied: true, ticks: 300 }), { item: RAW, ticks: 300 });
+  assert.deepEqual(migrateStationState('grill', { occupied: true }), { item: RAW, ticks: 0 });
+  assert.deepEqual(migrateStationState('grill', { occupied: false, ticks: 0 }), INITIAL.grill);
+});
+test('migrateStationState: new shapes pass through unchanged (same object)', () => {
+  /** @type {[keyof typeof INITIAL, unknown][]} */
+  const cases = [
+    ['grill', { item: RAW, ticks: 12 }], ['grill', { item: null, ticks: 0 }], ['counter', { items: [k('bun')] }],
+    ['board', { item: k('tomato') }], ['dishwasher', { plates: 2, ticks: 5 }], ['cabinet', { plates: 3 }],
+  ];
+  for (const [kind, s] of cases) assert.equal(migrateStationState(kind, s), s, kind);
+});
+test('migrateStationState: garbage becomes the initial state of that kind', () => {
+  for (const kind of /** @type {const} */ (['grill', 'board', 'counter', 'dishwasher', 'cabinet'])) {
+    for (const bad of [undefined, null, 42, 'x', [], {}, { items: 'no' }, { item: 7, ticks: 'a' }]) {
+      assert.deepEqual(migrateStationState(kind, bad), INITIAL[kind], `${kind} ${JSON.stringify(bad)}`);
+    }
+  }
 });
 
 // ---- Purity

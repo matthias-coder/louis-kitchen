@@ -27,6 +27,57 @@ const tallCabinet = [
   { name: 'cabinet', cubes: [{ origin: [-7, 0, -7], size: [14, 23, 14], top: 'top', side: 'side', bottom: 'bottom', front: 'front' }] },
 ];
 
+/** @param {[number, number, number]} origin @param {[number, number, number]} size @param {string} top @param {string} side @param {string} [bottom] @returns {CubeDef} */
+const cube = (origin, size, top, side, bottom) => ({ origin, size, top, side, ...(bottom ? { bottom } : {}) });
+
+/**
+ * Counter stacks on the plate (top at y=13): per family six layers, bottom to top. Layer n is shown
+ * from n items on, so the lower layers are always there and nothing floats. Highest point 23 px.
+ * @type {Record<'burger' | 'pizza' | 'doner' | 'sushi', CubeDef[][]>}
+ */
+export const COUNTER_STACKS = {
+  burger: [
+    [cube([-4, 13, -4], [8, 2, 8], 'bun_cut', 'bun_side')],
+    [cube([-5, 15, -5], [10, 2, 10], 'patty_top', 'patty_side')],
+    [cube([-5, 17, -5], [10, 1, 10], 'lettuce_top', 'lettuce_side')],
+    [cube([-4, 18, -4], [8, 1, 8], 'slices_top', 'slices_side')],
+    [cube([-5, 19, -5], [10, 1, 10], 'cheese_top', 'cheese_side')],
+    [cube([-4, 20, -4], [8, 2, 8], 'bun_top', 'bun_side', 'bun_cut'), cube([-3, 22, -3], [6, 1, 6], 'dome_top', 'bun_side')],
+  ],
+  // flat round pizza: dough, red sauce, yellow cheese, then toppings
+  pizza: [
+    [cube([-5, 13, -5], [10, 1, 10], 'dough_top', 'dough_side')],
+    [cube([-4.5, 14, -4.5], [9, 0.5, 9], 'sauce_top', 'sauce_side')],
+    [cube([-4, 14.5, -4], [8, 0.5, 8], 'pizza_cheese_top', 'pizza_cheese_side')],
+    [[-3, -3], [1, -2], [-2, 1.5]].map(([x, z]) => cube([x, 15, z], [2, 0.5, 2], 'salami', 'salami_side')),
+    [[1.5, 1.5], [-3.5, -0.5], [-0.5, -3.5]].map(([x, z]) => cube([x, 15, z], [1.5, 0.5, 1.5], 'pepper', 'pepper_side')),
+    [[0, 0], [2.5, -3.5], [-3.5, 2.5]].map(([x, z]) => cube([x, 15, z], [1, 0.5, 1], 'olive', 'olive')),
+  ],
+  // pita pocket with fillings and the upper half on top
+  doner: [
+    [cube([-5, 13, -3], [10, 1, 6], 'pita_top', 'pita_side')],
+    [cube([-4.5, 14, -2.5], [9, 2, 5], 'meat_top', 'meat_side')],
+    [cube([-4.5, 16, -2.5], [9, 1, 5], 'lettuce_top', 'lettuce_side')],
+    [cube([-4, 17, -2], [8, 1, 4], 'slices_top', 'slices_side')],
+    [cube([-4, 18, -2], [8, 0.5, 4], 'doner_sauce_top', 'doner_sauce_side')],
+    [cube([-5, 18.5, -3], [10, 1.5, 6], 'pita_top', 'pita_side')],
+  ],
+  // nori sheet, rice, salmon, then three maki pieces
+  sushi: [
+    [cube([-5, 13, -5], [10, 0.5, 10], 'nori_top', 'nori_side')],
+    [cube([-4.5, 13.5, -4.5], [9, 1, 9], 'rice_top', 'rice_side')],
+    [cube([-4, 14.5, -4], [8, 1, 8], 'salmon_top', 'salmon_side')],
+    [cube([-4, 15.5, -1.25], [2.5, 2.5, 2.5], 'maki_top', 'maki_side')],
+    [cube([-1.25, 15.5, -1.25], [2.5, 2.5, 2.5], 'maki_top', 'maki_side')],
+    [cube([1.5, 15.5, -1.25], [2.5, 2.5, 2.5], 'maki_top', 'maki_side')],
+  ],
+};
+
+/** Bones `<family>_<n>` for the counter (visibility in packs/BP/blocks/counter.json). @returns {BoneDef[]} */
+const counterStacks = () => Object.entries(COUNTER_STACKS).flatMap(([family, layers]) => (
+  layers.map((cubes, i) => ({ name: `${family}_${i + 1}`, cubes }))
+));
+
 /** Dish cabinet plates: 4 on the bottom board, 4 on the shelf; plate_n shows when the count is >= n. */
 const PLATE_Y = [1, 2, 3, 4, 8, 9, 10, 11];
 
@@ -87,25 +138,7 @@ export const models = {
   counter: [
     body(),
     { name: 'plate', cubes: [{ origin: [-5, 12, -5], size: [10, 1, 10], top: 'plate_top', side: 'plate_side' }] },
-    { name: 'bun_bottom', cubes: [{ origin: [-4, 13, -4], size: [8, 2, 8], top: 'bun_cut', side: 'bun_side' }] },
-    ...patties(15, 5),
-    { name: 'cheese', cubes: [{ origin: [-5, 17, -5], size: [10, 1, 10], top: 'cheese_top', side: 'cheese_side' }] },
-    { name: 'tomato_slices', cubes: [{ origin: [-4, 18, -4], size: [8, 1, 8], top: 'slices_top', side: 'slices_side' }] },
-    {
-      name: 'tomato_whole',
-      cubes: [
-        { origin: [5, 12, 4], size: [3, 3, 3], top: 'tomato_top', side: 'tomato_side' },
-        { origin: [6, 15, 5], size: [1, 1, 1], top: 'stem', side: 'stem' },
-      ],
-    },
-    { name: 'lettuce', cubes: [{ origin: [-5, 19, -5], size: [10, 1, 10], top: 'lettuce_top', side: 'lettuce_side' }] },
-    {
-      name: 'bun_top',
-      cubes: [
-        { origin: [-4, 20, -4], size: [8, 2, 8], top: 'bun_top', side: 'bun_side', bottom: 'bun_cut' },
-        { origin: [-3, 22, -3], size: [6, 1, 6], top: 'dome_top', side: 'bun_side' },
-      ],
-    },
+    ...counterStacks(),
   ],
   table: [
     {
@@ -119,32 +152,20 @@ export const models = {
     },
     { name: 'plate', cubes: [{ origin: [-5, 16, -5], size: [10, 1, 10], top: 'plate_top', side: 'plate_side' }] },
     { name: 'plate_empty', cubes: [{ origin: [-5, 16, -5], size: [10, 1, 10], top: 'plate_empty_top', side: 'plate_side' }] },
+    // one generic plated meal for every served dish
     {
-      name: 'hamburger',
+      name: 'food',
       cubes: [
-        { origin: [-4, 17, -4], size: [8, 2, 8], top: 'bun_cut', side: 'bun_side' },
-        { origin: [-4.5, 19, -4.5], size: [9, 2, 9], top: 'patty_top', side: 'patty_side' },
-        { origin: [-5, 21, -5], size: [10, 1, 10], top: 'lettuce_top', side: 'lettuce_side' },
-        { origin: [-4, 22, -4], size: [8, 2, 8], top: 'bun_top', side: 'bun_side', bottom: 'bun_cut' },
-        { origin: [-3, 24, -3], size: [6, 1, 6], top: 'dome_top', side: 'bun_side' },
+        { origin: [-3.5, 17, -3.5], size: [7, 2, 7], top: 'food_top', side: 'food_side' },
+        { origin: [-2, 19, -2], size: [4, 1.5, 4], top: 'food_small_top', side: 'food_small_side' },
+        { origin: [0, 20.5, -1], size: [2, 0.5, 2], top: 'garnish', side: 'garnish' },
       ],
     },
     {
-      name: 'cheeseburger',
+      name: 'failed',
       cubes: [
-        { origin: [-4, 17, -4], size: [8, 2, 8], top: 'bun_cut', side: 'bun_side' },
-        { origin: [-4.5, 19, -4.5], size: [9, 2, 9], top: 'patty_top', side: 'patty_side' },
-        { origin: [-5.5, 21, -5.5], size: [11, 1, 11], top: 'cheese_top', side: 'cheese_side' },
-        { origin: [-5, 22, -5], size: [10, 1, 10], top: 'lettuce_top', side: 'lettuce_side' },
-        { origin: [-4, 23, -4], size: [8, 2, 8], top: 'bun_top', side: 'bun_side', bottom: 'bun_cut' },
-        { origin: [-3, 25, -3], size: [6, 1, 6], top: 'dome_top', side: 'bun_side' },
-      ],
-    },
-    {
-      name: 'failed_dish',
-      cubes: [
-        { origin: [-3.5, 17, -3.5], size: [7, 3, 7], top: 'blob_top', side: 'blob_side' },
-        { origin: [-1, 20, -2], size: [4, 2, 4], top: 'blob_small_top', side: 'blob_small_side' },
+        { origin: [-3.5, 17, -3.5], size: [7, 2, 7], top: 'failed_top', side: 'failed_side' },
+        { origin: [-1.5, 19, -1.5], size: [3, 1.5, 3], top: 'failed_small_top', side: 'failed_small_side' },
       ],
     },
   ],

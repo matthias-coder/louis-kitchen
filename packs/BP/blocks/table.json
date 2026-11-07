@@ -7,18 +7,17 @@
         "category": "construction"
       },
       "states": {
-        "kochmod:plate": ["none", "hamburger", "cheeseburger", "failed_dish", "empty"]
+        "kochmod:plate": ["none", "food", "failed", "empty"]
       }
     },
     "components": {
       "minecraft:geometry": {
         "identifier": "geometry.kochmod.table",
         "bone_visibility": {
-          "plate": "q.block_state('kochmod:plate') == 'hamburger' || q.block_state('kochmod:plate') == 'cheeseburger' || q.block_state('kochmod:plate') == 'failed_dish'",
+          "plate": "q.block_state('kochmod:plate') == 'food' || q.block_state('kochmod:plate') == 'failed'",
           "plate_empty": "q.block_state('kochmod:plate') == 'empty'",
-          "hamburger": "q.block_state('kochmod:plate') == 'hamburger'",
-          "cheeseburger": "q.block_state('kochmod:plate') == 'cheeseburger'",
-          "failed_dish": "q.block_state('kochmod:plate') == 'failed_dish'"
+          "food": "q.block_state('kochmod:plate') == 'food'",
+          "failed": "q.block_state('kochmod:plate') == 'failed'"
         }
       },
       "minecraft:material_instances": {

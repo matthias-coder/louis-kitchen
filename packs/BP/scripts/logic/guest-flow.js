@@ -3,6 +3,9 @@ import {
   withinRadius, offset, seatDirection, availableDishes, pickWish, spawnDelay, rate, seatStillValid,
 } from './restaurant.js';
 import { locKey, parseLocKey } from './store.js';
+import { DISHES, FAILED } from './recipes.js';
+import { plateName } from './catalog.js';
+import { stationsFor } from './processes.js';
 
 /**
  * Guest life cycle, one guest per bell. Pure: the world is reached only
@@ -19,8 +22,9 @@ export const ARRIVE_DISTANCE = 1.5;
 /** Guest ticks the entity may be missing before the bell gives up on it (entities load after blocks). */
 export const MISSING_GRACE = 3;
 
-const STATION_KINDS = ['grill', 'cutting_board', 'counter'];
-const DISH_PLATES = ['hamburger', 'cheeseburger', 'failed_dish'];
+const STATION_KINDS = [...new Set(DISHES.flatMap(stationsFor))];
+/** Plate states of the table: one per dish plus the failed dish. */
+export const DISH_PLATES = [...DISHES.map(plateName), plateName(FAILED)];
 const PREFIX = 'kochmod:';
 
 /**

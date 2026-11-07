@@ -218,3 +218,13 @@ test('pack names carry the version so Minecraft lists versions apart', () => {
     assert.match(text, new RegExp(`^pack\.name=Kochmod ${v.replaceAll('.', '\.')}$`, 'm'));
   }
 });
+
+test('guest wish enum and table plate states follow the dish catalog', async () => {
+  const { DISHES } = await import('../packs/BP/scripts/logic/recipes.js');
+  const { plateName } = await import('../packs/BP/scripts/logic/catalog.js');
+  const { DISH_PLATES } = await import('../packs/BP/scripts/logic/guest-flow.js');
+  const guest = JSON.parse(fs.readFileSync(path.join(BP, 'entities', 'guest.json'), 'utf8'));
+  assert.deepEqual(guest['minecraft:entity'].description.properties['kochmod:wish'].values, ['none', ...DISHES.map(plateName)]);
+  const table = JSON.parse(fs.readFileSync(path.join(BP, 'blocks', 'table.json'), 'utf8'));
+  assert.deepEqual(table['minecraft:block'].description.states['kochmod:plate'], ['none', ...DISH_PLATES, 'empty']);
+});

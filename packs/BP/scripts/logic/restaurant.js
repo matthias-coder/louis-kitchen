@@ -1,4 +1,5 @@
 import { RECIPES, FAILED } from './recipes.js';
+import { isDish } from './catalog.js';
 
 /** @typedef {{ x: number, y: number, z: number }} Loc */
 /** @typedef {'north' | 'east' | 'south' | 'west'} Direction */
@@ -21,7 +22,6 @@ export const DIRECTIONS = ['north', 'east', 'south', 'west'];
 const PREFIX = 'kochmod:';
 export const CLEAN_PLATE = 'kochmod:clean_plate';
 export const DIRTY_PLATE = 'kochmod:dirty_plate';
-const DISH_IDS = [...RECIPES.map((r) => r.dish), FAILED];
 
 /**
  * @param {Loc} a
@@ -110,10 +110,10 @@ export function seatStillValid(s) {
  * @returns {TableResult}
  */
 export function tableInteract(state, held, guestWaiting, hasPlate) {
-  const isDish = held !== null && DISH_IDS.includes(held);
-  if (state.plate === 'empty' && !(isDish && guestWaiting)) return { state: { plate: 'none' }, give: DIRTY_PLATE };
+  const holdsDish = isDish(held);
+  if (state.plate === 'empty' && !(holdsDish && guestWaiting)) return { state: { plate: 'none' }, give: DIRTY_PLATE };
   if (state.plate === 'none' || state.plate === 'empty') {
-    if (!isDish) return { state };
+    if (!holdsDish) return { state };
     if (!guestWaiting) return { state, hint: 'kochmod.hint.no_guest' };
     if (!hasPlate) return { state, hint: 'kochmod.hint.need_plate' };
     return {
@@ -125,6 +125,6 @@ export function tableInteract(state, held, guestWaiting, hasPlate) {
       ...(state.plate === 'empty' ? { give: DIRTY_PLATE } : {}),
     };
   }
-  if (isDish) return { state, hint: 'kochmod.hint.table_busy' };
+  if (holdsDish) return { state, hint: 'kochmod.hint.table_busy' };
   return { state };
 }

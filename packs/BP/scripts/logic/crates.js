@@ -1,39 +1,24 @@
+import { ITEMS, itemsFrom } from './catalog.js';
+
 /**
  * Supply crates: tapping one opens a picture menu; every entry hands out `count` of `item`, forever.
  * @typedef {{ item: string, count: number }} CrateEntry
  * @typedef {{ title: string, entries: CrateEntry[] }} CrateDef
  */
 
+/** Amount a crate hands out: tools singly, everything else in fours. */
+const crateCount = (/** @type {string} */ id) => (ITEMS[id].kind === 'tool' ? 1 : 4);
+/** @param {import('./catalog.js').CrateSource} source */
+const crateEntries = (source) => itemsFrom(source).map((item) => ({ item, count: crateCount(item) }));
+
 /** @type {Record<string, CrateDef>} keyed by block id (without namespace) */
 export const CRATES = {
-  fridge: {
-    title: 'kochmod.crate.fridge',
-    entries: [
-      { item: 'kochmod:tomato', count: 4 },
-      { item: 'kochmod:lettuce', count: 4 },
-      { item: 'kochmod:raw_patty', count: 4 },
-      { item: 'kochmod:cheese', count: 4 },
-    ],
-  },
+  fridge: { title: 'kochmod.crate.fridge', entries: crateEntries('fridge') },
   // Dry goods; stage 2 adds noodles, rice and so on here.
-  pantry: { title: 'kochmod.crate.pantry', entries: [{ item: 'kochmod:bun', count: 4 }] },
-  crate_tools: {
-    title: 'kochmod.crate.tools',
-    entries: [
-      { item: 'kochmod:knife', count: 1 },
-      { item: 'kochmod:spatula', count: 1 },
-      { item: 'kochmod:clean_plate', count: 4 },
-    ],
-  },
+  pantry: { title: 'kochmod.crate.pantry', entries: crateEntries('pantry') },
+  crate_tools: { title: 'kochmod.crate.tools', entries: crateEntries('tools') },
 };
 
-/** Items of the crate_all menu with the amount handed out: ingredients and plates x4, tools, dishes and the restaurant kit x1. */
-const ALL_ITEMS = [
-  ...['bun', 'raw_patty', 'cooked_patty', 'burnt_patty', 'lettuce', 'tomato', 'tomato_slices', 'cheese'].map((id) => ({ id, count: 4 })),
-  ...['knife', 'spatula', 'hamburger', 'cheeseburger', 'failed_dish'].map((id) => ({ id, count: 1 })),
-  { id: 'clean_plate', count: 4 },
-  { id: 'restaurant_kit', count: 1 },
-];
 /** Every block of the add-on, in menu order (block items are handed out like items). */
 export const ALL_BLOCKS = [
   'grill', 'cutting_board', 'counter',
@@ -45,7 +30,10 @@ export const ALL_BLOCKS = [
 CRATES.crate_all = {
   title: 'kochmod.crate.all',
   entries: [
-    ...ALL_ITEMS.map(({ id, count }) => ({ item: `kochmod:${id}`, count })),
+    // every catalog item except those marked menu: false (dirty plate); ingredients, prepared items and plates x4, the rest x1
+    ...Object.keys(ITEMS)
+      .filter((id) => ITEMS[id].menu !== false)
+      .map((item) => ({ item, count: ['ingredient', 'prepared', 'plate'].includes(ITEMS[item].kind) ? 4 : 1 })),
     ...ALL_BLOCKS.map((id) => ({ item: `kochmod:${id}`, count: 1 })),
   ],
 };

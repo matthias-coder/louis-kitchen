@@ -1,15 +1,17 @@
+import { isDish } from './catalog.js';
+import { ASSEMBLY, POT, WOK, stationsFor } from './processes.js';
+
 export const FAILED = 'kochmod:failed_dish';
 
 /** @typedef {{ dish: string, parts: string[], stations: string[] }} Recipe */
 
-const STATIONS = ['grill', 'cutting_board', 'counter'];
-const BASE = ['kochmod:bun', 'kochmod:cooked_patty', 'kochmod:lettuce', 'kochmod:tomato_slices'];
+/** @type {Recipe[]} every assembly / pot / wok entry whose result is a real dish */
+export const RECIPES = [...ASSEMBLY, ...POT, ...WOK]
+  .filter((r) => isDish(r.dish) && r.dish !== FAILED)
+  .map((r) => ({ dish: r.dish, parts: r.parts, stations: stationsFor(r.dish) }));
 
-/** @type {Recipe[]} */
-export const RECIPES = [
-  { dish: 'kochmod:hamburger', parts: BASE, stations: STATIONS },
-  { dish: 'kochmod:cheeseburger', parts: [...BASE, 'kochmod:cheese'], stations: STATIONS },
-];
+/** Dish ids in recipe order (the failed dish is not one of them). */
+export const DISHES = RECIPES.map((r) => r.dish);
 
 /**
  * @param {string[]} a
@@ -23,10 +25,19 @@ function sameMultiset(a, b) {
 }
 
 /**
+ * @param {{ dish: string, parts: string[] }[]} list
+ * @param {string[]} itemIds
+ * @returns {string} dish id on exact multiset match, else FAILED
+ */
+export function evaluateFor(list, itemIds) {
+  const match = list.find((r) => sameMultiset(r.parts, itemIds));
+  return match ? match.dish : FAILED;
+}
+
+/**
  * @param {string[]} itemIds
  * @returns {string} dish id on exact multiset match, else FAILED
  */
 export function evaluateAssembly(itemIds) {
-  const match = RECIPES.find((r) => sameMultiset(r.parts, itemIds));
-  return match ? match.dish : FAILED;
+  return evaluateFor(ASSEMBLY, itemIds);
 }

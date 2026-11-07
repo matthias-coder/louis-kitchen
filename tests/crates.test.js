@@ -11,7 +11,7 @@ const NEEDED = ['kochmod:bun', 'kochmod:raw_patty', 'kochmod:lettuce', 'kochmod:
 
 const { crate_all: ALL, ...SUPPLY } = CRATES;
 const entries = Object.values(SUPPLY).flatMap((c) => c.entries);
-const ALL_ITEM_IDS = ['bun', 'raw_patty', 'cooked_patty', 'burnt_patty', 'lettuce', 'tomato', 'tomato_slices', 'cheese', 'knife', 'spatula', 'hamburger', 'cheeseburger', 'failed_dish', 'clean_plate', 'restaurant_kit'];
+const ALL_ITEM_IDS = ['bun', 'tomato', 'lettuce', 'raw_patty', 'cheese', 'cooked_patty', 'burnt_patty', 'tomato_slices', 'knife', 'spatula', 'hamburger', 'cheeseburger', 'failed_dish', 'clean_plate', 'restaurant_kit'];
 const ALL_BLOCK_IDS = ['grill', 'cutting_board', 'counter', 'crate_tools', 'crate_all', 'fridge', 'pantry', 'dishwasher', 'dish_cabinet', 'table', 'chair', 'bell'];
 
 test('there are exactly the four crates', () => {

@@ -1,5 +1,6 @@
 import { BURNT_AT, cookStage } from './cooking.js';
 import { evaluateAssembly } from './recipes.js';
+import { ITEMS } from './catalog.js';
 
 /**
  * take: consume one held item. give: item id handed to the player, `count` of them
@@ -34,10 +35,10 @@ const ID = {
   cleanPlate: 'kochmod:clean_plate',
 };
 
-const INGREDIENTS = [
-  ID.bun, ID.rawPatty, ID.cookedPatty, ID.burntPatty,
-  ID.lettuce, ID.tomato, ID.tomatoSlices, ID.cheese,
-];
+/** The counter takes every ingredient and prepared item of the catalog (no tools, dishes or plates). */
+function acceptsOnCounter(/** @type {string} */ id) {
+  return Object.hasOwn(ITEMS, id) && (ITEMS[id].kind === 'ingredient' || ITEMS[id].kind === 'prepared');
+}
 
 /** @type {{ grill: GrillState, board: BoardState, counter: CounterState, dishwasher: DishwasherState, cabinet: CabinetState }} */
 export const INITIAL = {
@@ -147,7 +148,7 @@ export function counterInteract(state, held) {
     if (state.items.length === 0) return { state };
     return { state: { items: [] }, give: evaluateAssembly(state.items), sound: 'kochmod.plate' };
   }
-  if (!INGREDIENTS.includes(held)) return { state };
+  if (!acceptsOnCounter(held)) return { state };
   if (state.items.length >= COUNTER_MAX) return { state, hint: 'kochmod.hint.counter_full' };
   return { state: { items: [...state.items, held] }, take: true };
 }

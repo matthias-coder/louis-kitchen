@@ -9,6 +9,7 @@ import {
   counterInteract, counterView, counterDrops,
   timedStation, grill, migrateStationState, COUNTER_LAYERS,
 } from '../packs/BP/scripts/logic/stations.js';
+import { CUTTABLE } from '../packs/BP/scripts/logic/processes.js';
 import { BURNT_AT, COOKED_AT } from '../packs/BP/scripts/logic/cooking.js';
 
 const k = (/** @type {string} */ id) => `kochmod:${id}`;
@@ -110,42 +111,57 @@ test('timedStation: works for any TIMED-shaped row', () => {
 });
 
 // ---- Board
-test('board: empty + tomato', () => {
-  const r = boardInteract(INITIAL.board, k('tomato'));
-  assert.deepEqual(r.state, { item: k('tomato') });
-  assert.equal(r.take, true);
+const CUT_PAIRS = Object.entries(CUTTABLE);
+test('board: empty + any cuttable item takes it', () => {
+  for (const [raw] of CUT_PAIRS) {
+    const r = boardInteract(INITIAL.board, raw);
+    assert.deepEqual(r.state, { item: raw });
+    assert.equal(r.take, true);
+  }
 });
-test('board: tomato + knife slices it', () => {
-  const r = boardInteract({ item: k('tomato') }, k('knife'));
-  assert.deepEqual(r.state, { item: k('tomato_slices') });
-  assert.equal(r.sound, 'kochmod.chop');
+test('board: knife cuts every cuttable item', () => {
+  for (const [raw, cut] of CUT_PAIRS) {
+    const r = boardInteract({ item: raw }, k('knife'));
+    assert.deepEqual(r.state, { item: cut });
+    assert.equal(r.sound, 'kochmod.chop');
+  }
 });
-test('board: slices + knife unchanged', () => {
-  const s = { item: k('tomato_slices') };
-  assert.deepEqual(boardInteract(s, k('knife')), { state: s });
+test('board: already cut or unknown item + knife unchanged', () => {
+  for (const item of [k('tomato_slices'), k('onion_rings'), k('lettuce'), 'kochmod:from_the_future']) {
+    const s = { item };
+    assert.deepEqual(boardInteract(s, k('knife')), { state: s });
+  }
 });
 test('board: occupied + empty hand gives item', () => {
-  const r = boardInteract({ item: k('tomato') }, null);
-  assert.equal(r.give, k('tomato'));
+  const r = boardInteract({ item: k('salmon') }, null);
+  assert.equal(r.give, k('salmon'));
   assert.deepEqual(r.state, { item: null });
 });
-test('board: occupied + tomato is full', () => {
-  const s = { item: k('tomato') };
-  const r = boardInteract(s, k('tomato'));
+test('board: occupied + a cuttable item is full', () => {
+  const s = { item: k('onion') };
+  const r = boardInteract(s, k('carrot'));
   assert.deepEqual(r.state, s);
   assert.equal(r.hint, 'kochmod.hint.board_full');
   assert.equal(r.take, undefined);
 });
-test('board: empty + lettuce unchanged', () => {
-  const r = boardInteract(INITIAL.board, k('lettuce'));
-  assert.deepEqual(r, { state: INITIAL.board });
+test('board: occupied + other item unchanged', () => {
+  const s = { item: k('onion') };
+  assert.deepEqual(boardInteract(s, k('lettuce')), { state: s });
+});
+test('board: empty + non-cuttable item unchanged', () => {
+  for (const held of [k('lettuce'), k('tomato_slices'), k('knife')]) {
+    assert.deepEqual(boardInteract(INITIAL.board, held), { state: INITIAL.board });
+  }
 });
 test('board: view and drops', () => {
   assert.equal(boardView(INITIAL.board), 'empty');
-  assert.equal(boardView({ item: k('tomato') }), 'tomato');
-  assert.equal(boardView({ item: k('tomato_slices') }), 'tomato_slices');
+  for (const [raw, cut] of CUT_PAIRS) {
+    assert.equal(boardView({ item: raw }), 'whole');
+    assert.equal(boardView({ item: cut }), 'cut');
+    assert.deepEqual(boardDrops({ item: raw }), [raw]);
+  }
+  assert.equal(boardView({ item: 'kochmod:from_the_future' }), 'whole');
   assert.deepEqual(boardDrops(INITIAL.board), []);
-  assert.deepEqual(boardDrops({ item: k('tomato') }), [k('tomato')]);
 });
 
 // ---- Counter

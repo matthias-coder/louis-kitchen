@@ -184,7 +184,7 @@
           ]
         },
         {
-          "name": "tomato",
+          "name": "whole",
           "pivot": [
             0,
             0,
@@ -342,7 +342,7 @@
           ]
         },
         {
-          "name": "tomato_slices",
+          "name": "cut",
           "pivot": [
             0,
             0,

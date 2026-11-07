@@ -7,15 +7,15 @@
         "category": "construction"
       },
       "states": {
-        "kochmod:content": ["empty", "tomato", "tomato_slices"]
+        "kochmod:content": ["empty", "whole", "cut"]
       }
     },
     "components": {
       "minecraft:geometry": {
         "identifier": "geometry.kochmod.cutting_board",
         "bone_visibility": {
-          "tomato": "q.block_state('kochmod:content') == 'tomato'",
-          "tomato_slices": "q.block_state('kochmod:content') == 'tomato_slices'"
+          "whole": "q.block_state('kochmod:content') == 'whole'",
+          "cut": "q.block_state('kochmod:content') == 'cut'"
         }
       },
       "minecraft:material_instances": {

@@ -15,7 +15,7 @@ test('interactStation sets the view, then saves, then applies', () => {
     save: (s) => calls.push(`save:${s.item}`),
     apply: (res) => calls.push(`apply:${res.take}`),
   });
-  assert.deepEqual(calls, ['view:tomato', 'save:kochmod:tomato', 'apply:true']);
+  assert.deepEqual(calls, ['view:whole', 'save:kochmod:tomato', 'apply:true']);
   assert.deepEqual(r.state, { item: 'kochmod:tomato' });
 });
 

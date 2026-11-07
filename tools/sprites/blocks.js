@@ -156,11 +156,11 @@ export const layouts = {
     body_bottom: /** @type {Region} */ ([32, 0, 16, 16]),
     board_top: /** @type {Region} */ ([0, 16, 12, 10]),
     board_side: /** @type {Region} */ ([16, 16, 12, 1]),
-    tomato_top: /** @type {Region} */ ([0, 32, 4, 4]),
-    tomato_side: /** @type {Region} */ ([8, 32, 4, 4]),
+    whole_top: /** @type {Region} */ ([0, 32, 4, 4]),
+    whole_side: /** @type {Region} */ ([8, 32, 4, 4]),
     stem: /** @type {Region} */ ([16, 32, 1, 1]),
-    slice_top: /** @type {Region} */ ([0, 40, 4, 4]),
-    slice_side: /** @type {Region} */ ([8, 40, 4, 1]),
+    cut_top: /** @type {Region} */ ([0, 40, 4, 4]),
+    cut_side: /** @type {Region} */ ([8, 40, 4, 1]),
   },
   // counter: body, plate and the layer pictures of the four stack families (tools/geometry.js COUNTER_STACKS)
   counter: {
@@ -293,7 +293,7 @@ export const grill = {
   rows: drawGrill(),
 };
 
-// ---- Cutting board: stone worktop, wooden board, tomato
+// ---- Cutting board: stone worktop, wooden board, a generic whole item and a generic cut pile
 
 function drawBoard() {
   const L = layouts.cutting_board;
@@ -319,18 +319,18 @@ function drawBoard() {
   c.border(L.board_top, 'Z');
   c.fill(L.board_side, 'Z');
 
-  c.fill(L.tomato_top, 't');
-  for (const [x, y] of [[1, 1], [2, 1], [1, 2], [2, 2]]) c.px(L.tomato_top, x, y, 'l');
-  c.px(L.tomato_top, 0, 0, 'j'); c.px(L.tomato_top, 3, 3, 'j');
-  c.fill(L.tomato_side, 't');
-  c.px(L.tomato_side, 1, 1, 'i');
-  c.row(L.tomato_side, 3, 'j');
+  c.fill(L.whole_top, 't');
+  for (const [x, y] of [[1, 1], [2, 1], [1, 2], [2, 2]]) c.px(L.whole_top, x, y, 'l');
+  c.px(L.whole_top, 0, 0, 'j'); c.px(L.whole_top, 3, 3, 'j');
+  c.fill(L.whole_side, 't');
+  c.px(L.whole_side, 1, 1, 'i');
+  c.row(L.whole_side, 3, 'j');
   c.fill(L.stem, 'L');
 
-  c.fill(L.slice_top, 't');
-  c.px(L.slice_top, 1, 1, 'k'); c.px(L.slice_top, 2, 1, 'i');
-  c.px(L.slice_top, 1, 2, 'i'); c.px(L.slice_top, 2, 2, 'k');
-  c.fill(L.slice_side, 'j');
+  c.fill(L.cut_top, 't');
+  c.px(L.cut_top, 1, 1, 'k'); c.px(L.cut_top, 2, 1, 'i');
+  c.px(L.cut_top, 1, 2, 'i'); c.px(L.cut_top, 2, 2, 'k');
+  c.fill(L.cut_side, 'j');
   return c.rows();
 }
 
@@ -340,7 +340,7 @@ export const cutting_board = {
   palette: {
     S: '#8e9196', T: '#a9adb3', U: '#62656a', V: '#cdd1d6', D: '#3e4044',
     W: '#cf9a5c', X: '#a8743c', Y: '#e8bc82', Z: '#7d5426',
-    t: '#e23a28', i: '#ff8a6a', j: '#a8231a', k: '#f6d36b', l: '#3fa34d', L: '#2a7a35',
+    t: '#e0742f', i: '#f6a45e', j: '#a8481a', k: '#f6d36b', l: '#3fa34d', L: '#2a7a35',
   },
   rows: drawBoard(),
 };

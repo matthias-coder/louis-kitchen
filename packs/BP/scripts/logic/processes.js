@@ -11,6 +11,10 @@ import { ITEMS } from './catalog.js';
  */
 export const CUTTABLE = {
   'kochmod:tomato': 'kochmod:tomato_slices',
+  'kochmod:onion': 'kochmod:onion_rings',
+  'kochmod:carrot': 'kochmod:carrot_slices',
+  'kochmod:potato': 'kochmod:potato_cubes',
+  'kochmod:salmon': 'kochmod:salmon_strips',
 };
 
 /**

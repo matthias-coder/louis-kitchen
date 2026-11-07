@@ -1,7 +1,7 @@
 import { BURNT_AT, cookStage } from './cooking.js';
 import { evaluateAssembly } from './recipes.js';
 import { ITEMS } from './catalog.js';
-import { TIMED } from './processes.js';
+import { CUTTABLE, TIMED } from './processes.js';
 
 /**
  * take: consume one held item. give: item id handed to the player, `count` of them
@@ -37,8 +37,6 @@ export const CABINET_MAX = 8;
 
 const ID = {
   rawPatty: 'kochmod:raw_patty', // what a stage 1 grill was cooking
-  tomato: 'kochmod:tomato',
-  tomatoSlices: 'kochmod:tomato_slices',
   knife: 'kochmod:knife',
   dirtyPlate: 'kochmod:dirty_plate',
   cleanPlate: 'kochmod:clean_plate',
@@ -133,26 +131,28 @@ export const INITIAL = {
  * @returns {Result<BoardState>}
  */
 export function boardInteract(state, held) {
+  const cuttable = held !== null && Object.hasOwn(CUTTABLE, held);
   if (state.item === null) {
-    if (held === ID.tomato) return { state: { item: ID.tomato }, take: true };
+    if (cuttable) return { state: { item: held }, take: true };
     return { state };
   }
   if (held === null) return { state: { item: null }, give: state.item };
-  if (held === ID.knife && state.item === ID.tomato) {
-    return { state: { item: ID.tomatoSlices }, sound: 'kochmod.chop' };
+  if (held === ID.knife && Object.hasOwn(CUTTABLE, state.item)) {
+    return { state: { item: CUTTABLE[state.item] }, sound: 'kochmod.chop' };
   }
-  if (held === ID.tomato) return { state, hint: 'kochmod.hint.board_full' };
+  if (cuttable) return { state, hint: 'kochmod.hint.board_full' };
   return { state };
 }
 
 /**
+ * Unknown stored ids show as whole.
  * @param {BoardState} state
- * @returns {'empty' | 'tomato' | 'tomato_slices'}
+ * @returns {'empty' | 'whole' | 'cut'}
  */
 export function boardView(state) {
-  if (state.item === ID.tomato) return 'tomato';
-  if (state.item === ID.tomatoSlices) return 'tomato_slices';
-  return 'empty';
+  if (state.item === null) return 'empty';
+  if (Object.values(CUTTABLE).includes(state.item)) return 'cut';
+  return 'whole';
 }
 
 /**

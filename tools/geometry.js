@@ -120,18 +120,18 @@ export const models = {
     body(),
     { name: 'board', cubes: [{ origin: [-6, 12, -5], size: [12, 1, 10], top: 'board_top', side: 'board_side' }] },
     {
-      name: 'tomato',
+      name: 'whole',
       cubes: [
-        { origin: [-2, 13, -2], size: [4, 4, 4], top: 'tomato_top', side: 'tomato_side' },
+        { origin: [-2, 13, -2], size: [4, 4, 4], top: 'whole_top', side: 'whole_side' },
         { origin: [-0.5, 17, -0.5], size: [1, 1, 1], top: 'stem', side: 'stem' },
       ],
     },
     {
-      name: 'tomato_slices',
+      name: 'cut',
       cubes: [
-        { origin: [-6, 13, -3], size: [4, 1, 4], top: 'slice_top', side: 'slice_side' },
-        { origin: [-2, 13, -1], size: [4, 1, 4], top: 'slice_top', side: 'slice_side' },
-        { origin: [2, 13, -3], size: [4, 1, 4], top: 'slice_top', side: 'slice_side' },
+        { origin: [-6, 13, -3], size: [4, 1, 4], top: 'cut_top', side: 'cut_side' },
+        { origin: [-2, 13, -1], size: [4, 1, 4], top: 'cut_top', side: 'cut_side' },
+        { origin: [2, 13, -3], size: [4, 1, 4], top: 'cut_top', side: 'cut_side' },
       ],
     },
   ],

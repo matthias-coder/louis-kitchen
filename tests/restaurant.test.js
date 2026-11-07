@@ -1,3 +1,4 @@
+import { RECIPES } from '../packs/BP/scripts/logic/recipes.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -57,6 +58,18 @@ test('availableDishes: pizzas need the oven (and the counter)', () => {
 test('availableDishes: ramen needs only the pot, potato soup also the cutting board', () => {
   assert.deepEqual(availableDishes(new Set(['pot'])), ['kochmod:ramen']);
   assert.deepEqual(availableDishes(new Set(['pot', 'cutting_board'])), ['kochmod:ramen', 'kochmod:potato_soup']);
+});
+
+test('availableDishes: with every station all dishes, and each recipe needs exactly its derived stations', () => {
+  const all = new Set(RECIPES.flatMap((r) => r.stations));
+  assert.deepEqual(availableDishes(all), RECIPES.map((r) => r.dish));
+  for (const r of RECIPES) {
+    assert.ok(availableDishes(new Set(r.stations)).includes(r.dish), r.dish);
+    for (const missing of r.stations) {
+      const rest = new Set(r.stations.filter((s) => s !== missing));
+      assert.ok(!availableDishes(rest).includes(r.dish), `${r.dish} without ${missing}`);
+    }
+  }
 });
 
 test('pickWish', () => {

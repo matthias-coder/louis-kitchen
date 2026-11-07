@@ -8,8 +8,8 @@ const lang = fs.readFileSync(new URL('../packs/RP/texts/de_DE.lang', import.meta
 const SUPPLIED = ['raw_patty', 'bun', 'lettuce', 'tomato', 'cheese', 'knife', 'spatula', 'clean_plate',
   'salami', 'egg', 'salmon', 'cream', 'onion', 'carrot', 'potato', 'spring_onion', 'doner_meat_raw',
   'dough', 'tomato_sauce', 'noodles', 'rice', 'broth', 'nori', 'pita', 'doner_sauce', 'soy_sauce',
-  'bowl', 'pizza_peel', 'wok_spatula'].map((i) => `kochmod:${i}`);
-const TOOLS = ['kochmod:knife', 'kochmod:spatula', 'kochmod:bowl', 'kochmod:pizza_peel', 'kochmod:wok_spatula'];
+  'bowl', 'pizza_peel', 'wok_spatula', 'recipe_book'].map((i) => `kochmod:${i}`);
+const TOOLS = ['kochmod:knife', 'kochmod:spatula', 'kochmod:bowl', 'kochmod:pizza_peel', 'kochmod:wok_spatula', 'kochmod:recipe_book'];
 // Stage 1 recipes need these; cooked patty and tomato slices are produced at stations.
 const NEEDED = ['kochmod:bun', 'kochmod:raw_patty', 'kochmod:lettuce', 'kochmod:tomato', 'kochmod:cheese', ...TOOLS];
 
@@ -35,7 +35,7 @@ test('tools come singly, ingredients in fours, and no crate is empty', () => {
 
 test('crate_all lists every item and every block exactly once, in order', () => {
   assert.deepEqual(ALL.entries.map((e) => e.item), [...ALL_ITEM_IDS, ...ALL_BLOCK_IDS].map((i) => `kochmod:${i}`));
-  assert.equal(ALL.entries.length, 52 + ALL_BLOCK_IDS.length);
+  assert.equal(ALL.entries.length, 53 + ALL_BLOCK_IDS.length);
   for (const e of ALL.entries) {
     const kind = ITEMS[e.item]?.kind;
     assert.equal(e.count, ['ingredient', 'prepared', 'plate'].includes(kind) ? 4 : 1, e.item);
@@ -119,6 +119,6 @@ test('items keep their item texture as menu icon', () => {
 test('crate_tools also hands out four clean plates', () => {
   assert.deepEqual(CRATES.crate_tools.entries, [
     { item: 'kochmod:knife', count: 1 }, { item: 'kochmod:spatula', count: 1 }, { item: 'kochmod:bowl', count: 1 },
-    { item: 'kochmod:pizza_peel', count: 1 }, { item: 'kochmod:wok_spatula', count: 1 }, { item: 'kochmod:clean_plate', count: 4 },
+    { item: 'kochmod:pizza_peel', count: 1 }, { item: 'kochmod:wok_spatula', count: 1 }, { item: 'kochmod:recipe_book', count: 1 }, { item: 'kochmod:clean_plate', count: 4 },
   ]);
 });

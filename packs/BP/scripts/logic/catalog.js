@@ -53,6 +53,7 @@ export const ITEMS = {
   'kochmod:bowl': { kind: 'tool', source: 'tools', stack: 1 },
   'kochmod:pizza_peel': { kind: 'tool', source: 'tools', stack: 1 },
   'kochmod:wok_spatula': { kind: 'tool', source: 'tools', stack: 1 },
+  'kochmod:recipe_book': { kind: 'tool', source: 'tools', stack: 1 },
   'kochmod:hamburger': { kind: 'dish', stack: 64 },
   'kochmod:cheeseburger': { kind: 'dish', stack: 64 },
   'kochmod:failed_dish': { kind: 'dish', stack: 64 },

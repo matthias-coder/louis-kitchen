@@ -31,7 +31,7 @@ test('itemsFrom lists what each crate supplies, in catalog order', () => {
     'salami', 'egg', 'salmon', 'cream', 'onion', 'carrot', 'potato', 'spring_onion', 'doner_meat_raw'));
   assert.deepEqual(itemsFrom('pantry'), k('bun',
     'dough', 'tomato_sauce', 'noodles', 'rice', 'broth', 'nori', 'pita', 'doner_sauce', 'soy_sauce'));
-  assert.deepEqual(itemsFrom('tools'), k('knife', 'spatula', 'bowl', 'pizza_peel', 'wok_spatula', 'clean_plate'));
+  assert.deepEqual(itemsFrom('tools'), k('knife', 'spatula', 'bowl', 'pizza_peel', 'wok_spatula', 'recipe_book', 'clean_plate'));
 });
 
 test('itemsOf, isDish and plateName', () => {

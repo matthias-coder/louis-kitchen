@@ -4,6 +4,7 @@ import { registerStations, tickStations, onBlockExploded } from './world/station
 import { registerFurniture, onFurnitureExploded } from './world/furniture.js';
 import { tickGuests } from './world/guests.js';
 import { registerKit } from './world/kit.js';
+import { registerRecipeBook } from './world/recipe-book.js';
 
 const STATION_TICK = 10;
 const GUEST_TICK = 20;
@@ -13,6 +14,7 @@ system.beforeEvents.startup.subscribe(({ blockComponentRegistry, itemComponentRe
   registerCrates(blockComponentRegistry);
   registerFurniture(blockComponentRegistry);
   registerKit(itemComponentRegistry);
+  registerRecipeBook(itemComponentRegistry);
 });
 
 system.runInterval(() => tickStations(STATION_TICK), STATION_TICK);

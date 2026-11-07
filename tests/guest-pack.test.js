@@ -4,6 +4,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildGuestGeometry } from '../tools/geometry.js';
+import { DISHES } from '../packs/BP/scripts/logic/recipes.js';
+import { plateName } from '../packs/BP/scripts/logic/catalog.js';
 import { guestLayout, GUEST_TEXTURE } from '../tools/sprites/entity.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -47,4 +49,18 @@ test('client entity references the declared animations and controllers', () => {
     }
   }
   for (const a of desc.scripts.animate) assert.ok(a in desc.animations, a);
+});
+
+test('every dish has a wish value, a bubble picture, a bubble bone and a render controller entry', () => {
+  const wishes = json('packs/BP/entities/guest.json')['minecraft:entity'].description.properties['kochmod:wish'].values;
+  assert.deepEqual(wishes, ['none', ...DISHES.map(plateName)]);
+  const rc = json('packs/RP/render_controllers/guest.render_controllers.json').render_controllers['controller.render.kochmod.guest'];
+  for (const dish of DISHES) {
+    const w = plateName(dish);
+    assert.ok(`bubble_${w}` in guestLayout, `layout bubble_${w}`);
+    assert.ok(bones.has(`bubble_${w}`), `bone bubble_${w}`);
+    const entry = rc.part_visibility.find((/** @type {any} */ e) => `bubble_${w}` in e);
+    assert.ok(entry, `part_visibility bubble_${w}`);
+    assert.ok(entry[`bubble_${w}`].includes(`'${w}'`), `condition for ${w}`);
+  }
 });

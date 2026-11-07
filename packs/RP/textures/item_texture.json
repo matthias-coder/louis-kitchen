@@ -167,6 +167,9 @@
     "kochmod_raw_salami_pizza": {
       "textures": "textures/items/raw_salami_pizza"
     },
+    "kochmod_recipe_book": {
+      "textures": "textures/items/recipe_book"
+    },
     "kochmod_restaurant_kit": {
       "textures": "textures/items/restaurant_kit"
     },

@@ -564,6 +564,12 @@ export const wok_spatula = paint('wok_spatula', { m: '#c3cad2', s: '#8c95a0', h:
   c.line(8, 7, 6, 9, 's').line(6, 9, 2, 14, 'B').line(7, 9, 3, 14, 'b').line(6, 10, 2, 15, 'b');
 });
 
+export const recipe_book = paint('recipe_book', { k: '#3b1a14', r: '#b8372c', R: '#d9574a', p: '#f4ecd6', w: '#f8f4e8', g: '#caa24a' }, (c) => {
+  c.rect(2, 1, 12, 14, 'k').rect(3, 2, 10, 12, 'r').rect(3, 2, 1, 12, 'k').rect(13, 3, 1, 11, 'p').rect(4, 2, 9, 1, 'R');
+  // plate on the cover
+  c.ellipse(8, 8, 3.6, 3.6, 'g').ellipse(8, 8, 2.6, 2.6, 'w');
+});
+
 // -- dishes --
 
 export const pizza_margherita = paint('pizza_margherita', PIZZA_COOKED, pizzaDraw(false, true));

@@ -142,6 +142,20 @@ function syncViewLater(def, dimension, location, key) {
 }
 
 /**
+ * Registers a freshly placed station with its initial state (what onPlace does).
+ * @template S
+ * @param {string} kind
+ * @param {StationDef<S>} def
+ * @param {Block} block
+ */
+function registerAs(kind, def, block) {
+  const key = keyOf(block);
+  worldStore.registryAdd(kind, key);
+  worldStore.save(key, def.initial);
+  if (def.syncOnPlace) syncViewLater(def, block.dimension, block.location, key);
+}
+
+/**
  * One custom component per station kind; `kind` is also the registry name.
  * @template S
  * @param {string} kind
@@ -153,10 +167,7 @@ function stationComponent(kind, def) {
     onPlace({ block, previousBlock }) {
       // Guard: if onPlace also fired on our own permutation changes, it must not reset the state.
       if (previousBlock.type.id === def.typeId) return;
-      const key = keyOf(block);
-      worldStore.registryAdd(kind, key);
-      worldStore.save(key, def.initial);
-      if (def.syncOnPlace) syncViewLater(def, block.dimension, block.location, key);
+      registerAs(kind, def, block);
     },
     onPlayerInteract({ block, player }) {
       if (!player) return;
@@ -186,6 +197,19 @@ const BY_TYPE = {
   [dishwasher.typeId]: ['dishwasher', dishwasher],
   [dishCabinet.typeId]: ['dish_cabinet', dishCabinet],
 };
+
+/**
+ * Registers a station placed by script (scripted placement may not fire onPlace).
+ * Same effect as the station's onPlace; other blocks are ignored.
+ * @param {Block} block
+ * @returns {boolean} whether the block is a station
+ */
+export function registerStationBlock(block) {
+  const entry = BY_TYPE[block.typeId];
+  if (!entry) return false;
+  registerAs(entry[0], entry[1], block);
+  return true;
+}
 
 /** @param {BlockComponentRegistry} blockComponentRegistry */
 export function registerStations(blockComponentRegistry) {

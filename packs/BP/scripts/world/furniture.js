@@ -72,14 +72,47 @@ function forgetChair(dimension, loc) {
   worldStore.registryRemove('chair', key);
 }
 
+/** A new table starts without a plate and turns the chairs around it. @param {Dimension} dimension @param {Vector3} loc */
+function registerTable(dimension, loc) {
+  const key = keyAt(dimension, loc);
+  worldStore.registryAdd('table', key);
+  worldStore.save(key, /** @type {TableState} */ ({ plate: 'none' }));
+  orientChairsAround(dimension, loc);
+}
+
+/** A new chair turns towards an adjacent table. @param {Dimension} dimension @param {Vector3} loc */
+function registerChair(dimension, loc) {
+  worldStore.registryAdd('chair', keyAt(dimension, loc));
+  orientChairLater(dimension, loc);
+}
+
+/** A new bell calls its first guest after the spawn delay. @param {Dimension} dimension @param {Vector3} loc */
+function registerBell(dimension, loc) {
+  const key = keyAt(dimension, loc);
+  worldStore.registryAdd('bell', key);
+  worldStore.save(key, { guestId: null, cooldown: spawnDelay(Math.random) });
+}
+
+/**
+ * Registers furniture placed by script (scripted placement may not fire onPlace).
+ * Same effect as the block's onPlace; other blocks are ignored.
+ * @param {Block} block
+ * @returns {boolean} whether the block is a table, chair or bell
+ */
+export function registerFurnitureBlock(block) {
+  switch (block.typeId) {
+    case TABLE: registerTable(block.dimension, block.location); return true;
+    case CHAIR: registerChair(block.dimension, block.location); return true;
+    case BELL: registerBell(block.dimension, block.location); return true;
+    default: return false;
+  }
+}
+
 /** @type {BlockCustomComponent} */
 const tableComponent = {
   onPlace({ block, dimension, previousBlock }) {
     if (previousBlock.type.id === TABLE) return; // own permutation change
-    const key = keyAt(dimension, block.location);
-    worldStore.registryAdd('table', key);
-    worldStore.save(key, /** @type {TableState} */ ({ plate: 'none' }));
-    orientChairsAround(dimension, block.location);
+    registerTable(dimension, block.location);
   },
   onPlayerInteract({ block, dimension, player }) {
     if (!player) return;
@@ -119,8 +152,7 @@ const tableComponent = {
 const chairComponent = {
   onPlace({ block, dimension, previousBlock }) {
     if (previousBlock.type.id === CHAIR) return; // own permutation change (turning)
-    worldStore.registryAdd('chair', keyAt(dimension, block.location));
-    orientChairLater(dimension, block.location);
+    registerChair(dimension, block.location);
   },
   onPlayerBreak({ block, dimension }) {
     forgetChair(dimension, block.location);
@@ -131,9 +163,7 @@ const chairComponent = {
 const bellComponent = {
   onPlace({ block, dimension, previousBlock }) {
     if (previousBlock.type.id === BELL) return;
-    const key = keyAt(dimension, block.location);
-    worldStore.registryAdd('bell', key);
-    worldStore.save(key, { guestId: null, cooldown: spawnDelay(Math.random) });
+    registerBell(dimension, block.location);
   },
   onPlayerInteract({ block, dimension, player }) {
     dimension.playSound(BELL_SOUND, block.center());

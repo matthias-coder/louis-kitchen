@@ -15,7 +15,7 @@ import { ALL_BLOCKS } from '../packs/BP/scripts/logic/crates.js';
 /** @type {Direction[]} */
 const FACINGS = ['north', 'east', 'south', 'west'];
 const { blocks, width, depth, height } = RESTAURANT;
-const STATIONS = ['grill', 'cutting_board', 'counter', 'oven', 'pot', 'spit', 'wok', 'dishwasher', 'dish_cabinet'];
+const STATIONS = ['grill', 'cutting_board', 'counter', 'oven', 'pot', 'spit', 'wok', 'dishwasher', 'dish_cabinet', 'trash_can'];
 const CABINETS = ['fridge', 'pantry'];
 const CRATES = ['crate_tools', 'crate_all', 'crate_kits'];
 
@@ -66,12 +66,12 @@ test('the pot stands on the back kitchen row at x=2, next to the fridge', () => 
   assert.equal(at('fridge').x, 3);
 });
 
-test('the doner spit stands on the back row at x=1, the wok at x=11; x=12 stays free', () => {
+test('the doner spit stands on the back row at x=1, the wok at x=11, the trash can at x=12', () => {
   const at = (/** @type {string} */ id) => ofId(id)[0];
   const z = at('counter').z;
   assert.deepEqual([at('spit').x, at('spit').y, at('spit').z], [1, 1, z]);
   assert.deepEqual([at('wok').x, at('wok').y, at('wok').z], [11, 1, z]);
-  assert.ok(!blocks.some((b) => b.x === 12 && b.y === 1 && b.z === z));
+  assert.deepEqual([at('trash_can').x, at('trash_can').y, at('trash_can').z], [12, 1, z]);
 });
 
 test('the dish cabinet starts with 8 plates', () => {
@@ -148,7 +148,7 @@ test('the bell has free air beside it on the dining side, for the guest to appea
   assert.ok(at.get(key({ ...bell, y: bell.y - 1 })), 'the bell stands on a counter');
 });
 
-test('everything is reachable on foot: a flood fill from the door touches every station, crate and chair', () => {
+test('everything is reachable on foot: a flood fill from the door touches every station, crate and chair (the corner crate across the trash can)', () => {
   const at = byPos(blocks);
   // walkable: floor below, feet and head cells empty
   const free = (/** @type {number} */ x, /** @type {number} */ z) => x >= 0 && x < width && z >= 0 && z < depth
@@ -161,7 +161,11 @@ test('everything is reachable on foot: a flood fill from the door touches every 
     seen.add(`${x},${z}`);
     queue.push([x + 1, z], [x - 1, z], [x, z + 1], [x, z - 1]);
   }
-  const reachable = (/** @type {any} */ b) => [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dz]) => seen.has(`${b.x + dx},${b.z + dz}`));
+  const beside = (/** @type {any} */ b) => [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dz]) => seen.has(`${b.x + dx},${b.z + dz}`));
+  // the corner crate is walled in by the trash can (14 px high): its free top face is tapped from the diagonal spot
+  const acrossCorner = (/** @type {any} */ b) => !at.has(`${b.x},${b.y + 1},${b.z}`)
+    && [[1, 1], [1, -1], [-1, 1], [-1, -1]].some(([dx, dz]) => seen.has(`${b.x + dx},${b.z + dz}`));
+  const reachable = (/** @type {any} */ b) => beside(b) || (b.id === 'kochmod:crate_all' && acrossCorner(b));
   for (const b of blocks.filter((x) => x.id.startsWith('kochmod:'))) assert.ok(reachable(b), `${b.id} at ${key(b)}`);
   assert.ok(seen.size > 50);
 });
@@ -276,7 +280,7 @@ const THEME_TABLE = {
   mega: { devices: ALL_DEVICES, tables: 8 },
 };
 /** Every theme has these exactly once. */
-const EVERY_THEME = ['fridge', 'pantry', 'crate_tools', 'crate_all', 'crate_kits', 'dishwasher', 'dish_cabinet'];
+const EVERY_THEME = ['fridge', 'pantry', 'crate_tools', 'crate_all', 'crate_kits', 'dishwasher', 'dish_cabinet', 'trash_can'];
 const dishIds = (/** @type {string[]} */ ...ids) => ids.map((i) => `kochmod:${i}`);
 /** What guests may wish for at each theme (RECIPES order). */
 const MENUS = {
@@ -357,7 +361,15 @@ function walk(layout) {
     const [x, z, s] = k.split(',').map(Number);
     return Math.abs(x - b.x) + Math.abs(z - b.z) === 1 && Math.abs(b.y - Math.floor(s / 2)) <= 1;
   });
-  return { seen, reaches };
+  /**
+   * Diagonal reach: a visited spot diagonally beside the block at the same level, and nothing on top of the
+   * block, so its top face can be tapped across the corner.
+   */
+  const reachesAcrossCorner = (/** @type {{ x: number, y: number, z: number }} */ b) => !at.has(`${b.x},${b.y + 1},${b.z}`) && [...seen].some((k) => {
+    const [x, z, s] = k.split(',').map(Number);
+    return Math.abs(x - b.x) === 1 && Math.abs(z - b.z) === 1 && Math.floor(s / 2) === b.y;
+  });
+  return { seen, reaches, reachesAcrossCorner };
 }
 
 test('THEMES: six themes in menu order, each with name key, kit item, a dish icon it can cook and a layout', () => {
@@ -486,26 +498,31 @@ for (const id of THEME_IDS) {
     }
   });
 
-  test(`${id}: walkable from the door to every station, crate, chair, bell and the spare kitchen cell`, () => {
-    const { seen, reaches } = walk(layout);
+  test(`${id}: walkable from the door to every station, crate, chair, bell and the trash can`, () => {
+    const { seen, reaches, reachesAcrossCorner } = walk(layout);
     const chairs = blocksOf(layout, 'chair');
     for (const b of list.filter((x) => x.id.startsWith('kochmod:'))) {
       // a bar table may only be reached across its own chair: two blocks away, well within a player's reach
       const acrossChair = b.id === 'kochmod:table' && chairs.some((c) => Math.abs(c.x - b.x) + Math.abs(c.z - b.z) === 1 && c.y === b.y && reaches(c));
-      assert.ok(reaches(b) || acrossChair, `${b.id} at ${key(b)}`);
+      // the back crate beside a kitchen row that runs up to the crates (classic, döner) is walled in by the
+      // trash can (14 px high); its free top face is tapped across the corner
+      const acrossCorner = b.id === 'kochmod:crate_all' && reachesAcrossCorner(b);
+      assert.ok(reaches(b) || acrossChair || acrossCorner, `${b.id} at ${key(b)}`);
     }
-    assert.ok(reaches(layout.spare), `spare cell ${key(layout.spare)}`);
     assert.ok(seen.size > 40, `${seen.size} standing spots`);
   });
 
-  test(`${id}: one free kitchen-row cell is kept for the trash can`, () => {
+  test(`${id}: exactly one trash can, standing in the kitchen row next to a kitchen device`, () => {
     const at = byPos(list);
-    const { spare } = layout;
-    assert.equal(at.get(key(spare)), undefined);
-    assert.equal(at.get(key({ ...spare, y: spare.y + 1 })), undefined);
-    assert.ok(at.get(key({ ...spare, y: spare.y - 1 })), 'floor below the spare cell');
-    assert.equal(spare.z, blocksOf(layout, 'dishwasher')[0].z, 'on the kitchen row');
-    assert.ok(FACINGS.some((d) => at.get(key(offset(spare, d)))?.id.startsWith('kochmod:')), 'next to a kitchen device');
+    const cans = blocksOf(layout, 'trash_can');
+    assert.equal(cans.length, 1);
+    const [can] = cans;
+    assert.equal(can.y, 1, 'on the ground floor');
+    assert.equal(at.get(key({ ...can, y: can.y + 1 })), undefined, 'free above the trash can');
+    assert.ok(at.get(key({ ...can, y: can.y - 1 })), 'floor below the trash can');
+    assert.equal(can.z, blocksOf(layout, 'dishwasher')[0].z, 'on the kitchen row');
+    assert.ok(FACINGS.some((d) => at.get(key(offset(can, d)))?.id.startsWith('kochmod:')), 'next to a kitchen device');
+    assert.equal('spare' in layout, false, 'no free kitchen cell is left over');
   });
 
   test(`${id}: placementOrigin puts the door ENTRANCE_DISTANCE blocks in front of the tapped block`, () => {

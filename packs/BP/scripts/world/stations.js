@@ -6,6 +6,7 @@ import {
   counterInteract, counterView, counterDrops,
   dishwasherInteract, dishwasherView, dishwasherDrops,
   cabinetInteract, cabinetView, cabinetDrops, INITIAL,
+  trash as trashStation,
 } from '../logic/stations.js';
 import { locKey } from '../logic/store.js';
 import { interactStation, breakStation, tickTimedStation, tickDishwashers } from '../logic/station-flow.js';
@@ -138,6 +139,20 @@ const dishCabinet = {
   syncOnPlace: true,
 };
 
+/**
+ * Trash can: block state `kochmod:open` lifts the lid for a moment after each throw. It stores nothing,
+ * so breaking it drops nothing.
+ * @type {StationDef<import('../logic/stations.js').TrashState>}
+ */
+const trashCan = {
+  typeId: 'kochmod:trash_can',
+  initial: trashStation.INITIAL,
+  interact: trashStation.interact,
+  states: trashStation.view,
+  drops: trashStation.drops,
+  migrate: (saved) => migrateStationState('trash', saved),
+};
+
 /** @param {Block} block */
 const keyOf = (block) => locKey(block.dimension.id, block.location);
 
@@ -265,6 +280,7 @@ const BY_TYPE = {
   [counter.typeId]: ['counter', counter],
   [dishwasher.typeId]: ['dishwasher', dishwasher],
   [dishCabinet.typeId]: ['dish_cabinet', dishCabinet],
+  [trashCan.typeId]: ['trash_can', trashCan],
 };
 
 /**
@@ -328,7 +344,8 @@ function tickIo(kind, def, statesOf) {
 }
 
 /**
- * Advances every loaded grill, oven, pot, wok, doner spit and dishwasher by `dt` ticks. Stations in unloaded chunks pause.
+ * Advances every loaded grill, oven, pot, wok, doner spit and dishwasher by `dt` ticks and closes open
+ * trash-can lids (with STATION_TICK = 10 a lid closes on the next station tick). Stations in unloaded chunks pause.
  * @param {number} dt
  */
 export function tickStations(dt) {
@@ -339,6 +356,7 @@ export function tickStations(dt) {
     tickTimedStation(worldStore.registryList(kind), dt, tickIo(kind, def, (view) => ({ 'kochmod:state': view })), def.typeId, kind, station);
   }
   tickTimedStation(worldStore.registryList('spit'), dt, tickIo('spit', spit, (view) => ({ 'kochmod:content': view })), spit.typeId, 'spit', spitStation);
+  tickTimedStation(worldStore.registryList('trash_can'), dt, tickIo('trash_can', trashCan, (view) => view), trashCan.typeId, 'trash_can', trashStation);
   tickDishwashers(
     worldStore.registryList('dishwasher'), dt,
     tickIo('dishwasher', dishwasher, (view) => ({ 'kochmod:state': view })), DISHWASHER_ID,

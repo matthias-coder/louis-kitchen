@@ -232,6 +232,18 @@ export const block_dish_cabinet = icon('dish_cabinet', {
   }
 });
 
+export const block_trash_can = icon('trash_can', {
+  g: '#5f6368', l: '#8a8f95', d: '#3c3f43', m: '#70757b', k: '#25272a',
+}, ({ rect }) => {
+  // grey bin with ribs, a darker rim and the lid with its handle
+  rect(3, 5, 12, 15, 'g');
+  for (const x of [4, 7, 10]) rect(x, 6, x, 14, 'l');
+  rect(2, 4, 13, 5, 'd');
+  rect(2, 3, 13, 3, 'm');
+  rect(6, 2, 9, 2, 'k');
+  rect(3, 15, 12, 15, 'd');
+});
+
 export const block_table = icon('table', { ...WOOD, ...PLATE }, ({ rect }) => {
   rect(0, 6, 15, 7, 'A');
   rect(0, 7, 15, 7, 'D');

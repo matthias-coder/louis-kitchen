@@ -51,5 +51,8 @@
   },
   "kochmod:dish_cabinet": {
     "sound": "wood"
+  },
+  "kochmod:trash_can": {
+    "sound": "metal"
   }
 }

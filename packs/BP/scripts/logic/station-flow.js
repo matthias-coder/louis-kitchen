@@ -37,8 +37,20 @@ export function breakStation(drops, state, io) {
 }
 
 /**
- * A station that changes over time (grill, dishwasher).
- * @template {{ ticks: number }} S
+ * Whether a tick changed nothing: the same object, or the same values in every field (shallow).
+ * @param {object} a @param {object} b
+ */
+function unchanged(a, b) {
+  if (a === b) return true;
+  const ra = /** @type {Record<string, unknown>} */ (a);
+  const rb = /** @type {Record<string, unknown>} */ (b);
+  const keys = Object.keys(ra);
+  return keys.length === Object.keys(rb).length && keys.every((k) => ra[k] === rb[k]);
+}
+
+/**
+ * A station that changes over time (grill, dishwasher, trash-can lid).
+ * @template {object} S
  * @template V
  * @typedef {{ name: string, initial: S, tick: (state: S, dt: number) => S, view: (state: S) => V }} TimedDef
  */
@@ -59,8 +71,9 @@ export function breakStation(drops, state, io) {
  * Advances every registered station of one kind by `dt`. Each key is isolated: an
  * error on one key is reported via `warn` and the remaining stations keep running.
  * A loaded station without saved state is initialised, a replaced block is forgotten,
- * unchanged state is not rewritten and the view is only set when it changes.
- * @template {{ ticks: number }} S
+ * unchanged state (see `unchanged`) is not rewritten and the view is only set when it changes
+ * (views are compared with !==, so an object view is set on every state change).
+ * @template {object} S
  * @template V
  * @param {string[]} keys
  * @param {number} dt
@@ -83,7 +96,7 @@ export function tickTimed(keys, dt, io, typeId, def) {
         continue;
       }
       const next = def.tick(state, dt);
-      if (next.ticks === state.ticks) continue;
+      if (unchanged(next, state)) continue;
       const nextView = def.view(next);
       if (nextView !== def.view(state)) io.setView(key, nextView);
       io.save(key, next);
@@ -97,8 +110,8 @@ export function tickTimed(keys, dt, io, typeId, def) {
 const DISHWASHER_TIMER = { name: 'dishwasher', initial: INITIAL.dishwasher, tick: dishwasherTick, view: dishwasherView };
 
 /**
- * Advances every registered station of one cooking kind (grill, oven, pot) by `dt` (see tickTimed).
- * @template {{ ticks: number }} S
+ * Advances every registered station of one kind (grill, oven, pot, wok, spit, trash can) by `dt` (see tickTimed).
+ * @template {object} S
  * @template V
  * @param {string[]} keys
  * @param {number} dt

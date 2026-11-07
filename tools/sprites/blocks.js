@@ -306,6 +306,15 @@ export const layouts = {
     contents_done: /** @type {Region} */ ([20, 32, 8, 8]),
     contents_burnt: /** @type {Region} */ ([30, 32, 8, 8]),
   },
+  trash_can: {
+    body_side: /** @type {Region} */ ([0, 0, 12, 13]),
+    body_top: /** @type {Region} */ ([16, 0, 12, 12]),
+    rim_side: /** @type {Region} */ ([32, 0, 13, 2]),
+    lid_side: /** @type {Region} */ ([32, 4, 13, 1]),
+    handle: /** @type {Region} */ ([32, 8, 3, 1]),
+    rim_top: /** @type {Region} */ ([0, 16, 13, 13]),
+    lid_top: /** @type {Region} */ ([16, 16, 13, 13]),
+  },
 };
 
 // ---- Grill: dark metal box, red knobs, silver grate over glowing coals
@@ -1257,4 +1266,31 @@ export const wok = {
     z: '#1a1614', Z: '#2e2723', s: '#ffffff', S: '#dfe8ee',
   },
   rows: drawWok(),
+};
+
+// ---- Trash can: dark grey metal bin with lighter vertical ribs, a darker rim and a lid with a handle
+
+function drawTrashCan() {
+  const L = layouts.trash_can;
+  const c = canvas();
+  c.fill(L.body_side, 'g');
+  for (let x = 1; x < L.body_side[2]; x += 3) for (let y = 0; y < L.body_side[3]; y++) c.px(L.body_side, x, y, 'l');
+  c.row(L.body_side, L.body_side[3] - 1, 'd');
+  c.fill(L.body_top, 'k'); // inside / bottom: dark
+  c.fill(L.rim_side, 'd');
+  c.row(L.rim_side, 0, 'D');
+  c.fill(L.rim_top, 'd');
+  c.fill(L.lid_top, 'm');
+  c.border(L.lid_top, 'd');
+  for (let i = 3; i < 10; i++) c.px(L.lid_top, i, 6, 'l'); // a shine line across the lid
+  c.fill(L.lid_side, 'd');
+  c.fill(L.handle, 'k');
+  return c.rows();
+}
+
+/** @type {Sprite} */
+export const trash_can = {
+  name: 'trash_can',
+  palette: { g: '#5f6368', l: '#8a8f95', d: '#3c3f43', D: '#4b4f54', k: '#25272a', m: '#70757b' },
+  rows: drawTrashCan(),
 };

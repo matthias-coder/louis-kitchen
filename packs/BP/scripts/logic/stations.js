@@ -6,8 +6,9 @@ import { CUTTABLE, TIMED, POT_DEF, WOK_DEF, SPIT } from './processes.js';
 /**
  * take: consume one held item. give: item id handed to the player, `count` of them
  * as one stack (default 1). hint: lang key for the action bar. sound: sound id to play at the block.
+ * particle: particle id spawned just above the block.
  * @template S
- * @typedef {{ state: S, take?: boolean, give?: string, count?: number, hint?: string, sound?: string }} Result
+ * @typedef {{ state: S, take?: boolean, give?: string, count?: number, hint?: string, sound?: string, particle?: string }} Result
  */
 /** item: what lies on the station (null when empty); ticks: cooking time so far. @typedef {{ item: string | null, ticks: number }} TimedState */
 /** @typedef {TimedState} GrillState */
@@ -19,6 +20,7 @@ import { CUTTABLE, TIMED, POT_DEF, WOK_DEF, SPIT } from './processes.js';
 /** @typedef {{ items: string[] }} CounterState */
 /** @typedef {{ plates: number, ticks: number }} DishwasherState */
 /** @typedef {{ plates: number }} CabinetState */
+/** open: ticks the lid stays up (the trash can stores nothing else). @typedef {{ open: number }} TrashState */
 
 export const COUNTER_MAX = 8;
 /** Layers the counter shows at most (block state `kochmod:layers`). */
@@ -252,7 +254,7 @@ export function spitDrops(state) {
 /** The spit's rules as one station (for the tick loop). */
 export const spit = { INITIAL: SPIT_EMPTY, interact: spitInteract, tick: spitTick, view: spitView, drops: spitDrops };
 
-/** @type {{ grill: GrillState, oven: TimedState, pot: PotState, wok: PotState, spit: SpitState, board: BoardState, counter: CounterState, dishwasher: DishwasherState, cabinet: CabinetState }} */
+/** @type {{ grill: GrillState, oven: TimedState, pot: PotState, wok: PotState, spit: SpitState, board: BoardState, counter: CounterState, dishwasher: DishwasherState, cabinet: CabinetState, trash: TrashState }} */
 export const INITIAL = {
   grill: grill.INITIAL,
   oven: oven.INITIAL,
@@ -263,6 +265,7 @@ export const INITIAL = {
   counter: { items: [] },
   dishwasher: { plates: 0, ticks: 0 },
   cabinet: { plates: CABINET_MAX }, // a placed cabinet comes full of clean plates
+  trash: { open: 0 },
 };
 
 // ---- Cutting board
@@ -426,6 +429,65 @@ export function cabinetDrops(state) {
   return Array(state.plates).fill(ID.cleanPlate);
 }
 
+// ---- Trash can
+
+/** Ticks the lid stays up after a throw. The station tick runs every 10 ticks, so it closes on the next one. */
+export const TRASH_LID_TICKS = 10;
+
+/**
+ * One held item disappears for good (any id, also unknown ones), with sound, a smoke puff and the lid
+ * popping up. Tools, Baukästen and the recipe book (catalog kinds 'tool' and 'misc') are refused, an empty
+ * hand gets a hint; a refusal keeps the given state.
+ * @param {string | null} held
+ * @param {TrashState} [state]
+ * @returns {Result<TrashState>}
+ */
+export function trashInteract(held, state = INITIAL.trash) {
+  if (held === null) return { state, hint: 'kochmod.hint.trash_empty_hand' };
+  const kind = Object.hasOwn(ITEMS, held) ? ITEMS[held].kind : undefined;
+  if (kind === 'tool' || kind === 'misc') return { state, hint: 'kochmod.hint.trash_no_tools' };
+  return { state: { open: TRASH_LID_TICKS }, take: true, sound: 'kochmod.trash', particle: 'minecraft:basic_smoke_particle' };
+}
+
+/**
+ * The lid closes by itself; a closed lid comes back as the same object.
+ * @param {TrashState} state
+ * @param {number} dt
+ * @returns {TrashState}
+ */
+export function trashTick(state, dt) {
+  if (state.open === 0) return state;
+  return { open: Math.max(0, state.open - dt) };
+}
+
+/**
+ * Block states of the trash can.
+ * @param {TrashState} state
+ * @returns {{ 'kochmod:open': boolean }}
+ */
+export function trashView(state) {
+  return { 'kochmod:open': state.open > 0 };
+}
+
+/**
+ * Nothing is stored, so a broken trash can drops nothing.
+ * @param {TrashState} _state
+ * @returns {string[]}
+ */
+export function trashDrops(_state) {
+  return [];
+}
+
+/** The trash can's rules as one station (for the station glue and the tick loop). */
+export const trash = {
+  INITIAL: INITIAL.trash,
+  /** @param {TrashState} state @param {string | null} held @returns {Result<TrashState>} */
+  interact: (state, held) => trashInteract(held, state),
+  tick: trashTick,
+  view: trashView,
+  drops: trashDrops,
+};
+
 // ---- Saved states from stage 1
 
 /** @param {unknown} v @returns {v is Record<string, unknown>} */
@@ -451,6 +513,7 @@ const VALID = {
   counter: (s) => Array.isArray(s.items) && s.items.every((i) => typeof i === 'string'),
   dishwasher: (s) => isCount(s.plates) && isCount(s.ticks),
   cabinet: (s) => isCount(s.plates),
+  trash: (s) => isCount(s.open),
 };
 
 /**

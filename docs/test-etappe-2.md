@@ -69,6 +69,15 @@ Für Papa und Sohn. Hake ab, was klappt. Erst am PC, dann am Tablet.
 - [ ] Mit leerer Hand: Hinweis „Nimm den Wokwender!".
 - [ ] Zu viele Zutaten: Hinweis „Der Wok ist voll.".
 
+### Mülleimer
+
+- [ ] Stell den Mülleimer hin (aus der Kochmod-Kiste). Er ist grau, aus Metall, mit Deckel.
+- [ ] Tippe ihn mit einer Verbrannten Pizza in der Hand an: Genau eine Pizza verschwindet, es klackt, ein kleines Rauchwölkchen steigt auf und der Deckel hüpft kurz hoch und fällt wieder zu.
+- [ ] Ein Misslungenes Gericht, eine Angebrannte Frikadelle und ein Schmutziger Teller verschwinden genauso, immer nur eins pro Antippen.
+- [ ] Mit leerer Hand: Hinweis „Nimm etwas in die Hand, das weg soll.".
+- [ ] Mit Messer, Pfannenwender, Schüssel, Pizzaschieber, Wokwender, Rezeptbuch oder einem Baukasten: Hinweis „Werkzeuge gehören nicht in den Müll.", nichts verschwindet.
+- [ ] Mülleimer abbauen: Es fällt nur der Mülleimer selbst heraus, nichts von dem Weggeworfenen.
+
 ## Teil 4: Jedes Gericht einmal nach dem Rezeptbuch
 
 - [ ] Hamburger: Brötchen, Frikadelle (Grill), Salat, Tomatenscheiben (Schneidebrett), alles auf die Anrichte.
@@ -110,10 +119,11 @@ Baue jedes Restaurant einmal auf einer freien, ebenen Fläche (im Überlebensmod
 - [ ] Pizzeria: Ziegelwände, grün-weiß-rote Markise über der Tür, 4 Tische. Küche: Pizzaofen, Suppentopf, Schneidebrett, Anrichte. Gäste wünschen sich Pizza, Ramen, Kartoffelsuppe und Sushi.
 - [ ] Sushi-Bar: dunkles Holz, weiße Wände, Laternen, 4 Tische als Theke in einer Reihe. Küche: Suppentopf, Wok, Schneidebrett, Anrichte. Gäste wünschen sich Sushi, Ramen, Kartoffelsuppe und Bratnudeln.
 - [ ] Döner-Imbiss: klein, hell, gekachelt, 3 Tische. Küche: Dönerspieß, Schneidebrett, Anrichte. Gäste wünschen sich nur Döner.
-- [ ] Restaurant: wie in Etappe 1, alle Geräte: Dönerspieß, Suppentopf, Grill, Schneidebrett, Anrichte, Pizzaofen, Spülmaschine, Geschirrschrank und Wok.
+- [ ] Restaurant: wie in Etappe 1, alle Geräte: Dönerspieß, Suppentopf, Grill, Schneidebrett, Anrichte, Pizzaofen, Spülmaschine, Geschirrschrank, Wok und Mülleimer.
 - [ ] Mega-Restaurant: zwei Stockwerke mit Treppe, unten die Küche, oben und unten je 4 Tische und eine Glocke.
 - [ ] Jedes Restaurant hat Kühlschrank, Vorratsschrank, Werkzeugkiste, Kochmod-Kiste, Restaurant-Kiste, Spülmaschine und Geschirrschrank.
-- [ ] In jeder Küchenreihe an der Rückwand ist ein Platz frei (dort kommt später der Mülleimer hin).
+- [ ] In jeder Küchenreihe an der Rückwand steht genau ein Mülleimer, und er funktioniert gleich nach dem Bauen.
+- [ ] Im Restaurant und im Döner-Imbiss steht die Kochmod-Kiste in der Ecke hinter dem Mülleimer: Man kann sie schräg von vorn oben antippen.
 - [ ] Alles ist begehbar. Man kommt an jedes Gerät, jede Kiste und jeden Stuhl. Im Mega-Restaurant kommt man über die Treppe nach oben.
 - [ ] Tippe die Glocke an. Ein Gast kommt und setzt sich. Im Mega-Restaurant kommen auch oben Gäste (obere Glocke läuten).
 - [ ] Ein alter „Restaurant-Baukasten" aus Etappe 1 baut weiterhin das Restaurant.

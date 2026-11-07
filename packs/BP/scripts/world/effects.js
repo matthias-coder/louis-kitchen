@@ -117,4 +117,12 @@ export function applyResult(result, player, block) {
   if (result.give) give(player, result.give, result.count ?? 1);
   if (result.hint) player.onScreenDisplay.setActionBar({ translate: result.hint });
   if (result.sound) block.dimension.playSound(result.sound, block.center());
+  if (result.particle) {
+    const { x, y, z } = block.center();
+    try {
+      block.dimension.spawnParticle(result.particle, { x, y: y + 0.6, z });
+    } catch (e) {
+      console.warn(`kochmod: particle ${result.particle} failed: ${e}`); // decoration only, never blocks the action
+    }
+  }
 }

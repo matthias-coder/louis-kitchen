@@ -35,7 +35,7 @@ export const CRATES = {
 export const ALL_BLOCKS = [
   'grill', 'cutting_board', 'counter', 'oven', 'pot', 'spit', 'wok',
   'crate_tools', 'crate_all', 'crate_kits', 'fridge', 'pantry',
-  'dishwasher', 'dish_cabinet',
+  'dishwasher', 'dish_cabinet', 'trash_can',
   'table', 'chair', 'bell',
 ];
 

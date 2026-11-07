@@ -408,3 +408,47 @@ test('spit and wok: names, hints, sound and block sounds exist', () => {
   const rpBlocks = JSON.parse(fs.readFileSync(path.join(root, 'packs/RP/blocks.json'), 'utf8'));
   for (const id of ['spit', 'wok']) assert.ok(rpBlocks[`kochmod:${id}`]?.sound, id);
 });
+
+test('trash can: open bool state, lid bone per state, 12x14x12 centred boxes, nothing above 23 px', () => {
+  const { block, geo, vis, bones } = blockWithGeometry('trash_can');
+  assert.equal(block.description.identifier, 'kochmod:trash_can');
+  assert.deepEqual(block.description.states, { 'kochmod:open': [false, true] });
+  assert.deepEqual(vis, {
+    lid: "!q.block_state('kochmod:open')",
+    lid_open: "q.block_state('kochmod:open')",
+  });
+  assert.ok(bones.includes('bin'));
+  assert.equal(block.components['minecraft:geometry'].identifier, 'geometry.kochmod.trash_can');
+  assert.equal(geo.description.identifier, 'geometry.kochmod.trash_can');
+  assert.deepEqual(block.components['minecraft:material_instances']['*'], { texture: 'kochmod_trash_can', render_method: 'alpha_test' });
+  assert.ok('kochmod:trash_can' in block.components);
+  assert.match(block.components['minecraft:map_color'], /^#[0-9a-f]{6}$/i);
+  for (const box of ['minecraft:collision_box', 'minecraft:selection_box']) {
+    assert.deepEqual(block.components[box], { origin: [-6, 0, -6], size: [12, 14, 12] }, box);
+  }
+  for (const bone of geo.bones) {
+    for (const cube of bone.cubes) assert.ok(cube.origin[1] + cube.size[1] <= 23, `${bone.name} reaches above 23 px`);
+  }
+  const top = (/** @type {string} */ name) => Math.max(...geo.bones.find((/** @type {any} */ b) => b.name === name).cubes.map((/** @type {any} */ c) => c.origin[1] + c.size[1]));
+  assert.ok(top('lid_open') > top('lid'), 'the open lid sits higher');
+  const terrain = JSON.parse(fs.readFileSync(path.join(RP, 'textures', 'terrain_texture.json'), 'utf8'));
+  assert.equal(terrain.texture_data.kochmod_trash_can.textures, 'textures/blocks/trash_can');
+});
+
+test('trash can: name, hints, sound and block sound exist', () => {
+  for (const lang of ['de_DE', 'en_US']) {
+    const lines = fs.readFileSync(path.join(RP, 'texts', `${lang}.lang`), 'utf8').split(/\r?\n/);
+    for (const line of [
+      'tile.kochmod:trash_can.name=Mülleimer',
+      'kochmod.hint.trash_empty_hand=Nimm etwas in die Hand, das weg soll.',
+      'kochmod.hint.trash_no_tools=Werkzeuge gehören nicht in den Müll.',
+    ]) {
+      assert.ok(lines.includes(line), `${lang}: ${line}`);
+    }
+  }
+  const sounds = JSON.parse(fs.readFileSync(path.join(RP, 'sounds', 'sound_definitions.json'), 'utf8')).sound_definitions;
+  assert.ok(sounds['kochmod.trash']?.sounds?.length > 0);
+  for (const s of sounds['kochmod.trash'].sounds) assert.match(s, /^sounds\//);
+  const rpBlocks = JSON.parse(fs.readFileSync(path.join(RP, 'blocks.json'), 'utf8'));
+  assert.equal(rpBlocks['kochmod:trash_can']?.sound, 'metal');
+});

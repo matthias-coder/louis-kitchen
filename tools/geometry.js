@@ -323,6 +323,31 @@ export const models = {
       ],
     },
   ],
+  // Grey metal bin (12x13x12) with a slightly wider rim; the lid lies on it, or pops up and back while
+  // `kochmod:open` is set (bones lid / lid_open). Highest point 18 px.
+  trash_can: [
+    {
+      name: 'bin',
+      cubes: [
+        cube([-6, 0, -6], [12, 13, 12], 'body_top', 'body_side'),
+        cube([-6.5, 11, -6.5], [13, 2, 13], 'rim_top', 'rim_side'),
+      ],
+    },
+    {
+      name: 'lid',
+      cubes: [
+        cube([-6.5, 13, -6.5], [13, 1, 13], 'lid_top', 'lid_side'),
+        cube([-1.5, 14, -0.5], [3, 1, 1], 'handle', 'handle'),
+      ],
+    },
+    {
+      name: 'lid_open',
+      cubes: [
+        cube([-6.5, 16, -4.5], [13, 1, 13], 'lid_top', 'lid_side'),
+        cube([-1.5, 17, 1.5], [3, 1, 1], 'handle', 'handle'),
+      ],
+    },
+  ],
   bell: [
     {
       name: 'bell',

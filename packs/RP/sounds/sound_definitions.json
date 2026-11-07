@@ -20,6 +20,10 @@
     "kochmod.bubble": {
       "category": "block",
       "sounds": ["sounds/bubbles/bubble1", "sounds/bubbles/bubble2", "sounds/bubbles/bubble3"]
+    },
+    "kochmod.trash": {
+      "category": "block",
+      "sounds": ["sounds/random/chestclosed"]
     }
   }
 }

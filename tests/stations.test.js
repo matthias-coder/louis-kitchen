@@ -11,7 +11,9 @@ import {
   pot, POT_MAX, potInteract, potTick, potView, potDrops,
   wok, WOK_MAX, wokInteract, wokTick, wokView, wokDrops,
   SPIT_SLICES, spitInteract, spitTick, spitView, spitDrops,
+  trash, TRASH_LID_TICKS, trashInteract, trashTick, trashView, trashDrops,
 } from '../packs/BP/scripts/logic/stations.js';
+import { itemsOf } from '../packs/BP/scripts/logic/catalog.js';
 import { CUTTABLE } from '../packs/BP/scripts/logic/processes.js';
 import { BURNT_AT, COOKED_AT } from '../packs/BP/scripts/logic/cooking.js';
 
@@ -678,5 +680,85 @@ test('migrateStationState: spit states pass through, garbage becomes an empty sp
     { meat: false, ticks: 0, slices: 3 }, { meat: false, ticks: 0, slices: -1 }, { meat: true, ticks: 0, slices: 2.5 },
   ]) {
     assert.deepEqual(migrateStationState('spit', bad), INITIAL.spit, JSON.stringify(bad));
+  }
+});
+
+// ---- Trash can
+const TRASH_RESULT = { take: true, sound: 'kochmod.trash', particle: 'minecraft:basic_smoke_particle' };
+
+test('trash: any food in hand disappears, one at a time, with sound, smoke and the lid popping up', () => {
+  assert.deepEqual(trashInteract(k('burnt_pizza')), { state: { open: TRASH_LID_TICKS }, ...TRASH_RESULT });
+  assert.equal(TRASH_LID_TICKS, 10);
+  for (const id of ['failed_dish', 'burnt_pizza', 'burnt_patty', 'dirty_plate', 'clean_plate', 'hamburger', 'tomato', 'cooked_rice'].map(k)) {
+    assert.deepEqual(trashInteract(id), { state: { open: TRASH_LID_TICKS }, ...TRASH_RESULT }, id);
+  }
+  for (const id of [...itemsOf('ingredient'), ...itemsOf('prepared'), ...itemsOf('dish'), ...itemsOf('plate')]) {
+    assert.equal(trashInteract(id).take, true, id);
+  }
+});
+
+test('trash: unknown item ids (other add-ons, vanilla, block items) are thrown away too', () => {
+  for (const id of ['kochmod:does_not_exist', 'minecraft:rotten_flesh', 'kochmod:grill', '']) {
+    assert.deepEqual(trashInteract(id), { state: { open: TRASH_LID_TICKS }, ...TRASH_RESULT }, id);
+  }
+});
+
+test('trash: an empty hand gets a hint, nothing else happens', () => {
+  const r = trashInteract(null);
+  assert.deepEqual(r, { state: INITIAL.trash, hint: 'kochmod.hint.trash_empty_hand' });
+  const open = { open: 10 };
+  assert.equal(trashInteract(null, open).state, open, 'a refusal keeps the lid as it is');
+});
+
+test('trash: tools, Baukästen and the recipe book (catalog kinds tool and misc) are refused', () => {
+  const refused = [...itemsOf('tool'), ...itemsOf('misc')];
+  for (const id of ['knife', 'spatula', 'bowl', 'pizza_peel', 'wok_spatula', 'recipe_book', 'kit_classic', 'restaurant_kit'].map(k)) {
+    assert.ok(refused.includes(id), `${id} is a tool or misc item in the catalog`);
+  }
+  for (const id of refused) {
+    const r = trashInteract(id);
+    assert.deepEqual(r, { state: INITIAL.trash, hint: 'kochmod.hint.trash_no_tools' }, id);
+    assert.equal('take' in r, false);
+  }
+  assert.deepEqual(trashInteract(k('knife')), { state: INITIAL.trash, hint: 'kochmod.hint.trash_no_tools' });
+});
+
+test('trash: the station interact keeps the state on refusals and opens the lid on a throw', () => {
+  const open = { open: 10 };
+  assert.equal(trash.interact(open, k('knife')).state, open);
+  assert.deepEqual(trash.interact(INITIAL.trash, k('failed_dish')), { state: { open: TRASH_LID_TICKS }, ...TRASH_RESULT });
+});
+
+test('trash: the lid counts down to closed; view is the kochmod:open state', () => {
+  assert.deepEqual(INITIAL.trash, { open: 0 });
+  assert.equal(trash.INITIAL, INITIAL.trash);
+  assert.deepEqual(trashTick({ open: 10 }, 4), { open: 6 });
+  assert.deepEqual(trashTick({ open: 10 }, 10), { open: 0 });
+  assert.deepEqual(trashTick({ open: 3 }, 10), { open: 0 });
+  const closed = { open: 0 };
+  assert.equal(trashTick(closed, 10), closed, 'a closed lid is returned unchanged');
+  assert.deepEqual(trashView({ open: 0 }), { 'kochmod:open': false });
+  assert.deepEqual(trashView({ open: 1 }), { 'kochmod:open': true });
+  assert.deepEqual(trashView(trashInteract(k('burnt_pizza')).state), { 'kochmod:open': true });
+});
+
+test('trash: nothing is stored, breaking drops nothing', () => {
+  assert.deepEqual(trashDrops(INITIAL.trash), []);
+  assert.deepEqual(trashDrops({ open: 10 }), []);
+  assert.deepEqual(trash.drops({ open: 5 }), []);
+});
+
+test('trash: reducers do not mutate input', () => {
+  const s = Object.freeze({ open: 10 });
+  trashInteract(k('tomato'), s);
+  trashInteract(null, s);
+  trashTick(s, 10);
+  assert.deepEqual(s, { open: 10 });
+});
+
+test('migrateStationState: trash states pass through, garbage becomes a closed trash can', () => {
+  for (const s of [{ open: 0 }, { open: 10 }]) assert.equal(migrateStationState('trash', s), s);
+  for (const bad of [undefined, null, 7, 'x', [], {}, { open: -1 }, { open: 'yes' }, { open: Infinity }, { item: null, ticks: 0 }]) {
+    assert.deepEqual(migrateStationState('trash', bad), INITIAL.trash, JSON.stringify(bad));
   }
 });

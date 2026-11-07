@@ -1,0 +1,43 @@
+{
+  "format_version": "1.21.90",
+  "minecraft:block": {
+    "description": {
+      "identifier": "kochmod:trash_can",
+      "menu_category": {
+        "category": "construction"
+      },
+      "states": {
+        "kochmod:open": [false, true]
+      }
+    },
+    "components": {
+      "minecraft:geometry": {
+        "identifier": "geometry.kochmod.trash_can",
+        "bone_visibility": {
+          "lid": "!q.block_state('kochmod:open')",
+          "lid_open": "q.block_state('kochmod:open')"
+        }
+      },
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "kochmod_trash_can",
+          "render_method": "alpha_test"
+        }
+      },
+      "minecraft:collision_box": {
+        "origin": [-6, 0, -6],
+        "size": [12, 14, 12]
+      },
+      "minecraft:selection_box": {
+        "origin": [-6, 0, -6],
+        "size": [12, 14, 12]
+      },
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 0.5
+      },
+      "minecraft:light_dampening": 0,
+      "minecraft:map_color": "#8a8d92",
+      "kochmod:trash_can": {}
+    }
+  }
+}

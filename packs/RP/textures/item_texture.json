@@ -50,6 +50,9 @@
     "kochmod_block_table": {
       "textures": "textures/items/block_table"
     },
+    "kochmod_block_trash_can": {
+      "textures": "textures/items/block_trash_can"
+    },
     "kochmod_block_wok": {
       "textures": "textures/items/block_wok"
     },

@@ -15,9 +15,8 @@ import { DIRECTIONS } from './restaurant.js';
  * @typedef {{ xs: number[], z: number }} Door entrance columns `xs` in the front wall row `z`
  * @typedef {{
  *   width: number, depth: number, height: number, door: Door,
- *   spare: Vec,
  *   blocks: LayoutBlock[],
- * }} Layout `spare`: the kitchen-row cell left free for the trash can (next task); blocks in placement order
+ * }} Layout blocks in placement order
  * @typedef {'burger' | 'italian' | 'japanese' | 'doner' | 'classic' | 'mega'} ThemeId
  * @typedef {{ id: ThemeId, name: string, kit: string, icon: string, layout: Layout }} Theme
  *   name: lang key; kit: the Baukasten item id; icon: dish id shown on the Restaurant-Kiste button
@@ -80,10 +79,10 @@ function plan(width, depth, height) {
     },
     /** @param {number} x @param {number} y @param {number} z */
     clear(x, y, z) { cells.delete(`${x},${y},${z}`); },
-    /** @param {Door} door @param {Vec} spare @returns {Layout} */
-    finish(door, spare) {
+    /** @param {Door} door @returns {Layout} */
+    finish(door) {
       const blocks = [...cells.values()].sort((a, b) => phase(a) - phase(b));
-      return { width, depth, height, door, spare, blocks };
+      return { width, depth, height, door, blocks };
     },
   };
 }
@@ -170,20 +169,13 @@ function diningGrid(p, { xs, zs, y = 1 }) {
 }
 
 /**
- * Kitchen devices side by side from x0 along row z (against the back wall). `null` leaves that cell free:
- * every kitchen row keeps exactly one free cell for the trash can, returned as the layout's `spare`.
- * @param {Plan} p @param {(string | null)[]} devices @param {{ z: number, x0: number, y?: number }} s
- * @returns {Vec} the free cell
+ * Kitchen devices side by side from x0 along row z (against the back wall). Every kitchen row has exactly
+ * one trash can.
+ * @param {Plan} p @param {string[]} devices @param {{ z: number, x0: number, y?: number }} s
  */
 function kitchenRow(p, devices, { z, x0, y = 1 }) {
-  if (devices.filter((d) => d === null).length !== 1) throw new Error('layout: a kitchen row needs exactly one free cell');
-  /** @type {Vec | undefined} */
-  let spare;
-  devices.forEach((d, i) => {
-    if (d === null) spare = { x: x0 + i, y, z };
-    else p.put(x0 + i, y, z, `kochmod:${d}`, DEVICE_STATES[d]);
-  });
-  return /** @type {Vec} */ (spare);
+  if (devices.filter((d) => d === 'trash_can').length !== 1) throw new Error('layout: a kitchen row needs exactly one trash can');
+  devices.forEach((d, i) => p.put(x0 + i, y, z, `kochmod:${d}`, DEVICE_STATES[d]));
 }
 
 /** The three crates in a column from the back wall forward: all, tools, kits. @param {Plan} p @param {number} x @param {number} zBack */
@@ -229,8 +221,8 @@ function lanterns(p, y, xz) {
 
 // ---- the themes ----
 
-/** Every device of the stage 1 kitchen, in its back-row order; `null` is the free trash-can cell (x = 12). */
-const FULL_KITCHEN = ['spit', 'pot', 'fridge', 'pantry', 'grill', 'cutting_board', 'counter', 'oven', 'dishwasher', 'dish_cabinet', 'wok', null];
+/** Every device of the full kitchen, in its back-row order; the trash can stands at the right end (x = 12). */
+const FULL_KITCHEN = ['spit', 'pot', 'fridge', 'pantry', 'grill', 'cutting_board', 'counter', 'oven', 'dishwasher', 'dish_cabinet', 'wok', 'trash_can'];
 
 /**
  * @typedef {{
@@ -238,7 +230,7 @@ const FULL_KITCHEN = ['spit', 'pot', 'fridge', 'pantry', 'grill', 'cutting_board
  *   wall: (x: number, y: number, z: number) => string,
  *   halfWall: string, worktop: string,
  *   tables: { xs: number[], zs: number[] },
- *   kitchen: (string | null)[], kitchenX0: number,
+ *   kitchen: string[], kitchenX0: number,
  *   decorate?: (p: Plan) => void,
  * }} StandardSpec
  */
@@ -260,13 +252,13 @@ function standard(s) {
   halfWall(p, { z: 5, x0: 1, x1: 13, gap: door, block: s.halfWall, top: s.worktop });
   bellCounter(p, { x: 6, y: 2, z: 4 }, s.halfWall);
   diningGrid(p, s.tables);
-  const spare = kitchenRow(p, s.kitchen, { z: 9, x0: s.kitchenX0 });
+  kitchenRow(p, s.kitchen, { z: 9, x0: s.kitchenX0 });
   crates(p, 13, 9);
   s.decorate?.(p);
-  return p.finish({ xs: door, z: 0 }, spare);
+  return p.finish({ xs: door, z: 0 });
 }
 
-/** Stage 1 restaurant: every device; the trash-can cell is (12, 1, 9) at the right end of the kitchen row. */
+/** Stage 1 restaurant: every device; the trash can stands at (12, 1, 9), the right end of the kitchen row. */
 const classic = () => standard({
   floor: (x, z) => (z >= 5 ? KITCHEN_FLOOR : FLOOR),
   wall: () => WALL,
@@ -277,45 +269,45 @@ const classic = () => standard({
   kitchenX0: 1,
 });
 
-/** Burger-Laden: red/white terracotta, checkered floor. Trash-can cell: (9, 1, 9), right of the dish cabinet. */
+/** Burger-Laden: red/white terracotta, checkered floor. Trash can: (9, 1, 9), right of the dish cabinet. */
 const burger = () => standard({
   floor: checker(mc('black_concrete'), mc('white_concrete')),
   wall: (x, y) => (y === 1 || y === 4 ? mc('red_terracotta') : WALL),
   halfWall: mc('red_terracotta'),
   worktop: WORKTOP,
   tables: { xs: [2, 5, 10, 13], zs: [3] },
-  kitchen: ['fridge', 'pantry', 'grill', 'cutting_board', 'counter', 'dishwasher', 'dish_cabinet', null],
+  kitchen: ['fridge', 'pantry', 'grill', 'cutting_board', 'counter', 'dishwasher', 'dish_cabinet', 'trash_can'],
   kitchenX0: 2,
 });
 
 const AWNING = [mc('green_concrete'), mc('white_concrete'), mc('red_concrete')];
-/** Pizzeria: brick walls, a green/white/red awning row along the top of the front wall. Trash-can cell: (10, 1, 9). */
+/** Pizzeria: brick walls, a green/white/red awning row along the top of the front wall. Trash can: (10, 1, 9). */
 const italian = () => standard({
   floor: (x, z) => (z >= 5 ? KITCHEN_FLOOR : mc('oak_planks')),
   wall: (x, y, z) => (z === 0 && y === 4 ? AWNING[x % 3] : mc('brick_block')),
   halfWall: mc('brick_block'),
   worktop: WORKTOP,
   tables: { xs: [2, 4, 11, 13], zs: [3] },
-  kitchen: ['fridge', 'pantry', 'oven', 'pot', 'cutting_board', 'counter', 'dishwasher', 'dish_cabinet', null],
+  kitchen: ['fridge', 'pantry', 'oven', 'pot', 'cutting_board', 'counter', 'dishwasher', 'dish_cabinet', 'trash_can'],
   kitchenX0: 2,
 });
 
 const DARK_OAK = mc('dark_oak_planks');
 /** @param {number} x @param {number} z @returns {boolean} dark oak posts of the paper walls */
 const post = (x, z) => ((z === 0 || z === 10) && [0, 4, 10, 14].includes(x)) || ((x === 0 || x === 14) && [0, 5, 10].includes(z));
-/** Sushi-Bar: dark oak frame with paper-like white walls, lanterns, the four tables as one bar row. Trash-can cell: (10, 1, 9). */
+/** Sushi-Bar: dark oak frame with paper-like white walls, lanterns, the four tables as one bar row. Trash can: (10, 1, 9). */
 const japanese = () => standard({
   floor: (x, z) => (z >= 5 ? KITCHEN_FLOOR : mc('spruce_planks')),
   wall: (x, y, z) => (y === 4 || post(x, z) ? DARK_OAK : mc('white_concrete')),
   halfWall: DARK_OAK,
   worktop: mc('dark_oak_slab'),
   tables: { xs: [2, 3, 4, 5], zs: [4] },
-  kitchen: ['fridge', 'pantry', 'pot', 'wok', 'cutting_board', 'counter', 'dishwasher', 'dish_cabinet', null],
+  kitchen: ['fridge', 'pantry', 'pot', 'wok', 'cutting_board', 'counter', 'dishwasher', 'dish_cabinet', 'trash_can'],
   kitchenX0: 2,
   decorate: (p) => lanterns(p, 4, [[2, 3], [5, 3], [10, 3], [12, 3]]),
 });
 
-/** Döner-Imbiss: a small, bright, tiled stand, 11 x 10 x 6, three tables. Trash-can cell: (8, 1, 8). */
+/** Döner-Imbiss: a small, bright, tiled stand, 11 x 10 x 6, three tables. Trash can: (8, 1, 8). */
 function doner() {
   const p = plan(11, 10, 6);
   const door = [5, 6];
@@ -327,15 +319,15 @@ function doner() {
   halfWall(p, { z: 5, x0: 1, x1: 9, gap: door, block: tile, top: WORKTOP });
   bellCounter(p, { x: 4, y: 2, z: 4 }, tile);
   diningGrid(p, { xs: [2, 3, 8], zs: [3] });
-  const spare = kitchenRow(p, ['fridge', 'pantry', 'spit', 'cutting_board', 'counter', 'dishwasher', 'dish_cabinet', null], { z: 8, x0: 1 });
+  kitchenRow(p, ['fridge', 'pantry', 'spit', 'cutting_board', 'counter', 'dishwasher', 'dish_cabinet', 'trash_can'], { z: 8, x0: 1 });
   crates(p, 9, 8);
-  return p.finish({ xs: door, z: 0 }, spare);
+  return p.finish({ xs: door, z: 0 });
 }
 
 /**
  * Mega-Restaurant, 20 x 14 x 9: two storeys of three wall layers each, the upper floor is layer 4.
  * Ground floor: dining room, half-wall, the full kitchen along the back wall, stairs along the left wall.
- * Upper floor: dining only, with its own bell. Trash-can cell: (12, 1, 12), right of the wok.
+ * Upper floor: dining only, with its own bell. Trash can: (12, 1, 12), right of the wok.
  */
 function mega() {
   const p = plan(20, 14, 9);
@@ -353,11 +345,11 @@ function mega() {
   halfWall(p, { z: 8, x0: 2, x1: 18, gap: door, block: HALF_WALL, top: WORKTOP });
   bellCounter(p, { x: 8, y: 2, z: 7 }, HALF_WALL);
   diningGrid(p, { xs: [4, 7, 13, 16], zs: [5] });
-  const spare = kitchenRow(p, FULL_KITCHEN, { z: 12, x0: 1 });
+  kitchenRow(p, FULL_KITCHEN, { z: 12, x0: 1 });
   crates(p, 18, 12);
   bellCounter(p, { x: 10, y: 6, z: 7 }, HALF_WALL);
   diningGrid(p, { xs: [6, 14], zs: [4, 10], y: 5 });
-  return p.finish({ xs: door, z: 0 }, spare);
+  return p.finish({ xs: door, z: 0 });
 }
 
 /** @param {ThemeId} id @param {string} icon dish id @param {Layout} layout @returns {Theme} */

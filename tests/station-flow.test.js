@@ -197,3 +197,18 @@ test('tickTimedStation: cooks loaded woks with the wok rules', async () => {
   assert.deepEqual(w.states.a, { items: ['kochmod:egg'], ticks: 165 });
   assert.deepEqual(w.views, { a: 'done' });
 });
+
+test('tickTimedStation: an open trash-can lid closes on the next station tick, a closed one is not rewritten', async () => {
+  const { trash } = await import('../packs/BP/scripts/logic/stations.js');
+  const TRASH = 'kochmod:trash_can';
+  const w = fakeWorld({ a: TRASH, b: TRASH }, { a: { open: 10 }, b: { open: 0 } });
+  let saves = 0;
+  const save = w.io.save;
+  w.io.save = (k, s) => { saves++; save(k, s); };
+  tickTimedStation(['a', 'b'], 10, w.io, TRASH, 'trash_can', trash);
+  assert.deepEqual(w.states.a, { open: 0 });
+  assert.deepEqual(w.states.b, { open: 0 });
+  assert.equal(saves, 1);
+  assert.deepEqual(w.views, { a: { 'kochmod:open': false } });
+  assert.deepEqual(w.warnings, []);
+});

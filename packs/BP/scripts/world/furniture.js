@@ -1,9 +1,9 @@
 import { BlockPermutation, system } from '@minecraft/server';
-import { DIRECTIONS, offset, seatDirection, spawnDelay, tableInteract } from '../logic/restaurant.js';
+import { CLEAN_PLATE, DIRECTIONS, offset, seatDirection, spawnDelay, tableInteract } from '../logic/restaurant.js';
 import { BELL, CHAIR, TABLE } from '../logic/guest-flow.js';
 import { locKey } from '../logic/store.js';
 import { interactStation } from '../logic/station-flow.js';
-import { worldStore, applyResult, heldItemId } from './effects.js';
+import { worldStore, applyResult, heldItemId, playerHasItem, removeOneItem } from './effects.js';
 import { bellAvailability, forgetBell, hasWaitingGuest, onTableServed, setPlate } from './guests.js';
 
 /** @typedef {import('@minecraft/server').Block} Block */
@@ -87,11 +87,14 @@ const tableComponent = {
     /** @type {TableState} */
     const state = worldStore.load(key) ?? { plate: 'none' };
     const waiting = hasWaitingGuest(key);
+    const hasPlate = playerHasItem(player, CLEAN_PLATE);
     /** @type {string | undefined} */
     let serve;
+    let consumePlate = false;
     interactStation((s, held) => {
-      const result = tableInteract(s, held, waiting);
+      const result = tableInteract(s, held, waiting, hasPlate);
       serve = result.serve;
+      consumePlate = result.consumePlate === true;
       return result;
     }, (s) => s.plate, state, heldItemId(player), {
       setView: (plate) => { if (plate !== state.plate) setPlate(key, plate); },
@@ -99,7 +102,11 @@ const tableComponent = {
         worldStore.save(key, next);
         worldStore.registryAdd('table', key);
       },
-      apply: (result) => applyResult(result, player, block),
+      apply: (result) => {
+        applyResult(result, player, block);
+        // the dish goes onto one clean plate from the inventory
+        if (consumePlate) removeOneItem(player, CLEAN_PLATE);
+      },
     });
     if (serve) onTableServed(key, serve);
   },

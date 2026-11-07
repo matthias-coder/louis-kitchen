@@ -75,47 +75,60 @@ test('seatStillValid only when all three exist', () => {
   assert.equal(seatStillValid({ bellExists: true, chairExists: true, tableExists: false }), false);
 });
 
-test('tableInteract: serve a dish to a waiting guest', () => {
+const DIRTY = 'kochmod:dirty_plate';
+
+test('tableInteract: serve a dish to a waiting guest with a clean plate', () => {
   const state = { plate: /** @type {const} */ ('none') };
-  assert.deepEqual(tableInteract(state, CHEESE, true), {
-    state: { plate: 'cheeseburger' }, take: true, serve: CHEESE, sound: 'kochmod.plate',
+  assert.deepEqual(tableInteract(state, CHEESE, true, true), {
+    state: { plate: 'cheeseburger' }, take: true, serve: CHEESE, sound: 'kochmod.plate', consumePlate: true,
   });
-  assert.deepEqual(tableInteract(state, FAILED, true).state, { plate: 'failed_dish' });
+  assert.deepEqual(tableInteract(state, FAILED, true, true).state, { plate: 'failed_dish' });
+});
+
+test('tableInteract: no clean plate gives a hint and takes nothing', () => {
+  for (const plate of /** @type {const} */ (['none', 'empty'])) {
+    const state = { plate };
+    assert.deepEqual(tableInteract(state, HAM, true, false), { state, hint: 'kochmod.hint.need_plate' });
+  }
 });
 
 test('tableInteract: dish without guest gives hint', () => {
   const state = { plate: /** @type {const} */ ('none') };
-  assert.deepEqual(tableInteract(state, HAM, false), { state, hint: 'kochmod.hint.no_guest' });
+  assert.deepEqual(tableInteract(state, HAM, false, true), { state, hint: 'kochmod.hint.no_guest' });
+  assert.deepEqual(tableInteract(state, HAM, false, false), { state, hint: 'kochmod.hint.no_guest' });
 });
 
 test('tableInteract: non-dish on empty table does nothing', () => {
   const state = { plate: /** @type {const} */ ('none') };
-  assert.deepEqual(tableInteract(state, 'kochmod:bun', true), { state });
-  assert.deepEqual(tableInteract(state, null, true), { state });
+  assert.deepEqual(tableInteract(state, 'kochmod:bun', true, true), { state });
+  assert.deepEqual(tableInteract(state, null, true, true), { state });
 });
 
-test('tableInteract: empty plate is cleared by any other tap', () => {
+test('tableInteract: any other tap on an empty plate hands out a dirty plate', () => {
   const state = { plate: /** @type {const} */ ('empty') };
-  for (const held of [null, 'kochmod:bun']) {
-    assert.deepEqual(tableInteract(state, held, true), { state: { plate: 'none' } });
+  for (const held of [null, 'kochmod:bun', 'kochmod:clean_plate']) {
+    for (const hasPlate of [true, false]) {
+      assert.deepEqual(tableInteract(state, held, true, hasPlate), { state: { plate: 'none' }, give: DIRTY });
+    }
   }
-  assert.deepEqual(tableInteract(state, HAM, false), { state: { plate: 'none' } });
+  assert.deepEqual(tableInteract(state, HAM, false, true), { state: { plate: 'none' }, give: DIRTY });
 });
 
-test('tableInteract: a dish on an empty plate with a waiting guest is served', () => {
+test('tableInteract: a dish on an empty plate with a waiting guest is served and the dirty plate comes back', () => {
   const state = { plate: /** @type {const} */ ('empty') };
-  assert.deepEqual(tableInteract(state, HAM, true), {
-    state: { plate: 'hamburger' }, take: true, serve: HAM, sound: 'kochmod.plate',
+  assert.deepEqual(tableInteract(state, HAM, true, true), {
+    state: { plate: 'hamburger' }, take: true, serve: HAM, sound: 'kochmod.plate', consumePlate: true, give: DIRTY,
   });
 });
 
 test('tableInteract: busy table with another dish gives hint', () => {
   const state = { plate: /** @type {const} */ ('hamburger') };
-  assert.deepEqual(tableInteract(state, CHEESE, false), { state, hint: 'kochmod.hint.table_busy' });
+  assert.deepEqual(tableInteract(state, CHEESE, false, true), { state, hint: 'kochmod.hint.table_busy' });
+  assert.deepEqual(tableInteract(state, CHEESE, true, true), { state, hint: 'kochmod.hint.table_busy' });
 });
 
 test('tableInteract: busy table with non-dish does nothing', () => {
   const state = { plate: /** @type {const} */ ('hamburger') };
-  assert.deepEqual(tableInteract(state, 'kochmod:bun', false), { state });
-  assert.deepEqual(tableInteract(state, null, false), { state });
+  assert.deepEqual(tableInteract(state, 'kochmod:bun', false, true), { state });
+  assert.deepEqual(tableInteract(state, null, false, false), { state });
 });

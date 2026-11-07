@@ -36,10 +36,11 @@ export const CRATES = {
   },
 };
 
+/** Items of the crate_all menu with the amount handed out: ingredients and plates x4, tools and dishes x1. */
 const ALL_ITEMS = [
-  'bun', 'raw_patty', 'cooked_patty', 'burnt_patty', 'lettuce', 'tomato', 'tomato_slices', 'cheese',
-  'knife', 'spatula',
-  'hamburger', 'cheeseburger', 'failed_dish',
+  ...['bun', 'raw_patty', 'cooked_patty', 'burnt_patty', 'lettuce', 'tomato', 'tomato_slices', 'cheese'].map((id) => ({ id, count: 4 })),
+  ...['knife', 'spatula', 'hamburger', 'cheeseburger', 'failed_dish'].map((id) => ({ id, count: 1 })),
+  { id: 'clean_plate', count: 4 },
 ];
 /** Every block of the add-on, in menu order (block items are handed out like items). */
 export const ALL_BLOCKS = [
@@ -51,7 +52,7 @@ export const ALL_BLOCKS = [
 CRATES.crate_all = {
   title: 'kochmod.crate.all',
   entries: [
-    ...ALL_ITEMS.map((id, i) => ({ item: `kochmod:${id}`, count: i < 8 ? 4 : 1 })), // ingredients x4, tools and dishes x1
+    ...ALL_ITEMS.map(({ id, count }) => ({ item: `kochmod:${id}`, count })),
     ...ALL_BLOCKS.map((id) => ({ item: `kochmod:${id}`, count: 1 })),
   ],
 };

@@ -14,8 +14,14 @@
     "kochmod_cheeseburger": {
       "textures": "textures/items/cheeseburger"
     },
+    "kochmod_clean_plate": {
+      "textures": "textures/items/clean_plate"
+    },
     "kochmod_cooked_patty": {
       "textures": "textures/items/cooked_patty"
+    },
+    "kochmod_dirty_plate": {
+      "textures": "textures/items/dirty_plate"
     },
     "kochmod_failed_dish": {
       "textures": "textures/items/failed_dish"

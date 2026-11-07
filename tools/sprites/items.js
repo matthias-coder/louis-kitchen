@@ -297,3 +297,35 @@ export const failed_dish = {
     '................',
   ],
 };
+
+/**
+ * Clean plate seen from above: white with a light-blue rim. The "s" pixels are where
+ * the dirty plate has its brown smears; on the clean plate they are plain white.
+ * @type {Sprite}
+ */
+export const clean_plate = {
+  name: 'clean_plate',
+  palette: {
+    o: '#5f8fb0', r: '#9fd3f2', h: '#d6f0ff', w: '#f4f6f7', c: '#ffffff', s: '#ffffff',
+  },
+  rows: [
+    '......oooo......',
+    '....oorrrroo....',
+    '..oorhhhhrrroo..',
+    '..orhwwwwwwrro..',
+    '.orhwwccccwwrro.',
+    '.ohwwcccsccwwro.',
+    'orhwcsscccccwrro',
+    'orhwccsscccswrro',
+    'orhwccccccccwrro',
+    'orrwcccccsscwrro',
+    '.orwwcccccswwro.',
+    '.orrwwccccwwrro.',
+    '..orrwwwwwwrro..',
+    '..oorrrrrrrroo..',
+    '....oorrrroo....',
+    '......oooo......',
+  ],
+};
+
+export const dirty_plate = recolor(clean_plate, 'dirty_plate', { s: '#8a5a2b', c: '#f1ece2' });

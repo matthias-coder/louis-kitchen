@@ -3,7 +3,10 @@ import { RECIPES, FAILED } from './recipes.js';
 /** @typedef {{ x: number, y: number, z: number }} Loc */
 /** @typedef {'north' | 'east' | 'south' | 'west'} Direction */
 /** @typedef {{ plate: 'none' | 'hamburger' | 'cheeseburger' | 'failed_dish' | 'empty' }} TableState */
-/** @typedef {import('./stations.js').Result<TableState> & { serve?: string }} TableResult */
+/**
+ * serve: dish id handed to the waiting guest. consumePlate: remove one clean plate from the player's inventory.
+ * @typedef {import('./stations.js').Result<TableState> & { serve?: string, consumePlate?: boolean }} TableResult
+ */
 
 export const RADIUS = 16;
 export const SPAWN_MIN = 400;
@@ -16,6 +19,8 @@ export const LEAVE_TICKS = 40;
 export const DIRECTIONS = ['north', 'east', 'south', 'west'];
 
 const PREFIX = 'kochmod:';
+export const CLEAN_PLATE = 'kochmod:clean_plate';
+export const DIRTY_PLATE = 'kochmod:dirty_plate';
 const DISH_IDS = [...RECIPES.map((r) => r.dish), FAILED];
 
 /**
@@ -96,22 +101,28 @@ export function seatStillValid(s) {
 }
 
 /**
+ * Serving needs a clean plate in the player's inventory; an empty plate left on the
+ * table comes back as a dirty plate.
  * @param {TableState} state
  * @param {string | null} held
  * @param {boolean} guestWaiting
+ * @param {boolean} hasPlate the player carries a clean plate (any slot)
  * @returns {TableResult}
  */
-export function tableInteract(state, held, guestWaiting) {
+export function tableInteract(state, held, guestWaiting, hasPlate) {
   const isDish = held !== null && DISH_IDS.includes(held);
-  if (state.plate === 'empty' && !(isDish && guestWaiting)) return { state: { plate: 'none' } };
+  if (state.plate === 'empty' && !(isDish && guestWaiting)) return { state: { plate: 'none' }, give: DIRTY_PLATE };
   if (state.plate === 'none' || state.plate === 'empty') {
     if (!isDish) return { state };
     if (!guestWaiting) return { state, hint: 'kochmod.hint.no_guest' };
+    if (!hasPlate) return { state, hint: 'kochmod.hint.need_plate' };
     return {
       state: { plate: /** @type {TableState['plate']} */ (/** @type {string} */ (held).slice(PREFIX.length)) },
       take: true,
       serve: /** @type {string} */ (held),
       sound: 'kochmod.plate',
+      consumePlate: true,
+      ...(state.plate === 'empty' ? { give: DIRTY_PLATE } : {}),
     };
   }
   if (isDish) return { state, hint: 'kochmod.hint.table_busy' };

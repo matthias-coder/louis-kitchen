@@ -1,0 +1,19 @@
+{
+  "format_version": "1.21.90",
+  "minecraft:item": {
+    "description": {
+      "identifier": "kochmod:clean_plate",
+      "menu_category": {
+        "category": "items"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "kochmod_clean_plate"
+        }
+      },
+      "minecraft:max_stack_size": 16
+    }
+  }
+}

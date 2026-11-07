@@ -5,7 +5,7 @@ import { recolor, spriteToRgba } from '../tools/sprites/util.js';
 
 const ITEM_IDS = [
   'bun', 'raw_patty', 'cooked_patty', 'burnt_patty', 'lettuce', 'tomato', 'tomato_slices',
-  'cheese', 'knife', 'spatula', 'hamburger', 'cheeseburger', 'failed_dish',
+  'cheese', 'knife', 'spatula', 'hamburger', 'cheeseburger', 'failed_dish', 'clean_plate', 'dirty_plate',
 ];
 
 /** @type {import('../tools/sprites/util.js').Sprite[]} */
@@ -52,4 +52,12 @@ test('raw, cooked and burnt patty share their shape but differ in color', () => 
   assert.deepEqual(burnt.rows, cooked.rows);
   assert.notDeepEqual(raw.palette, cooked.palette);
   assert.notDeepEqual(burnt.palette, cooked.palette);
+});
+
+test('clean and dirty plate share their shape; the dirty one has brown smears', () => {
+  const [clean, dirty] = ['clean_plate', 'dirty_plate'].map((n) => sprites.find((s) => s.name === n));
+  assert.ok(clean && dirty);
+  assert.deepEqual(dirty.rows, clean.rows);
+  assert.equal(clean.palette.s, clean.palette.c, 'no smears on the clean plate');
+  assert.notEqual(dirty.palette.s, dirty.palette.c);
 });

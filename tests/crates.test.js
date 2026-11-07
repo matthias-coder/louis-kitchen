@@ -11,7 +11,7 @@ const NEEDED = ['kochmod:bun', 'kochmod:raw_patty', 'kochmod:lettuce', 'kochmod:
 
 const { crate_all: ALL, ...SUPPLY } = CRATES;
 const entries = Object.values(SUPPLY).flatMap((c) => c.entries);
-const ALL_ITEM_IDS = ['bun', 'raw_patty', 'cooked_patty', 'burnt_patty', 'lettuce', 'tomato', 'tomato_slices', 'cheese', 'knife', 'spatula', 'hamburger', 'cheeseburger', 'failed_dish'];
+const ALL_ITEM_IDS = ['bun', 'raw_patty', 'cooked_patty', 'burnt_patty', 'lettuce', 'tomato', 'tomato_slices', 'cheese', 'knife', 'spatula', 'hamburger', 'cheeseburger', 'failed_dish', 'clean_plate'];
 const ALL_BLOCK_IDS = ['grill', 'cutting_board', 'counter', 'crate_vegetables', 'crate_meat', 'crate_bread', 'crate_dairy', 'crate_tools', 'crate_all', 'fridge', 'pantry', 'table', 'chair', 'bell'];
 
 test('there are exactly the eight crates', () => {
@@ -31,8 +31,8 @@ test('tools come singly, ingredients in fours, and no crate is empty', () => {
 
 test('crate_all lists every item and every block exactly once, in order', () => {
   assert.deepEqual(ALL.entries.map((e) => e.item), [...ALL_ITEM_IDS, ...ALL_BLOCK_IDS].map((i) => `kochmod:${i}`));
-  assert.equal(ALL.entries.length, 27);
-  ALL.entries.forEach((e, i) => assert.equal(e.count, i < 8 ? 4 : 1, e.item));
+  assert.equal(ALL.entries.length, 28);
+  ALL.entries.forEach((e, i) => assert.equal(e.count, i < 8 || e.item === 'kochmod:clean_plate' ? 4 : 1, e.item));
 });
 
 test('every crate title exists in de_DE.lang', () => {

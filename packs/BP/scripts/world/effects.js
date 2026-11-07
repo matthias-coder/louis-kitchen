@@ -1,6 +1,7 @@
 import { ItemStack, world } from '@minecraft/server';
 import { createStore, parseLocKey } from '../logic/store.js';
 import { giveOrDrop } from '../logic/give.js';
+import { hasItem, removeOne } from '../logic/inventory.js';
 
 export { giveOrDrop };
 
@@ -46,6 +47,28 @@ function inventory(player) {
  */
 export function heldItemId(player) {
   return inventory(player)?.getItem(player.selectedSlotIndex)?.typeId ?? null;
+}
+
+/**
+ * Whether the player carries the item in any inventory slot.
+ * @param {Player} player
+ * @param {string} itemId
+ * @returns {boolean}
+ */
+export function playerHasItem(player, itemId) {
+  const container = inventory(player);
+  return container ? hasItem(container, itemId) : false;
+}
+
+/**
+ * Removes exactly one of the item from the player's inventory (any slot).
+ * @param {Player} player
+ * @param {string} itemId
+ * @returns {boolean} whether one was removed
+ */
+export function removeOneItem(player, itemId) {
+  const container = inventory(player);
+  return container ? removeOne(container, itemId) : false;
 }
 
 /** @param {Player} player */

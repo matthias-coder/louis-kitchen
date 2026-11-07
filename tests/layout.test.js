@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {
   RESTAURANT, DOOR_XS, ENTRANCE_DISTANCE, rotateLayout, rotateDirection, rotateOffset, placementOrigin,
-  facingFromView, clearanceOffsets, isReplaceable, hasSpace,
+  facingFromView, clearanceOffsets, floorOffsets, isReplaceable, isOverwritable, hasSpace,
 } from '../packs/BP/scripts/logic/layout.js';
 import { RADIUS, seatDirection, withinRadius, offset } from '../packs/BP/scripts/logic/restaurant.js';
 
@@ -206,5 +206,26 @@ test('restaurant kit item: stack of 1, kit component, name and hints in both lan
     assert.ok(t.includes('\nitem.kochmod:restaurant_kit=Restaurant-Baukasten\n'), f);
     assert.ok(t.includes('\nkochmod.hint.kit_built=Dein Restaurant steht! Tipp die Glocke an.\n'), f);
     assert.ok(t.includes('\nkochmod.hint.kit_no_space=Hier ist nicht genug Platz. Such eine freie, ebene Fläche.\n'), f);
+  }
+});
+
+test('isOverwritable allows air, plants and natural ground only', () => {
+  for (const id of ['air', 'short_grass', 'poppy', 'snow_layer', 'grass_block', 'dirt', 'coarse_dirt', 'podzol', 'stone', 'deepslate', 'sand', 'gravel', 'sandstone', 'snow', 'moss_block', 'mud', 'oak_leaves', 'cherry_leaves', 'oak_log', 'stripped_birch_log', 'spruce_wood']) {
+    assert.equal(isOverwritable(`minecraft:${id}`, false), true, id);
+  }
+  for (const id of ['chest', 'oak_door', 'red_bed', 'oak_sign', 'water', 'oak_planks', 'furnace', 'glass', 'torch']) {
+    assert.equal(isOverwritable(`minecraft:${id}`, false), false, id);
+  }
+  assert.equal(isOverwritable('kochmod:table', false), false);
+  assert.equal(isOverwritable('minecraft:barrel', true), false);
+  assert.equal(isOverwritable('minecraft:dirt', true), false);
+});
+
+test('floorOffsets covers the whole footprint at y = 0', () => {
+  for (const facing of ['north', 'east', 'south', 'west']) {
+    const cells = floorOffsets(RESTAURANT, facing);
+    assert.equal(cells.length, RESTAURANT.width * RESTAURANT.depth);
+    assert.ok(cells.every((c) => c.y === 0));
+    assert.equal(new Set(cells.map((c) => `${c.x},${c.z}`)).size, cells.length);
   }
 });

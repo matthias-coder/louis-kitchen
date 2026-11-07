@@ -32,6 +32,7 @@ export const CRATES = {
     entries: [
       { item: 'kochmod:knife', count: 1 },
       { item: 'kochmod:spatula', count: 1 },
+      { item: 'kochmod:clean_plate', count: 4 },
     ],
   },
 };

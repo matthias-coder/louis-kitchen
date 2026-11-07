@@ -99,7 +99,8 @@ Mit dem Restaurant-Baukasten steht in einer Sekunde ein fertiges Restaurant da.
 
 - [ ] Öffne die Kochmod-Kiste und nimm den **Restaurant-Baukasten** (das Häuschen mit der Kochmütze).
 - [ ] Stell dich auf eine freie, ebene Fläche (Wiese ist gut, Blumen und Gras stören nicht). Platz nach vorne: etwa 15 Blöcke breit und 13 Blöcke tief.
-- [ ] Schau geradeaus und tippe mit dem Baukasten auf den Boden vor dir.
+- [ ] Schau geradeaus und tippe mit dem Baukasten von oben auf den Boden vor dir. Der Baukasten baut nur, wenn du die **Oberseite** eines Blocks antippst. An einer Wand oder Seite steht oben „Tipp auf den Boden, nicht an eine Wand.“ und nichts passiert.
+- [ ] Der Baukasten baut nie über Sachen, die du gebaut hast (Kisten, Öfen, Betten, Türen, Kochmod-Blöcke ...): dann steht oben „Hier ist nicht genug Platz.“ und nichts wird zerstört.
 - [ ] Das Restaurant erscheint vor dir, der Eingang zeigt zu dir. Oben steht: „Dein Restaurant steht! Tipp die Glocke an."
 - [ ] Ist zu wenig Platz (Bäume, Hügel), steht oben: „Hier ist nicht genug Platz. Such eine freie, ebene Fläche." Dann passiert nichts und der Baukasten bleibt in der Hand.
 - [ ] Im Überlebensmodus ist der Baukasten danach weg, im Kreativmodus bleibt er.

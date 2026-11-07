@@ -228,11 +228,45 @@ export function isReplaceable(typeId) {
   return REPLACEABLE.has(typeId);
 }
 
+/** Natural ground and terrain blocks the kit may overwrite (besides replaceable plants and air). */
+const NATURAL = new Set([
+  'grass_block', 'dirt', 'coarse_dirt', 'podzol', 'stone', 'deepslate', 'sand', 'gravel', 'sandstone', 'snow', 'moss_block', 'mud',
+  'tall_grass', 'short_grass',
+].map((id) => `minecraft:${id}`));
+
+/**
+ * Whether the Baukasten may overwrite a block: air, replaceable plants, natural ground, leaves, logs.
+ * Everything else (player builds, kochmod blocks, containers, beds, doors, signs, water ...) is protected.
+ * @param {string} typeId
+ * @param {boolean} hasInventory the block has a minecraft:inventory component (chest, barrel, furnace ...)
+ * @returns {boolean}
+ */
+export function isOverwritable(typeId, hasInventory) {
+  if (hasInventory || !typeId.startsWith('minecraft:')) return false;
+  if (isReplaceable(typeId) || NATURAL.has(typeId)) return true;
+  return /_leaves$|_log$|_wood$|^minecraft:(leaves|leaves2|log|log2)$/.test(typeId);
+}
+
+/**
+ * World offsets of every floor-layer cell (y = 0) of the footprint.
+ * @param {Layout} layout
+ * @param {Direction} facing
+ * @returns {Vec[]}
+ */
+export function floorOffsets(layout, facing) {
+  /** @type {Vec[]} */
+  const cells = [];
+  for (let z = 0; z < layout.depth; z++) {
+    for (let x = 0; x < layout.width; x++) cells.push(rotateOffset({ x, y: 0, z }, facing));
+  }
+  return cells;
+}
+
 /** At most this share of the space above the floor may be blocked. */
 export const MAX_BLOCKED_SHARE = 0.1;
 
 /**
- * @param {number} blocked cells above the floor that are neither air nor replaceable
+ * @param {number} blocked natural blocks sticking into the room above the floor
  * @param {number} total all cells above the floor
  * @returns {boolean}
  */

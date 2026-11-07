@@ -1,6 +1,6 @@
-import { BlockPermutation, GameMode, Player, system } from '@minecraft/server';
+import { BlockPermutation, Direction, GameMode, Player, system } from '@minecraft/server';
 import {
-  RESTAURANT, rotateLayout, placementOrigin, facingFromView, clearanceOffsets, isReplaceable, hasSpace,
+  RESTAURANT, rotateLayout, placementOrigin, facingFromView, clearanceOffsets, floorOffsets, isReplaceable, isOverwritable, hasSpace,
 } from '../logic/layout.js';
 import { registerStationBlock } from './stations.js';
 import { registerFurnitureBlock } from './furniture.js';
@@ -16,7 +16,7 @@ const KIT_ID = 'kochmod:restaurant_kit';
 const AIR = 'minecraft:air';
 /** Block changes per tick while building (the job continues on the next tick). */
 const BLOCKS_PER_TICK = 96;
-const HINT = { built: 'kochmod.hint.kit_built', noSpace: 'kochmod.hint.kit_no_space' };
+const HINT = { built: 'kochmod.hint.kit_built', noSpace: 'kochmod.hint.kit_no_space', tapFloor: 'kochmod.hint.kit_tap_floor' };
 
 /** One restaurant at a time; a second tap while building is ignored. */
 let building = false;
@@ -44,17 +44,34 @@ function blockAt(dimension, loc) {
   }
 }
 
+/** @param {Block} block @returns {boolean} */
+function hasInventory(block) {
+  try {
+    return block.getComponent('minecraft:inventory') !== undefined;
+  } catch {
+    return false;
+  }
+}
+
 /**
- * Number of cells above the floor that are neither air nor replaceable (unloaded cells count as blocked).
- * @param {Dimension} dimension @param {Vector3} origin @param {Vector3[]} cells
+ * Inspects the footprint. `protectedCount` counts cells (floor included) that must never be overwritten
+ * (player builds, kochmod blocks, containers, unloaded cells); `blocked` counts natural blocks sticking into the room.
+ * @param {Dimension} dimension @param {Vector3} origin @param {Vector3[]} floor @param {Vector3[]} cells
+ * @returns {{ protectedCount: number, blocked: number }}
  */
-function countBlocked(dimension, origin, cells) {
+function inspectFootprint(dimension, origin, floor, cells) {
+  let protectedCount = 0;
   let blocked = 0;
+  for (const c of floor) {
+    const block = blockAt(dimension, add(origin, c));
+    if (!block || !isOverwritable(block.typeId, hasInventory(block))) protectedCount++;
+  }
   for (const c of cells) {
     const block = blockAt(dimension, add(origin, c));
-    if (!block || !isReplaceable(block.typeId)) blocked++;
+    if (!block || !isOverwritable(block.typeId, hasInventory(block))) protectedCount++;
+    else if (!isReplaceable(block.typeId)) blocked++;
   }
-  return blocked;
+  return { protectedCount, blocked };
 }
 
 /**
@@ -99,7 +116,10 @@ function* buildJob(player, dimension, origin, cells, blocks) {
       if (++done % BLOCKS_PER_TICK === 0) yield;
     }
     if (failures > 0) console.warn(`kochmod kit: ${failures} block(s) could not be placed`);
-    if (player.isValid) hint(player, HINT.built);
+    if (player.isValid) {
+      if (player.getGameMode() !== GameMode.Creative) removeOneItem(player, KIT_ID);
+      hint(player, HINT.built);
+    }
   } finally {
     building = false;
   }
@@ -117,11 +137,11 @@ function buildFor(player, tapped) {
   const facing = facingFromView(player.getViewDirection());
   const origin = placementOrigin(ground.location, facing);
   const cells = clearanceOffsets(RESTAURANT, facing);
-  if (!hasSpace(countBlocked(dimension, origin, cells), cells.length)) {
+  const { protectedCount, blocked } = inspectFootprint(dimension, origin, floorOffsets(RESTAURANT, facing), cells);
+  if (protectedCount > 0 || !hasSpace(blocked, cells.length)) {
     hint(player, HINT.noSpace);
     return;
   }
-  if (player.getGameMode() !== GameMode.Creative) removeOneItem(player, KIT_ID);
   building = true;
   try {
     system.runJob(buildJob(player, dimension, origin, cells, rotateLayout(RESTAURANT, facing)));
@@ -134,8 +154,12 @@ function buildFor(player, tapped) {
 /** @param {ItemComponentRegistry} itemComponentRegistry */
 export function registerKit(itemComponentRegistry) {
   itemComponentRegistry.registerCustomComponent(KIT_ID, {
-    onUseOn({ source, block }) {
+    onUseOn({ source, block, blockFace }) {
       if (!(source instanceof Player)) return;
+      if (blockFace !== Direction.Up) {
+        hint(source, HINT.tapFloor);
+        return;
+      }
       // build outside the event callback, which may not allow world changes
       system.run(() => {
         try {

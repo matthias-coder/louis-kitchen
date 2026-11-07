@@ -108,10 +108,10 @@ function drawPatty(c, top, side, kind, seed) {
 
 // ---- Layouts (source of truth for the geometry UVs)
 
-/** Tall cabinet atlas (fridge, pantry): 14x30 front, side and back, 14x14 top and bottom. */
+/** Tall cabinet atlas (fridge, pantry): 14x23 front, side and back, 14x14 top and bottom. */
 const TALL = {
-  front: /** @type {Region} */ ([0, 0, 14, 30]),
-  side: /** @type {Region} */ ([14, 0, 14, 30]),
+  front: /** @type {Region} */ ([0, 0, 14, 23]),
+  side: /** @type {Region} */ ([14, 0, 14, 23]),
   top: /** @type {Region} */ ([28, 0, 14, 14]),
   bottom: /** @type {Region} */ ([28, 14, 14, 14]),
 };
@@ -743,18 +743,18 @@ function drawFridge() {
   const c = canvas();
   c.fill(L.front, 'W');
   c.border(L.front, 'L');
-  c.row(L.front, 10, 'S');
-  c.row(L.front, 9, 'L');
-  c.row(L.front, 11, 'L');
-  for (let y = 3; y <= 7; y++) c.px(L.front, 11, y, 'H');
-  for (let y = 14; y <= 22; y++) c.px(L.front, 11, y, 'H');
-  c.px(L.front, 10, 3, 'M'); c.px(L.front, 10, 14, 'M');
-  c.px(L.front, 3, 4, 'B'); c.px(L.front, 4, 4, 'B'); // small indicator light on the freezer
-  for (let y = 28; y < 30; y++) c.row(L.front, y, 'D');
+  c.row(L.front, 7, 'S');
+  c.row(L.front, 6, 'L');
+  c.row(L.front, 8, 'L');
+  for (let y = 2; y <= 5; y++) c.px(L.front, 11, y, 'H');
+  for (let y = 11; y <= 17; y++) c.px(L.front, 11, y, 'H');
+  c.px(L.front, 10, 2, 'M'); c.px(L.front, 10, 11, 'M');
+  c.px(L.front, 3, 3, 'B'); c.px(L.front, 4, 3, 'B'); // small indicator light on the freezer
+  for (let y = 21; y < 23; y++) c.row(L.front, y, 'D');
   c.fill(L.side, 'G');
   c.border(L.side, 'F');
-  c.row(L.side, 10, 'F');
-  for (let y = 28; y < 30; y++) c.row(L.side, y, 'D');
+  c.row(L.side, 7, 'F');
+  for (let y = 21; y < 23; y++) c.row(L.side, y, 'D');
   c.fill(L.top, 'W');
   c.border(L.top, 'L');
   c.fill(L.bottom, 'D');
@@ -779,24 +779,24 @@ function drawPantry() {
   const L = TALL;
   const c = canvas();
   c.fill(L.front, 'O');
-  for (let y = 0; y < 28; y += 2) for (let x = 1; x < 13; x += 5) c.px(L.front, x + (y % 4 === 0 ? 0 : 2), y, 'P'); // wood grain
+  for (let y = 0; y < 21; y += 2) for (let x = 1; x < 13; x += 5) c.px(L.front, x + (y % 4 === 0 ? 0 : 2), y, 'P'); // wood grain
   c.border(L.front, 'K');
   c.row(L.front, 1, 'K');
-  for (let y = 0; y < 30; y++) { c.px(L.front, 1, y, 'K'); c.px(L.front, 12, y, 'K'); }
-  c.row(L.front, 10, 'K'); // shelf line between the upper and lower door panels
-  c.row(L.front, 11, 'N');
-  for (let y = 0; y < 28; y++) { c.px(L.front, 6, y, 'K'); c.px(L.front, 7, y, 'K'); } // gap between the two doors
-  for (let y = 12; y < 27; y++) { c.px(L.front, 2, y, 'N'); c.px(L.front, 11, y, 'N'); }
-  for (const [kx, ky] of [[4, 17], [8, 17], [4, 5], [8, 5]]) { // round knobs, 2x2 with a highlight
+  for (let y = 0; y < 23; y++) { c.px(L.front, 1, y, 'K'); c.px(L.front, 12, y, 'K'); }
+  c.row(L.front, 7, 'K'); // shelf line between the upper and lower door panels
+  c.row(L.front, 8, 'N');
+  for (let y = 0; y < 21; y++) { c.px(L.front, 6, y, 'K'); c.px(L.front, 7, y, 'K'); } // gap between the two doors
+  for (let y = 9; y < 20; y++) { c.px(L.front, 2, y, 'N'); c.px(L.front, 11, y, 'N'); }
+  for (const [kx, ky] of [[4, 13], [8, 13], [4, 3], [8, 3]]) { // round knobs, 2x2 with a highlight
     c.px(L.front, kx, ky, 'Y'); c.px(L.front, kx + 1, ky, 'Q');
     c.px(L.front, kx, ky + 1, 'Q'); c.px(L.front, kx + 1, ky + 1, 'K');
   }
-  for (let y = 28; y < 30; y++) c.row(L.front, y, 'K');
+  for (let y = 21; y < 23; y++) c.row(L.front, y, 'K');
   c.fill(L.side, 'O');
-  for (let y = 1; y < 28; y += 3) c.row(L.side, y, 'P');
+  for (let y = 1; y < 21; y += 3) c.row(L.side, y, 'P');
   c.border(L.side, 'K');
-  c.row(L.side, 10, 'K');
-  for (let y = 28; y < 30; y++) c.row(L.side, y, 'K');
+  c.row(L.side, 7, 'K');
+  for (let y = 21; y < 23; y++) c.row(L.side, y, 'K');
   c.fill(L.top, 'O');
   c.border(L.top, 'K');
   c.fill(L.bottom, 'K');

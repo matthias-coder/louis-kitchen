@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import { CRATES, ALL_BLOCKS, BUSY_RETRIES, entryLook, shouldRetryBusy } from '../packs/BP/scripts/logic/crates.js';
 
 const lang = fs.readFileSync(new URL('../packs/RP/texts/de_DE.lang', import.meta.url), 'utf8');
-const SUPPLIED = ['raw_patty', 'bun', 'lettuce', 'tomato', 'cheese', 'knife', 'spatula'].map((i) => `kochmod:${i}`);
+const SUPPLIED = ['raw_patty', 'bun', 'lettuce', 'tomato', 'cheese', 'knife', 'spatula', 'clean_plate'].map((i) => `kochmod:${i}`);
 const TOOLS = ['kochmod:knife', 'kochmod:spatula'];
 // Stage 1 recipes need these; cooked patty and tomato slices are produced at stations.
 const NEEDED = ['kochmod:bun', 'kochmod:raw_patty', 'kochmod:lettuce', 'kochmod:tomato', 'kochmod:cheese', ...TOOLS];
@@ -18,7 +18,7 @@ test('there are exactly the eight crates', () => {
   assert.deepEqual(Object.keys(CRATES).sort(), ['crate_all', 'crate_bread', 'crate_dairy', 'crate_meat', 'crate_tools', 'crate_vegetables', 'fridge', 'pantry']);
 });
 
-test('crates only hand out the seven supply items, and together all that stage 1 needs', () => {
+test('crates only hand out the supply items, and together all that stage 1 needs', () => {
   for (const e of entries) assert.ok(SUPPLIED.includes(e.item), e.item);
   const given = new Set(entries.map((e) => e.item));
   for (const n of NEEDED) assert.ok(given.has(n), `no crate supplies ${n}`);
@@ -26,7 +26,7 @@ test('crates only hand out the seven supply items, and together all that stage 1
 
 test('tools come singly, ingredients in fours, and no crate is empty', () => {
   for (const c of Object.values(CRATES)) assert.ok(c.entries.length > 0);
-  for (const e of entries) assert.equal(e.count, TOOLS.includes(e.item) ? 1 : 4, e.item);
+  for (const e of entries) assert.equal(e.count, ['kochmod:knife', 'kochmod:spatula'].includes(e.item) ? 1 : 4, e.item);
 });
 
 test('crate_all lists every item and every block exactly once, in order', () => {
@@ -65,8 +65,8 @@ test('fridge and pantry geometry exists, UVs stay inside the texture and the fac
     assert.equal(texture.readUInt32BE(16), geo.description.texture_width);
     assert.equal(texture.readUInt32BE(20), geo.description.texture_height);
     for (const cube of geo.bones.flatMap((/** @type {any} */ b) => b.cubes)) {
-      assert.deepEqual(cube.size, [14, 30, 14]);
-      assert.ok(cube.origin[1] === 0 && cube.origin[1] + cube.size[1] <= 30);
+      assert.deepEqual(cube.size, [14, 23, 14]);
+      assert.ok(cube.origin[1] === 0 && cube.origin[1] + cube.size[1] <= 23);
       assert.ok(Math.abs(cube.origin[0]) + cube.size[0] / 2 <= 15 && cube.origin[0] === -cube.size[0] / 2 && cube.origin[2] === -cube.size[2] / 2);
       for (const f of Object.values(cube.uv)) {
         assert.ok(f.uv[0] + f.uv_size[0] <= geo.description.texture_width && f.uv[1] + f.uv_size[1] <= geo.description.texture_height);
@@ -105,4 +105,10 @@ test('every block in crate_all has a 16x16 menu icon and entryLook uses it', () 
 
 test('items keep their item texture as menu icon', () => {
   assert.deepEqual(entryLook('kochmod:clean_plate'), { name: { translate: 'item.kochmod:clean_plate' }, icon: 'textures/items/clean_plate' });
+});
+
+test('crate_tools also hands out four clean plates', () => {
+  assert.deepEqual(CRATES.crate_tools.entries, [
+    { item: 'kochmod:knife', count: 1 }, { item: 'kochmod:spatula', count: 1 }, { item: 'kochmod:clean_plate', count: 4 },
+  ]);
 });

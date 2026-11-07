@@ -19,12 +19,12 @@ const patties = (y, half) => ['raw', 'cooked', 'burnt'].map((kind) => ({
 }));
 
 /**
- * Tall cabinet (fridge, pantry): one 14x30x14 box, front (north, -z) distinct from the sides.
- * Blocks may reach 30 px high; their collision box is capped at 16 in the block JSON.
+ * Tall cabinet (fridge, pantry): one 14x23x14 box, front (north, -z) distinct from the sides.
+ * Blocks may reach 23 px high (Bedrock allows 7 px beyond the block); their collision box is capped at 16 in the block JSON.
  * @type {BoneDef[]}
  */
 const tallCabinet = [
-  { name: 'cabinet', cubes: [{ origin: [-7, 0, -7], size: [14, 30, 14], top: 'top', side: 'side', bottom: 'bottom', front: 'front' }] },
+  { name: 'cabinet', cubes: [{ origin: [-7, 0, -7], size: [14, 23, 14], top: 'top', side: 'side', bottom: 'bottom', front: 'front' }] },
 ];
 
 /** Dish cabinet plates: 4 on the bottom board, 4 on the shelf; plate_n shows when the count is >= n. */

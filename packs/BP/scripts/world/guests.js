@@ -1,7 +1,9 @@
 import { BlockPermutation, ItemStack, world } from '@minecraft/server';
 import { DIRECTIONS, offset, tableView } from '../logic/restaurant.js';
 import { parseLocKey } from '../logic/store.js';
-import { TABLE, tickBells, guestAvailability, serveTable, findWaitingGuest, releaseBell, sweepOrphans } from '../logic/guest-flow.js';
+import {
+  TABLE, tickBells, guestAvailability, serveTable, findWaitingGuest, releaseBell, sweepOrphans, ringBell as ringBellFlow,
+} from '../logic/guest-flow.js';
 import { worldStore, loadedBlock } from './effects.js';
 
 /** @typedef {import('@minecraft/server').Entity} Entity */
@@ -206,9 +208,9 @@ export function hasWaitingGuest(tableKey) {
   return findWaitingGuest(tableKey, io) !== null;
 }
 
-/** Bell broken or exploded: its guest leaves, the bell is forgotten. @param {string} bellKey */
+/** Bell broken or exploded: its guests leave, the bell is forgotten. @param {string} bellKey */
 export function forgetBell(bellKey) {
-  releaseBell(bellKey, io, Math.random);
+  releaseBell(bellKey, io);
 }
 
 /**
@@ -218,4 +220,14 @@ export function forgetBell(bellKey) {
  */
 export function bellAvailability(bellKey) {
   return guestAvailability(bellKey, io);
+}
+
+/**
+ * The bell was rung: one guest for every free seat in range, staggered.
+ * The bell must already be in the `bell` registry so its own guests count as seated.
+ * @param {string} bellKey
+ * @returns {import('../logic/guest-flow.js').RingStatus}
+ */
+export function ringBell(bellKey) {
+  return ringBellFlow(bellKey, io, Math.random).status;
 }

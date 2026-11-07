@@ -8,8 +8,9 @@ import { plateName } from './catalog.js';
 import { stationsFor } from './processes.js';
 
 /**
- * Guest life cycle, one guest per bell. Pure: the world is reached only
- * through the injected `GuestIo` and `Guest` handles (see world/guests.js).
+ * Guest life cycle, any number of guests per bell (one per seat). Pure: the
+ * world is reached only through the injected `GuestIo` and `Guest` handles
+ * (see world/guests.js).
  */
 
 export const BELL = 'kochmod:bell';
@@ -17,6 +18,8 @@ export const CHAIR = 'kochmod:chair';
 export const TABLE = 'kochmod:table';
 /** Ticks until the next spawn attempt when no seat or no dish is available. */
 export const RETRY_TICKS = 100;
+/** Ticks between the guests called by one ring of the bell. */
+export const RING_STAGGER = 10;
 /** A walking guest this close (blocks) to the seat centre sits down. */
 export const ARRIVE_DISTANCE = 1.5;
 /** Guest ticks the entity may be missing before the bell gives up on it (entities load after blocks). */
@@ -28,9 +31,14 @@ export const DISH_PLATES = [...DISHES.map(plateName), plateName(FAILED)];
 const PREFIX = 'kochmod:';
 
 /**
- * Per-bell state under `kochmod:st:<bellKey>`. `seat`/`table` are kept on the
- * bell so the guest can be cleaned up even when its entity is gone.
- * @typedef {{ guestId: string | null, cooldown: number, seat?: string, table?: string, missing?: number }} BellState
+ * One seated (or walking) guest of a bell. The table is kept on the bell so
+ * the guest can be cleaned up even when its entity is gone.
+ * @typedef {{ guestId: string, table: string, missing?: number }} SeatEntry
+ */
+/**
+ * Per-bell state under `kochmod:st:<bellKey>`: the guests by seat key, the
+ * spawn countdown and how many guests of a ring are still to be called.
+ * @typedef {{ guests: Record<string, SeatEntry>, cooldown: number, pending?: number }} BellState
  */
 /**
  * Script state of one guest (entity dynamic properties). `wish` and `served`
@@ -55,7 +63,7 @@ const PREFIX = 'kochmod:';
  * @typedef {{
  *   blockTypeAt(key: string): string | undefined,
  *   registryList(kind: string): string[],
- *   loadBell(key: string): BellState | undefined,
+ *   loadBell(key: string): unknown,
  *   saveBell(key: string, state: BellState): void,
  *   forgetBell(key: string): void,
  *   getGuest(id: string): Guest | undefined,
@@ -64,16 +72,67 @@ const PREFIX = 'kochmod:';
  *   setPlate(tableKey: string, plate: string): void,
  *   payout(tableKey: string, emeralds: number): void,
  *   warn(message: string): void,
- * }} GuestIo blockTypeAt returns undefined while the chunk is not loaded
+ * }} GuestIo blockTypeAt returns undefined while the chunk is not loaded;
+ *   loadBell returns the raw stored value (any stage), read through `migrateBellState`
  */
 
 /** @typedef {'ok' | 'no_seat' | 'no_kitchen'} GuestAvailability */
+/** @typedef {GuestAvailability | 'full'} RingStatus `full`: there are seats in range, but all are taken */
 
 /** @param {string} dishId @returns {string} the `kochmod:wish` property value */
 const wishLook = (dishId) => (dishId.startsWith(PREFIX) ? dishId.slice(PREFIX.length) : 'none');
 
-/** @param {() => number} rnd @returns {BellState} */
-const freeBell = (rnd) => ({ guestId: null, cooldown: spawnDelay(rnd) });
+/** @param {unknown} v @returns {v is Record<string, any>} */
+const isRecord = (v) => typeof v === 'object' && v !== null && !Array.isArray(v);
+
+/** A bell without guests that calls the next one after the spawn delay. @param {() => number} rnd @returns {BellState} */
+export const freeBell = (rnd) => ({ guests: {}, cooldown: spawnDelay(rnd) });
+
+/** @param {unknown} v @returns {SeatEntry | null} the entry, or null when it is unusable */
+function seatEntry(v) {
+  if (!isRecord(v) || typeof v.guestId !== 'string' || typeof v.table !== 'string') return null;
+  /** @type {SeatEntry} */
+  const entry = { guestId: v.guestId, table: v.table };
+  if (typeof v.missing === 'number') entry.missing = v.missing;
+  return entry;
+}
+
+/**
+ * Reads a stored bell state of any stage. Stage 1 kept one guest
+ * (`{ guestId, cooldown, seat?, table?, missing? }`); it moves under its seat.
+ * Unusable seat entries are dropped (their guest is swept as an orphan);
+ * anything unreadable becomes a free bell that retries soon.
+ * @param {unknown} saved
+ * @returns {BellState}
+ */
+export function migrateBellState(saved) {
+  if (!isRecord(saved) || typeof saved.cooldown !== 'number') return { guests: {}, cooldown: RETRY_TICKS };
+  /** @type {BellState} */
+  const state = { guests: {}, cooldown: saved.cooldown };
+  if (isRecord(saved.guests)) {
+    for (const [seat, v] of Object.entries(saved.guests)) {
+      const entry = seatEntry(v);
+      if (entry) state.guests[seat] = entry;
+    }
+    if (typeof saved.pending === 'number' && saved.pending > 0) state.pending = saved.pending;
+    return state;
+  }
+  if (!('guestId' in saved)) return { guests: {}, cooldown: RETRY_TICKS };
+  const entry = seatEntry(saved);
+  if (entry && typeof saved.seat === 'string') state.guests[saved.seat] = entry;
+  return state;
+}
+
+/**
+ * The bell's state, or undefined when nothing is stored.
+ * @param {string} bellKey
+ * @param {GuestIo} io
+ * @returns {BellState | undefined}
+ */
+function loadBell(bellKey, io) {
+  const saved = io.loadBell(bellKey);
+  return saved === undefined ? undefined : migrateBellState(saved);
+}
 
 /**
  * The table a chair faces, or null when the chair is not loaded/not a chair or has no table.
@@ -90,30 +149,29 @@ function tableOf(chairKey, io) {
 }
 
 /**
- * Seats and tables used by the guests of all other bells.
- * @param {string} bellKey
+ * Seats and tables used by the guests of all bells (this bell's own included).
  * @param {GuestIo} io
  * @returns {Set<string>}
  */
-function occupied(bellKey, io) {
+function occupied(io) {
   const taken = new Set();
   for (const key of io.registryList('bell')) {
-    if (key === bellKey) continue;
-    const state = io.loadBell(key);
-    if (!state?.guestId) continue;
-    if (state.seat) taken.add(state.seat);
-    if (state.table) taken.add(state.table);
+    for (const [seat, entry] of Object.entries(loadBell(key, io)?.guests ?? {})) {
+      taken.add(seat);
+      taken.add(entry.table);
+    }
   }
   return taken;
 }
 
 /**
  * Whether a guest could come to this bell right now, and what the pick would be.
- * The seat is checked first, then the kitchen.
+ * The seat is checked first, then the kitchen. `free` lists every free seat in
+ * range, nearest first.
  * @param {string} bellKey
  * @param {GuestIo} io
  * @param {() => number} rnd
- * @returns {{ status: GuestAvailability, seat?: string, table?: string, wish?: string }}
+ * @returns {{ status: RingStatus, free: { seat: string, table: string }[], wish?: string }}
  */
 function assess(bellKey, io, rnd) {
   const bell = parseLocKey(bellKey);
@@ -121,35 +179,58 @@ function assess(bellKey, io, rnd) {
     const p = parseLocKey(key);
     return p.dimensionId === bell.dimensionId && withinRadius(bell, p);
   };
-  const taken = occupied(bellKey, io);
   const dist2 = (/** @type {string} */ key) => {
     const p = parseLocKey(key);
     return (p.x - bell.x) ** 2 + (p.y - bell.y) ** 2 + (p.z - bell.z) ** 2;
   };
-  const seats = io.registryList('chair')
-    .filter((seat) => near(seat) && !taken.has(seat))
-    .map((seat) => ({ seat, table: tableOf(seat, io) }))
-    .filter((s) => s.table !== null && !taken.has(s.table))
+  /** @type {{ seat: string, table: string }[]} */
+  const seats = [];
+  for (const seat of io.registryList('chair')) {
+    if (!near(seat)) continue;
+    const table = tableOf(seat, io);
+    if (table !== null) seats.push({ seat, table });
+  }
+  const taken = occupied(io);
+  const free = seats
+    .filter((s) => !taken.has(s.seat) && !taken.has(s.table))
     .sort((a, b) => dist2(a.seat) - dist2(b.seat));
-  if (seats.length === 0) return { status: 'no_seat' };
+  if (free.length === 0) return { status: seats.length === 0 ? 'no_seat' : 'full', free };
   const kinds = new Set(STATION_KINDS.filter((kind) => io.registryList(kind).some(near)));
   const wish = pickWish(availableDishes(kinds), rnd);
-  if (wish === null) return { status: 'no_kitchen' };
-  return { status: 'ok', seat: seats[0].seat, table: /** @type {string} */ (seats[0].table), wish };
+  if (wish === null) return { status: 'no_kitchen', free };
+  return { status: 'ok', free, wish };
 }
 
 /**
- * Can a guest come to this bell, and if not, why not.
+ * Can a guest come to this bell, and if not, why not (all seats taken counts as no_seat).
  * @param {string} bellKey
  * @param {GuestIo} io
  * @returns {GuestAvailability}
  */
 export function guestAvailability(bellKey, io) {
-  return assess(bellKey, io, () => 0).status;
+  const { status } = assess(bellKey, io, () => 0);
+  return status === 'full' ? 'no_seat' : status;
 }
 
 /**
- * Counts down; at 0 spawns a guest if a free seat and a cookable dish exist.
+ * Spawns a guest walking to the nearest free seat (the assessment must be `ok`).
+ * @param {string} bellKey
+ * @param {BellState} state
+ * @param {ReturnType<typeof assess>} found
+ * @param {GuestIo} io
+ * @returns {BellState} with the new guest listed under its seat
+ */
+function spawnAt(bellKey, state, found, io) {
+  const { seat, table } = found.free[0];
+  const guest = io.spawnGuest(bellKey, {
+    phase: 'walking', seat, table, bell: bellKey, timer: WALK_TIMEOUT, served: '', wish: /** @type {string} */ (found.wish),
+  });
+  return { ...state, guests: { ...state.guests, [seat]: { guestId: guest.id, table } } };
+}
+
+/**
+ * Counts down; at 0 calls one guest: the next one of a ring while some are
+ * pending, else the automatic spawner fills one free seat.
  * @param {string} bellKey
  * @param {BellState} state
  * @param {number} dt
@@ -159,59 +240,55 @@ export function guestAvailability(bellKey, io) {
  */
 function trySpawn(bellKey, state, dt, io, rnd) {
   const cooldown = state.cooldown - dt;
-  if (cooldown > 0) return { guestId: null, cooldown };
+  if (cooldown > 0) return { ...state, cooldown };
+  const { pending: _, ...rest } = state;
   const found = assess(bellKey, io, rnd);
-  if (found.status !== 'ok') return { guestId: null, cooldown: RETRY_TICKS };
-  const seat = /** @type {string} */ (found.seat);
-  const table = /** @type {string} */ (found.table);
-  const guest = io.spawnGuest(bellKey, {
-    phase: 'walking', seat, table, bell: bellKey, timer: WALK_TIMEOUT, served: '', wish: /** @type {string} */ (found.wish),
-  });
-  return { guestId: guest.id, cooldown: 0, seat, table };
+  if (found.status !== 'ok') return { ...rest, cooldown: RETRY_TICKS };
+  const next = spawnAt(bellKey, rest, found, io);
+  const pending = (state.pending ?? 0) - 1;
+  return pending > 0 ? { ...next, cooldown: RING_STAGGER, pending } : { ...next, cooldown: spawnDelay(rnd) };
 }
 
 /**
- * Removes the guest (if present), clears a dish left on its table, frees the bell.
+ * Removes the guest (if present) and clears a dish left on its table.
  * The dish was served, so it is consumed and not dropped; an empty plate stays.
- * @param {BellState} state
+ * @param {SeatEntry} entry
  * @param {Guest | undefined} guest
  * @param {boolean} tableExists
  * @param {GuestIo} io
- * @param {() => number} rnd
- * @returns {BellState}
+ * @returns {null} the seat is free
  */
-function cleanup(state, guest, tableExists, io, rnd) {
+function cleanup(entry, guest, tableExists, io) {
   if (guest) guest.remove(false);
-  if (tableExists && state.table && DISH_PLATES.includes(io.getPlate(state.table))) io.setPlate(state.table, 'none');
-  return freeBell(rnd);
+  if (tableExists && DISH_PLATES.includes(io.getPlate(entry.table))) io.setPlate(entry.table, 'none');
+  return null;
 }
 
 /**
- * One step of the bell's guest.
- * @param {BellState} state with a guestId
+ * One step of the guest on one seat.
+ * @param {string} seat
+ * @param {SeatEntry} entry
  * @param {number} dt
  * @param {GuestIo} io
  * @param {() => number} rnd
- * @returns {BellState}
+ * @returns {SeatEntry | null} the updated entry, or null when the guest is gone
  */
-function stepGuest(state, dt, io, rnd) {
-  const guestId = /** @type {string} */ (state.guestId);
-  const { seat, table } = state;
-  if (!seat || !table) return cleanup(state, io.getGuest(guestId), false, io, rnd);
+function stepGuest(seat, entry, dt, io, rnd) {
+  const { guestId, table } = entry;
   const chairType = io.blockTypeAt(seat);
   const tableType = io.blockTypeAt(table);
-  if (chairType === undefined || tableType === undefined) return state; // not loaded: pause
+  if (chairType === undefined || tableType === undefined) return entry; // not loaded: pause
   const tableExists = tableType === TABLE;
   const guest = io.getGuest(guestId);
   if (!seatStillValid({ bellExists: true, chairExists: chairType === CHAIR, tableExists })) {
-    return cleanup(state, guest, tableExists, io, rnd);
+    return cleanup(entry, guest, tableExists, io);
   }
   if (!guest) {
-    const missing = (state.missing ?? 0) + 1;
-    return missing >= MISSING_GRACE ? cleanup(state, undefined, tableExists, io, rnd) : { ...state, missing };
+    const missing = (entry.missing ?? 0) + 1;
+    return missing >= MISSING_GRACE ? cleanup(entry, undefined, tableExists, io) : { ...entry, missing };
   }
-  /** @type {BellState} */
-  const keep = { guestId, cooldown: 0, seat, table };
+  /** @type {SeatEntry} */
+  const keep = { guestId, table };
   const d = guest.data();
   switch (d.phase) {
     case 'walking': {
@@ -251,29 +328,50 @@ function stepGuest(state, dt, io, rnd) {
         return keep;
       }
       guest.remove(true);
-      return freeBell(rnd);
+      return null;
     }
     default:
-      return cleanup(state, guest, tableExists, io, rnd);
+      return cleanup(entry, guest, tableExists, io);
   }
 }
 
 /**
- * Removes the bell's guest (dish plate cleared) and forgets the bell: bell broken or replaced.
+ * Removes all guests of the bell (dish plates cleared) and forgets the bell: bell broken or replaced.
  * @param {string} bellKey
  * @param {GuestIo} io
- * @param {() => number} rnd
  */
-export function releaseBell(bellKey, io, rnd) {
-  const state = io.loadBell(bellKey);
-  if (state?.guestId) {
-    const tableExists = state.table !== undefined && io.blockTypeAt(state.table) === TABLE;
-    cleanup(state, io.getGuest(state.guestId), tableExists, io, rnd);
+export function releaseBell(bellKey, io) {
+  for (const entry of Object.values(loadBell(bellKey, io)?.guests ?? {})) {
+    cleanup(entry, io.getGuest(entry.guestId), io.blockTypeAt(entry.table) === TABLE, io);
   }
   io.forgetBell(bellKey);
 }
 
 /**
+ * The bell was rung: calls one guest for every free seat in range, the first
+ * right away, each further one RING_STAGGER ticks later (via `pending`).
+ * @param {string} bellKey
+ * @param {GuestIo} io
+ * @param {() => number} rnd
+ * @returns {{ status: RingStatus, spawned: number }} spawned: guests spawned right now
+ */
+export function ringBell(bellKey, io, rnd) {
+  const state = loadBell(bellKey, io) ?? freeBell(rnd);
+  const found = assess(bellKey, io, rnd);
+  if (found.status !== 'ok') {
+    io.saveBell(bellKey, state);
+    return { status: found.status, spawned: 0 };
+  }
+  const { pending: _, ...rest } = state;
+  const next = spawnAt(bellKey, rest, found, io);
+  const pending = found.free.length - 1;
+  io.saveBell(bellKey, pending > 0 ? { ...next, cooldown: RING_STAGGER, pending } : { ...next, cooldown: spawnDelay(rnd) });
+  return { status: 'ok', spawned: 1 };
+}
+
+/**
+ * Spawner first (a seat freed in this step is filled only after a fresh delay),
+ * then one step per seated guest; each guest is isolated by its own try/catch.
  * @param {string} bellKey
  * @param {number} dt
  * @param {GuestIo} io
@@ -283,11 +381,29 @@ function tickBell(bellKey, dt, io, rnd) {
   const type = io.blockTypeAt(bellKey);
   if (type === undefined) return; // chunk not loaded
   if (type !== BELL) {
-    releaseBell(bellKey, io, rnd);
+    releaseBell(bellKey, io);
     return;
   }
-  const state = io.loadBell(bellKey) ?? freeBell(rnd);
-  io.saveBell(bellKey, state.guestId === null ? trySpawn(bellKey, state, dt, io, rnd) : stepGuest(state, dt, io, rnd));
+  const loaded = loadBell(bellKey, io) ?? freeBell(rnd);
+  const state = trySpawn(bellKey, loaded, dt, io, rnd);
+  /** @type {Record<string, SeatEntry>} */
+  const guests = { ...state.guests };
+  let left = false;
+  for (const [seat, entry] of Object.entries(loaded.guests)) {
+    try {
+      const next = stepGuest(seat, entry, dt, io, rnd);
+      if (next) {
+        guests[seat] = next;
+      } else {
+        delete guests[seat];
+        left = true;
+      }
+    } catch (e) {
+      io.warn(`kochmod: guest step failed at seat ${seat} of bell ${bellKey}: ${e}`);
+    }
+  }
+  const cooldown = left && !state.pending ? spawnDelay(rnd) : state.cooldown;
+  io.saveBell(bellKey, { ...state, guests, cooldown });
 }
 
 /**
@@ -316,10 +432,11 @@ export function tickBells(bellKeys, dt, io, rnd) {
  */
 export function findWaitingGuest(tableKey, io) {
   for (const key of io.registryList('bell')) {
-    const state = io.loadBell(key);
-    if (!state?.guestId || state.table !== tableKey) continue;
-    const guest = io.getGuest(state.guestId);
-    if (guest && guest.data().phase === 'waiting') return guest;
+    for (const entry of Object.values(loadBell(key, io)?.guests ?? {})) {
+      if (entry.table !== tableKey) continue;
+      const guest = io.getGuest(entry.guestId);
+      if (guest && guest.data().phase === 'waiting') return guest;
+    }
   }
   return null;
 }
@@ -340,15 +457,17 @@ export function serveTable(tableKey, dishId, io) {
 }
 
 /**
- * Removes guest entities that no bell points at (spawned but never recorded,
- * or left over after their bell was cleaned up). No poof: they just vanish.
+ * Removes guest entities that no bell lists under a seat (spawned but never
+ * recorded, or left over after their bell was cleaned up). No poof: they just vanish.
  * @param {Guest[]} guests loaded guest entities
  * @param {GuestIo} io
  */
 export function sweepOrphans(guests, io) {
+  const listed = new Set();
+  for (const key of io.registryList('bell')) {
+    for (const entry of Object.values(loadBell(key, io)?.guests ?? {})) listed.add(entry.guestId);
+  }
   for (const guest of guests) {
-    const bell = guest.data().bell;
-    const state = bell ? io.loadBell(bell) : undefined;
-    if (state?.guestId !== guest.id) guest.remove(false);
+    if (!listed.has(guest.id)) guest.remove(false);
   }
 }

@@ -21,7 +21,7 @@ export const CRATES = {
 
 /** Every block of the add-on, in menu order (block items are handed out like items). */
 export const ALL_BLOCKS = [
-  'grill', 'cutting_board', 'counter', 'oven', 'pot',
+  'grill', 'cutting_board', 'counter', 'oven', 'pot', 'spit', 'wok',
   'crate_tools', 'crate_all', 'fridge', 'pantry',
   'dishwasher', 'dish_cabinet',
   'table', 'chair', 'bell',

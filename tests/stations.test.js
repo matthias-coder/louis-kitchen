@@ -9,6 +9,8 @@ import {
   counterInteract, counterView, counterDrops,
   timedStation, grill, oven, migrateStationState, COUNTER_LAYERS,
   pot, POT_MAX, potInteract, potTick, potView, potDrops,
+  wok, WOK_MAX, wokInteract, wokTick, wokView, wokDrops,
+  SPIT_SLICES, spitInteract, spitTick, spitView, spitDrops,
 } from '../packs/BP/scripts/logic/stations.js';
 import { CUTTABLE } from '../packs/BP/scripts/logic/processes.js';
 import { BURNT_AT, COOKED_AT } from '../packs/BP/scripts/logic/cooking.js';
@@ -511,5 +513,170 @@ test('migrateStationState: pot states pass through, garbage becomes an empty pot
   assert.equal(migrateStationState('pot', s), s);
   for (const bad of [undefined, null, 42, [], {}, { items: 'no', ticks: 0 }, { items: [3], ticks: 0 }, { items: [], ticks: -1 }, { item: null, ticks: 0 }]) {
     assert.deepEqual(migrateStationState('pot', bad), INITIAL.pot, JSON.stringify(bad));
+  }
+});
+
+// ---- Wok (pot-station factory with the WOK recipes and the wok spatula)
+
+const WOK_EMPTY = { items: [], ticks: 0 };
+const NOODLE_PARTS = ['noodles', 'egg', 'carrot_slices', 'spring_onion', 'soy_sauce'].map(k);
+const WOK_SPATULA = k('wok_spatula');
+
+test('wok: INITIAL and WOK_MAX', () => {
+  assert.deepEqual(INITIAL.wok, WOK_EMPTY);
+  assert.deepEqual(wok.INITIAL, WOK_EMPTY);
+  assert.equal(WOK_MAX, 6);
+});
+
+test('wok: food goes in while not cooked, with the sizzle sound', () => {
+  for (const held of [k('noodles'), k('carrot_slices'), k('soy_sauce')]) {
+    assert.deepEqual(wokInteract(WOK_EMPTY, held), { state: { items: [held], ticks: 0 }, take: true, sound: 'kochmod.sizzle' });
+  }
+});
+
+test('wok: a full wok says so and takes nothing', () => {
+  const s = { items: Array(WOK_MAX).fill(k('egg')), ticks: 10 };
+  assert.deepEqual(wokInteract(s, k('egg')), { state: s, hint: 'kochmod.hint.wok_full' });
+});
+
+test('wok: adding to a cooked wok says it is cooking and takes nothing', () => {
+  const s = { items: [k('egg')], ticks: COOKED_AT };
+  assert.deepEqual(wokInteract(s, k('noodles')), { state: s, hint: 'kochmod.hint.pot_cooking' });
+});
+
+test('wok: the bowl and other tools change nothing (the wok wants its spatula)', () => {
+  const s = { items: NOODLE_PARTS, ticks: COOKED_AT };
+  for (const held of [k('bowl'), k('spatula'), k('knife'), k('pizza_peel'), k('fried_noodles'), k('nope')]) {
+    assert.deepEqual(wokInteract(s, held), { state: s }, held);
+  }
+});
+
+test('wok: empty hand on a filled wok asks for the wok spatula; on an empty wok nothing happens', () => {
+  const s = { items: [k('egg')], ticks: 30 };
+  assert.deepEqual(wokInteract(s, null), { state: s, hint: 'kochmod.hint.need_wok_spatula' });
+  assert.deepEqual(wokInteract(WOK_EMPTY, null), { state: WOK_EMPTY });
+});
+
+test('wok: the spatula on an empty wok says it is empty, on an uncooked wok that it is cooking; nothing consumed', () => {
+  assert.deepEqual(wokInteract(WOK_EMPTY, WOK_SPATULA), { state: WOK_EMPTY, hint: 'kochmod.hint.pot_empty' });
+  const s = { items: NOODLE_PARTS, ticks: COOKED_AT - 1 };
+  assert.deepEqual(wokInteract(s, WOK_SPATULA), { state: s, hint: 'kochmod.hint.pot_cooking' });
+});
+
+for (const [parts, ticks, out] of /** @type {[string[], number, string][]} */ ([
+  [NOODLE_PARTS, COOKED_AT, k('fried_noodles')],
+  [['soy_sauce', 'spring_onion', 'carrot_slices', 'egg', 'noodles'].map(k), BURNT_AT - 1, k('fried_noodles')],
+  [NOODLE_PARTS, BURNT_AT, k('failed_dish')],
+  [['noodles', 'egg', 'carrot', 'spring_onion', 'soy_sauce'].map(k), COOKED_AT, k('failed_dish')],
+  [['broth', 'noodles', 'egg', 'spring_onion'].map(k), COOKED_AT, k('failed_dish')],
+  [[k('mystery')], COOKED_AT, k('failed_dish')],
+])) {
+  test(`wok: the spatula serves ${out} from ${parts.join('+')} after ${ticks} ticks and empties the wok`, () => {
+    assert.deepEqual(wokInteract({ items: parts, ticks }, WOK_SPATULA), { state: WOK_EMPTY, take: true, give: out });
+  });
+}
+
+test('wok: tick, view and drops work like the pot', () => {
+  assert.equal(wokTick(WOK_EMPTY, 50), WOK_EMPTY);
+  assert.deepEqual(wokTick({ items: [k('egg')], ticks: 700 }, 500), { items: [k('egg')], ticks: BURNT_AT });
+  const v = (/** @type {number} */ ticks) => wokView({ items: [k('egg')], ticks });
+  assert.deepEqual([wokView(WOK_EMPTY), v(0), v(COOKED_AT / 2), v(COOKED_AT), v(BURNT_AT)], ['empty', 'raw', 'cooking', 'done', 'burnt']);
+  assert.deepEqual(wokDrops({ items: [k('egg'), k('mystery')], ticks: 400 }), [k('egg'), k('mystery')]);
+});
+
+test('migrateStationState: wok states pass through, garbage becomes an empty wok', () => {
+  const s = { items: [k('egg')], ticks: 12 };
+  assert.equal(migrateStationState('wok', s), s);
+  for (const bad of [undefined, null, 'x', {}, { items: [3], ticks: 0 }, { items: [], ticks: -1 }]) {
+    assert.deepEqual(migrateStationState('wok', bad), INITIAL.wok, JSON.stringify(bad));
+  }
+});
+
+// ---- Doner spit
+
+const MEAT_RAW = k('doner_meat_raw');
+const MEAT = k('doner_meat');
+const KNIFE = k('knife');
+const SPIT_EMPTY = { meat: false, ticks: 0, slices: 0 };
+const spitAt = (/** @type {number} */ ticks, slices = SPIT_SLICES) => ({ meat: true, ticks, slices });
+
+test('spit: INITIAL and SPIT_SLICES', () => {
+  assert.deepEqual(INITIAL.spit, SPIT_EMPTY);
+  assert.equal(SPIT_SLICES, 6);
+});
+
+test('spit: raw doner meat goes on an empty spit with six slices', () => {
+  assert.deepEqual(spitInteract(SPIT_EMPTY, MEAT_RAW), { state: { meat: true, ticks: 0, slices: 6 }, take: true });
+});
+
+test('spit: raw doner meat on a spit with meat says it is busy and takes nothing', () => {
+  for (const s of [spitAt(0), spitAt(COOKED_AT, 3)]) {
+    assert.deepEqual(spitInteract(s, MEAT_RAW), { state: s, hint: 'kochmod.hint.spit_busy' });
+  }
+});
+
+test('spit: the knife on cooked meat cuts one doner meat, the knife stays', () => {
+  assert.deepEqual(spitInteract(spitAt(COOKED_AT), KNIFE), { state: spitAt(COOKED_AT, 5), give: MEAT });
+  assert.deepEqual(spitInteract(spitAt(COOKED_AT, 2), KNIFE), { state: spitAt(COOKED_AT, 1), give: MEAT });
+});
+
+test('spit: cutting the last slice empties the spit', () => {
+  assert.deepEqual(spitInteract(spitAt(COOKED_AT, 1), KNIFE), { state: SPIT_EMPTY, give: MEAT });
+});
+
+test('spit: the knife on raw meat says it is not done yet; nothing given', () => {
+  const s = spitAt(COOKED_AT - 1);
+  assert.deepEqual(spitInteract(s, KNIFE), { state: s, hint: 'kochmod.hint.spit_raw' });
+});
+
+test('spit: the knife on an empty spit asks for doner meat', () => {
+  assert.deepEqual(spitInteract(SPIT_EMPTY, KNIFE), { state: SPIT_EMPTY, hint: 'kochmod.hint.spit_empty' });
+});
+
+test('spit: other items, an empty hand and unknown ids change nothing', () => {
+  for (const s of [SPIT_EMPTY, spitAt(COOKED_AT)]) {
+    for (const held of [null, MEAT, k('raw_patty'), k('spatula'), k('bowl'), k('doner'), k('nope')]) {
+      assert.deepEqual(spitInteract(s, held), { state: s }, String(held));
+    }
+  }
+});
+
+test('spit: tick runs only with meat and stops at COOKED_AT (it never burns)', () => {
+  assert.equal(spitTick(SPIT_EMPTY, 50), SPIT_EMPTY);
+  assert.deepEqual(spitTick(spitAt(10), 20), spitAt(30));
+  assert.deepEqual(spitTick(spitAt(150), 500), spitAt(COOKED_AT));
+  assert.deepEqual(spitTick(spitAt(COOKED_AT, 2), 500), spitAt(COOKED_AT, 2));
+});
+
+test('spit: view empty, raw, cooked', () => {
+  assert.equal(spitView(SPIT_EMPTY), 'empty');
+  assert.equal(spitView(spitAt(0)), 'raw');
+  assert.equal(spitView(spitAt(COOKED_AT - 1)), 'raw');
+  assert.equal(spitView(spitAt(COOKED_AT, 1)), 'cooked');
+});
+
+test('spit: drops the raw meat as it went on, or the doner meat that is left', () => {
+  assert.deepEqual(spitDrops(SPIT_EMPTY), []);
+  assert.deepEqual(spitDrops(spitAt(COOKED_AT - 1)), [MEAT_RAW]);
+  assert.deepEqual(spitDrops(spitAt(COOKED_AT)), Array(6).fill(MEAT));
+  assert.deepEqual(spitDrops(spitAt(COOKED_AT, 2)), [MEAT, MEAT]);
+});
+
+test('spit: reducers do not mutate input', () => {
+  const s = Object.freeze(spitAt(COOKED_AT, 3));
+  spitInteract(s, KNIFE);
+  spitInteract(s, MEAT_RAW);
+  spitTick(s, 10);
+  assert.deepEqual(s, spitAt(COOKED_AT, 3));
+});
+
+test('migrateStationState: spit states pass through, garbage becomes an empty spit', () => {
+  for (const s of [SPIT_EMPTY, spitAt(40), spitAt(COOKED_AT, 1)]) assert.equal(migrateStationState('spit', s), s);
+  for (const bad of [
+    undefined, null, 7, [], {}, { item: null, ticks: 0 }, { meat: 'yes', ticks: 0, slices: 6 },
+    { meat: true, ticks: -1, slices: 6 }, { meat: true, ticks: 0, slices: 7 }, { meat: true, ticks: 0, slices: 0 },
+    { meat: false, ticks: 0, slices: 3 }, { meat: false, ticks: 0, slices: -1 }, { meat: true, ticks: 0, slices: 2.5 },
+  ]) {
+    assert.deepEqual(migrateStationState('spit', bad), INITIAL.spit, JSON.stringify(bad));
   }
 });

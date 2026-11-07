@@ -1,0 +1,43 @@
+{
+  "format_version": "1.21.90",
+  "minecraft:block": {
+    "description": {
+      "identifier": "kochmod:spit",
+      "menu_category": {
+        "category": "construction"
+      },
+      "states": {
+        "kochmod:content": ["empty", "raw", "cooked"]
+      }
+    },
+    "components": {
+      "minecraft:geometry": {
+        "identifier": "geometry.kochmod.spit",
+        "bone_visibility": {
+          "meat_raw": "q.block_state('kochmod:content') == 'raw'",
+          "meat_cooked": "q.block_state('kochmod:content') == 'cooked'"
+        }
+      },
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "kochmod_spit",
+          "render_method": "alpha_test"
+        }
+      },
+      "minecraft:collision_box": {
+        "origin": [-8, 0, -8],
+        "size": [16, 16, 16]
+      },
+      "minecraft:selection_box": {
+        "origin": [-8, 0, -8],
+        "size": [16, 16, 16]
+      },
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 0.5
+      },
+      "minecraft:light_dampening": 0,
+      "minecraft:map_color": "#9ea2a8",
+      "kochmod:spit": {}
+    }
+  }
+}

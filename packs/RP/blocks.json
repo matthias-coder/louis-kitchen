@@ -19,6 +19,12 @@
   "kochmod:pot": {
     "sound": "metal"
   },
+  "kochmod:spit": {
+    "sound": "metal"
+  },
+  "kochmod:wok": {
+    "sound": "metal"
+  },
   "kochmod:crate_tools": {
     "sound": "metal"
   },

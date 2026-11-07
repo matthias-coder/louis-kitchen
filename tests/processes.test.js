@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { ITEMS } from '../packs/BP/scripts/logic/catalog.js';
-import { stepsFor, stationsFor, CUTTABLE, TIMED, POT, POT_DEF } from '../packs/BP/scripts/logic/processes.js';
+import { stepsFor, stationsFor, CUTTABLE, TIMED, POT, POT_DEF, WOK, WOK_DEF, SPIT, ASSEMBLY } from '../packs/BP/scripts/logic/processes.js';
 
 const k = (/** @type {string} */ id) => `kochmod:${id}`;
 
@@ -114,4 +114,58 @@ test('potato soup steps: cut potato and carrot, then the pot step with the bowl'
 
 test('cooked rice is a prepared item, so it has no steps of its own as a dish', () => {
   assert.deepEqual(stepsFor(k('cooked_rice')), []);
+});
+
+test('wok recipes: fried noodles', () => {
+  assert.deepEqual(WOK, [
+    { dish: k('fried_noodles'), parts: ['noodles', 'egg', 'carrot_slices', 'spring_onion', 'soy_sauce'].map(k) },
+  ]);
+  for (const r of WOK) for (const id of [r.dish, ...r.parts]) assert.ok(id in ITEMS, id);
+});
+
+test('wok def: recipes, wok spatula, six items, hints and the sizzle sound', () => {
+  assert.deepEqual(WOK_DEF, {
+    recipes: WOK,
+    tool: k('wok_spatula'),
+    max: 6,
+    hints: { full: 'kochmod.hint.wok_full', cooking: 'kochmod.hint.pot_cooking', needTool: 'kochmod.hint.need_wok_spatula', empty: 'kochmod.hint.pot_empty' },
+    sound: 'kochmod.sizzle',
+  });
+});
+
+test('spit: raw doner meat becomes doner meat, cut with the knife', () => {
+  assert.deepEqual(SPIT, { raw: k('doner_meat_raw'), cooked: k('doner_meat'), tool: k('knife'), station: 'spit' });
+});
+
+test('assembly recipes: doner and sushi after the burgers and raw pizzas', () => {
+  assert.deepEqual(ASSEMBLY.map((r) => r.dish), ['hamburger', 'cheeseburger', 'raw_pizza_margherita', 'raw_salami_pizza', 'doner', 'sushi'].map(k));
+  assert.deepEqual(ASSEMBLY[4].parts, ['pita', 'doner_meat', 'lettuce', 'tomato_slices', 'onion_rings', 'doner_sauce'].map(k));
+  assert.deepEqual(ASSEMBLY[5].parts, ['nori', 'cooked_rice', 'salmon_strips'].map(k));
+});
+
+test('doner steps: meat from the spit, cut tomato and onion, then the counter', () => {
+  assert.deepEqual(stepsFor(k('doner')), [
+    { item: k('doner_meat_raw'), station: 'spit', tool: k('knife'), result: k('doner_meat') },
+    { item: k('tomato'), station: 'cutting_board', tool: k('knife'), result: k('tomato_slices') },
+    { item: k('onion'), station: 'cutting_board', tool: k('knife'), result: k('onion_rings') },
+    { item: k('doner'), station: 'counter', parts: ['pita', 'doner_meat', 'lettuce', 'tomato_slices', 'onion_rings', 'doner_sauce'].map(k) },
+  ]);
+  assert.deepEqual(stationsFor(k('doner')), ['spit', 'cutting_board', 'counter']);
+});
+
+test('sushi steps: rice in the pot, cut salmon, then the counter', () => {
+  assert.deepEqual(stepsFor(k('sushi')), [
+    { item: k('cooked_rice'), station: 'pot', tool: k('bowl'), parts: [k('rice')] },
+    { item: k('salmon'), station: 'cutting_board', tool: k('knife'), result: k('salmon_strips') },
+    { item: k('sushi'), station: 'counter', parts: ['nori', 'cooked_rice', 'salmon_strips'].map(k) },
+  ]);
+  assert.deepEqual(stationsFor(k('sushi')), ['pot', 'cutting_board', 'counter']);
+});
+
+test('fried noodle steps: cut the carrot, then the wok with the wok spatula', () => {
+  assert.deepEqual(stepsFor(k('fried_noodles')), [
+    { item: k('carrot'), station: 'cutting_board', tool: k('knife'), result: k('carrot_slices') },
+    { item: k('fried_noodles'), station: 'wok', tool: k('wok_spatula'), parts: ['noodles', 'egg', 'carrot_slices', 'spring_onion', 'soy_sauce'].map(k) },
+  ]);
+  assert.deepEqual(stationsFor(k('fried_noodles')), ['cutting_board', 'wok']);
 });

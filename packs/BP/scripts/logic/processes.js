@@ -41,6 +41,12 @@ export const TIMED = {
   },
 };
 
+/**
+ * The doner spit roasts one cone of raw meat; the knife cuts the cooked meat off it.
+ * @type {{ raw: string, cooked: string, tool: string, station: string }}
+ */
+export const SPIT = { raw: 'kochmod:doner_meat_raw', cooked: 'kochmod:doner_meat', tool: 'kochmod:knife', station: 'spit' };
+
 const BASE = ['kochmod:bun', 'kochmod:cooked_patty', 'kochmod:lettuce', 'kochmod:tomato_slices'];
 
 const PIZZA_BASE = ['kochmod:dough', 'kochmod:tomato_sauce', 'kochmod:cheese'];
@@ -51,6 +57,11 @@ export const ASSEMBLY = [
   { dish: 'kochmod:cheeseburger', parts: [...BASE, 'kochmod:cheese'] },
   { dish: 'kochmod:raw_pizza_margherita', parts: PIZZA_BASE },
   { dish: 'kochmod:raw_salami_pizza', parts: [...PIZZA_BASE, 'kochmod:salami'] },
+  {
+    dish: 'kochmod:doner',
+    parts: ['kochmod:pita', 'kochmod:doner_meat', 'kochmod:lettuce', 'kochmod:tomato_slices', 'kochmod:onion_rings', 'kochmod:doner_sauce'],
+  },
+  { dish: 'kochmod:sushi', parts: ['kochmod:nori', 'kochmod:cooked_rice', 'kochmod:salmon_strips'] },
 ];
 /** @type {DishRecipe[]} pot recipes; a result need not be a dish (cooked rice is a prepared item) */
 export const POT = [
@@ -60,7 +71,7 @@ export const POT = [
 ];
 
 /**
- * A station that cooks a mix of items by time and is emptied with a tool (pot; the wok later).
+ * A station that cooks a mix of items by time and is emptied with a tool (pot, wok).
  * hints: lang keys for full, still cooking, empty hand on a filled station, tool on an empty station.
  * @typedef {{ recipes: DishRecipe[], tool: string, max: number,
  *   hints: { full: string, cooking: string, needTool: string, empty: string }, sound: string }} PotDef
@@ -73,11 +84,21 @@ export const POT_DEF = {
   hints: { full: 'kochmod.hint.pot_full', cooking: 'kochmod.hint.pot_cooking', needTool: 'kochmod.hint.need_bowl', empty: 'kochmod.hint.pot_empty' },
   sound: 'kochmod.bubble',
 };
-/** @type {DishRecipe[]} wok recipes (later tasks) */
-export const WOK = [];
+/** @type {DishRecipe[]} wok recipes */
+export const WOK = [
+  { dish: 'kochmod:fried_noodles', parts: ['kochmod:noodles', 'kochmod:egg', 'kochmod:carrot_slices', 'kochmod:spring_onion', 'kochmod:soy_sauce'] },
+];
+/** @type {PotDef} */
+export const WOK_DEF = {
+  recipes: WOK,
+  tool: 'kochmod:wok_spatula',
+  max: 6,
+  hints: { full: 'kochmod.hint.wok_full', cooking: 'kochmod.hint.pot_cooking', needTool: 'kochmod.hint.need_wok_spatula', empty: 'kochmod.hint.pot_empty' },
+  sound: 'kochmod.sizzle',
+};
 
 /** @type {[string, DishRecipe[], string?][]} assembling station -> its recipe list and the tool that empties it */
-const FINAL_STATIONS = [['counter', ASSEMBLY], ['pot', POT, POT_DEF.tool], ['wok', WOK]];
+const FINAL_STATIONS = [['counter', ASSEMBLY], ['pot', POT, POT_DEF.tool], ['wok', WOK, WOK_DEF.tool]];
 
 /** @type {DishRecipe[]} what timed stations make: cooked result <- the one raw item, in TIMED / accepts order */
 export const TIMED_RECIPES = Object.values(TIMED).flatMap((def) => (
@@ -86,12 +107,13 @@ export const TIMED_RECIPES = Object.values(TIMED).flatMap((def) => (
 
 /**
  * @param {string} item
- * @returns {Step | null} the cutting or cooking step that makes an item, or null
+ * @returns {Step | null} the cutting, roasting or cooking step that makes an item, or null
  */
 function processStep(item) {
   for (const [raw, cut] of Object.entries(CUTTABLE)) {
     if (cut === item) return { item: raw, station: 'cutting_board', tool: 'kochmod:knife', result: cut };
   }
+  if (item === SPIT.cooked) return { item: SPIT.raw, station: SPIT.station, tool: SPIT.tool, result: item };
   for (const [station, def] of Object.entries(TIMED)) {
     for (const [raw, out] of Object.entries(def.accepts)) {
       if (out.cooked === item) return { item: raw, station, tool: def.tool, result: item };
@@ -118,7 +140,7 @@ function stepsToMake(item) {
 
 /**
  * @param {string} dishId
- * @returns {Step[]} preparation steps in part order, then the final step (assembly, the pot, or the oven for a pizza);
+ * @returns {Step[]} preparation steps in part order, then the final step (assembly, the pot, the wok, or the oven for a pizza);
  * [] for unknown dishes
  */
 export function stepsFor(dishId) {

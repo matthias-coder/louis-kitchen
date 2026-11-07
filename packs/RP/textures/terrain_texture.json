@@ -49,8 +49,14 @@
     "kochmod_pot": {
       "textures": "textures/blocks/pot"
     },
+    "kochmod_spit": {
+      "textures": "textures/blocks/spit"
+    },
     "kochmod_table": {
       "textures": "textures/blocks/table"
+    },
+    "kochmod_wok": {
+      "textures": "textures/blocks/wok"
     }
   }
 }

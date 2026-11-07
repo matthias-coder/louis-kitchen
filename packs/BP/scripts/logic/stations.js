@@ -1,7 +1,7 @@
 import { BURNT_AT, COOKED_AT, cookStage } from './cooking.js';
 import { evaluateAssembly, evaluateFor, FAILED } from './recipes.js';
 import { ITEMS } from './catalog.js';
-import { CUTTABLE, TIMED, POT_DEF } from './processes.js';
+import { CUTTABLE, TIMED, POT_DEF, WOK_DEF, SPIT } from './processes.js';
 
 /**
  * take: consume one held item. give: item id handed to the player, `count` of them
@@ -13,6 +13,7 @@ import { CUTTABLE, TIMED, POT_DEF } from './processes.js';
 /** @typedef {TimedState} GrillState */
 /** items: what is in the pot, in order; ticks: cooking time so far. @typedef {{ items: string[], ticks: number }} PotState */
 /** @typedef {import('./processes.js').PotDef} PotDef */
+/** meat: a cone hangs on the spit; ticks: roasting time so far; slices: cuts left. @typedef {{ meat: boolean, ticks: number, slices: number }} SpitState */
 /** @typedef {typeof TIMED[string]} TimedDef */
 /** @typedef {{ item: string | null }} BoardState */
 /** @typedef {{ items: string[] }} CounterState */
@@ -118,7 +119,7 @@ export const grillDrops = grill.drops;
 
 export const oven = timedStation(TIMED.oven);
 
-// ---- Pot stations (soup pot; the wok later)
+// ---- Pot stations (soup pot, wok)
 
 /**
  * A station that cooks a mix of up to `def.max` items by time; the tool scoops out what the mix has become.
@@ -185,11 +186,79 @@ export const potTick = pot.tick;
 export const potView = pot.view;
 export const potDrops = pot.drops;
 
-/** @type {{ grill: GrillState, oven: TimedState, pot: PotState, board: BoardState, counter: CounterState, dishwasher: DishwasherState, cabinet: CabinetState }} */
+export const WOK_MAX = WOK_DEF.max;
+export const wok = potStation(WOK_DEF);
+export const wokInteract = wok.interact;
+export const wokTick = wok.tick;
+export const wokView = wok.view;
+export const wokDrops = wok.drops;
+
+// ---- Doner spit
+
+/** How many doner meat slices one cone gives. */
+export const SPIT_SLICES = 6;
+
+/** @type {SpitState} */
+const SPIT_EMPTY = { meat: false, ticks: 0, slices: 0 };
+
+/**
+ * Raw meat goes on an empty spit; the knife cuts cooked meat off, one slice at a time.
+ * @param {SpitState} state
+ * @param {string | null} held
+ * @returns {Result<SpitState>}
+ */
+export function spitInteract(state, held) {
+  if (held === SPIT.raw) {
+    if (state.meat) return { state, hint: 'kochmod.hint.spit_busy' };
+    return { state: { meat: true, ticks: 0, slices: SPIT_SLICES }, take: true };
+  }
+  if (held !== SPIT.tool) return { state };
+  if (!state.meat) return { state, hint: 'kochmod.hint.spit_empty' };
+  if (state.ticks < COOKED_AT) return { state, hint: 'kochmod.hint.spit_raw' };
+  const slices = state.slices - 1;
+  return { state: slices > 0 ? { ...state, slices } : SPIT_EMPTY, give: SPIT.cooked };
+}
+
+/**
+ * Roasts while meat hangs on the spit, up to COOKED_AT: the meat never burns.
+ * @param {SpitState} state
+ * @param {number} dt
+ * @returns {SpitState}
+ */
+export function spitTick(state, dt) {
+  if (!state.meat || state.ticks >= COOKED_AT) return state;
+  return { ...state, ticks: Math.min(state.ticks + dt, COOKED_AT) };
+}
+
+/**
+ * @param {SpitState} state
+ * @returns {'empty' | 'raw' | 'cooked'}
+ */
+export function spitView(state) {
+  if (!state.meat) return 'empty';
+  return state.ticks < COOKED_AT ? 'raw' : 'cooked';
+}
+
+/**
+ * Raw meat comes back as the one cone that went on (it cannot be cut yet); cooked meat as the slices left.
+ * @param {SpitState} state
+ * @returns {string[]}
+ */
+export function spitDrops(state) {
+  if (!state.meat) return [];
+  return state.ticks < COOKED_AT ? [SPIT.raw] : Array(state.slices).fill(SPIT.cooked);
+}
+
+/** The spit's rules as one station (for the tick loop). */
+export const spit = { INITIAL: SPIT_EMPTY, interact: spitInteract, tick: spitTick, view: spitView, drops: spitDrops };
+
+/** @type {{ grill: GrillState, oven: TimedState, pot: PotState, wok: PotState, spit: SpitState, board: BoardState, counter: CounterState, dishwasher: DishwasherState, cabinet: CabinetState }} */
 export const INITIAL = {
   grill: grill.INITIAL,
   oven: oven.INITIAL,
   pot: pot.INITIAL,
+  wok: wok.INITIAL,
+  spit: SPIT_EMPTY,
   board: { item: null },
   counter: { items: [] },
   dishwasher: { plates: 0, ticks: 0 },
@@ -367,11 +436,17 @@ const isCount = (v) => typeof v === 'number' && Number.isFinite(v) && v >= 0;
 /** Saved shape of every timed station. */
 const validTimed = (/** @type {Record<string, unknown>} */ s) => (s.item === null || typeof s.item === 'string') && isCount(s.ticks);
 
+/** Saved shape of every pot station. */
+const validPot = (/** @type {Record<string, unknown>} */ s) => Array.isArray(s.items) && s.items.every((i) => typeof i === 'string') && isCount(s.ticks);
+
 /** Shape checks of the current saved states. @type {{ [K in keyof typeof INITIAL]: (s: Record<string, unknown>) => boolean }} */
 const VALID = {
   grill: validTimed,
   oven: validTimed,
-  pot: (s) => Array.isArray(s.items) && s.items.every((i) => typeof i === 'string') && isCount(s.ticks),
+  pot: validPot,
+  wok: validPot,
+  spit: (s) => typeof s.meat === 'boolean' && isCount(s.ticks) && isCount(s.slices) && Number.isInteger(s.slices)
+    && /** @type {number} */ (s.slices) <= SPIT_SLICES && s.meat === /** @type {number} */ (s.slices) > 0,
   board: (s) => s.item === null || typeof s.item === 'string',
   counter: (s) => Array.isArray(s.items) && s.items.every((i) => typeof i === 'string'),
   dishwasher: (s) => isCount(s.plates) && isCount(s.ticks),

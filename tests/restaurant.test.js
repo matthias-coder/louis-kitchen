@@ -153,3 +153,11 @@ test('tableView: any served dish shows as food, the failed dish as failed', () =
   assert.equal(tableView('none'), 'none');
   assert.equal(tableView('no_such_dish'), 'none', 'unknown stored values show no plate');
 });
+
+test('availableDishes: doner needs spit, cutting board and counter; sushi pot, cutting board and counter; fried noodles the wok', () => {
+  assert.deepEqual(availableDishes(new Set(['spit', 'cutting_board', 'counter'])), ['kochmod:doner']);
+  assert.deepEqual(availableDishes(new Set(['spit', 'counter'])), []);
+  assert.deepEqual(availableDishes(new Set(['pot', 'cutting_board', 'counter'])), ['kochmod:sushi', 'kochmod:ramen', 'kochmod:potato_soup']);
+  assert.deepEqual(availableDishes(new Set(['wok', 'cutting_board'])), ['kochmod:fried_noodles']);
+  assert.deepEqual(availableDishes(new Set(['wok'])), []);
+});

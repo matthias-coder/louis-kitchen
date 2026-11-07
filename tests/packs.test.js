@@ -343,3 +343,68 @@ test('pot: name, hints and sound exist', () => {
   const rpBlocks = JSON.parse(fs.readFileSync(path.join(root, 'packs/RP/blocks.json'), 'utf8'));
   assert.ok(rpBlocks['kochmod:pot']?.sound);
 });
+
+test('spit: content enum, one meat bone per stage, rod, heater, nothing above 23 px, collision within the block', () => {
+  const { block, geo, vis, bones } = blockWithGeometry('spit');
+  assert.equal(block.description.identifier, 'kochmod:spit');
+  assert.deepEqual(block.description.states, { 'kochmod:content': ['empty', 'raw', 'cooked'] });
+  assert.deepEqual(vis, {
+    meat_raw: "q.block_state('kochmod:content') == 'raw'",
+    meat_cooked: "q.block_state('kochmod:content') == 'cooked'",
+  });
+  for (const bone of ['base', 'rod', 'heater']) assert.ok(bones.includes(bone), bone);
+  assert.equal(block.components['minecraft:geometry'].identifier, 'geometry.kochmod.spit');
+  assert.deepEqual(block.components['minecraft:material_instances']['*'], { texture: 'kochmod_spit', render_method: 'alpha_test' });
+  assert.ok('kochmod:spit' in block.components);
+  assert.match(block.components['minecraft:map_color'], /^#[0-9a-f]{6}$/i);
+  for (const box of ['minecraft:collision_box', 'minecraft:selection_box']) {
+    const { origin, size } = block.components[box];
+    assert.ok(origin[1] + size[1] <= 16, box);
+  }
+  for (const bone of geo.bones) {
+    for (const cube of bone.cubes) assert.ok(cube.origin[1] + cube.size[1] <= 23, `${bone.name} reaches above 23 px`);
+  }
+});
+
+test('wok: state enum like the pot, contents per state, steam while cooking or done, nothing above 23 px', () => {
+  const { block, geo, vis, bones } = blockWithGeometry('wok');
+  assert.equal(block.description.identifier, 'kochmod:wok');
+  assert.deepEqual(block.description.states, { 'kochmod:state': ['empty', 'raw', 'cooking', 'done', 'burnt'] });
+  assert.deepEqual(vis, {
+    contents_raw: "q.block_state('kochmod:state') == 'raw'",
+    contents_cooking: "q.block_state('kochmod:state') == 'cooking'",
+    contents_done: "q.block_state('kochmod:state') == 'done'",
+    contents_burnt: "q.block_state('kochmod:state') == 'burnt'",
+    steam: "q.block_state('kochmod:state') == 'cooking' || q.block_state('kochmod:state') == 'done'",
+  });
+  for (const bone of ['burner', 'wok']) assert.ok(bones.includes(bone), bone);
+  assert.equal(block.components['minecraft:geometry'].identifier, 'geometry.kochmod.wok');
+  assert.deepEqual(block.components['minecraft:material_instances']['*'], { texture: 'kochmod_wok', render_method: 'alpha_test' });
+  assert.ok('kochmod:wok' in block.components);
+  assert.match(block.components['minecraft:map_color'], /^#[0-9a-f]{6}$/i);
+  for (const box of ['minecraft:collision_box', 'minecraft:selection_box']) {
+    const { origin, size } = block.components[box];
+    assert.ok(origin[1] + size[1] <= 16, box);
+  }
+  for (const bone of geo.bones) {
+    for (const cube of bone.cubes) assert.ok(cube.origin[1] + cube.size[1] <= 23, `${bone.name} reaches above 23 px`);
+  }
+});
+
+test('spit and wok: names, hints, sound and block sounds exist', () => {
+  for (const lang of ['de_DE', 'en_US']) {
+    const text = fs.readFileSync(path.join(root, 'packs/RP/texts', `${lang}.lang`), 'utf8');
+    for (const line of [
+      'tile.kochmod:spit.name=Dönerspieß', 'tile.kochmod:wok.name=Wok',
+      'kochmod.hint.wok_full=Der Wok ist voll.', 'kochmod.hint.need_wok_spatula=Nimm den Wokwender!',
+      'kochmod.hint.spit_busy=Da hängt schon Fleisch.', 'kochmod.hint.spit_raw=Das Fleisch ist noch nicht fertig.',
+      'kochmod.hint.spit_empty=Häng Dönerfleisch an den Spieß.',
+    ]) {
+      assert.ok(text.split(/\r?\n/).includes(line), `${lang}: ${line}`);
+    }
+  }
+  const sounds = JSON.parse(fs.readFileSync(path.join(root, 'packs/RP/sounds/sound_definitions.json'), 'utf8')).sound_definitions;
+  assert.ok(sounds['kochmod.sizzle']?.sounds?.length > 0);
+  const rpBlocks = JSON.parse(fs.readFileSync(path.join(root, 'packs/RP/blocks.json'), 'utf8'));
+  for (const id of ['spit', 'wok']) assert.ok(rpBlocks[`kochmod:${id}`]?.sound, id);
+});

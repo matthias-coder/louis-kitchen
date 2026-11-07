@@ -13,7 +13,10 @@
         { "bubble_pizza_margherita": "q.property('kochmod:wish') == 'pizza_margherita'" },
         { "bubble_salami_pizza": "q.property('kochmod:wish') == 'salami_pizza'" },
         { "bubble_ramen": "q.property('kochmod:wish') == 'ramen'" },
-        { "bubble_potato_soup": "q.property('kochmod:wish') == 'potato_soup'" }
+        { "bubble_potato_soup": "q.property('kochmod:wish') == 'potato_soup'" },
+        { "bubble_doner": "q.property('kochmod:wish') == 'doner'" },
+        { "bubble_sushi": "q.property('kochmod:wish') == 'sushi'" },
+        { "bubble_fried_noodles": "q.property('kochmod:wish') == 'fried_noodles'" }
       ]
     }
   }

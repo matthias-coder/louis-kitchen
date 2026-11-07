@@ -21,7 +21,7 @@ test('every id used by recipes, crates and processes exists in ITEMS', () => {
 
 test('DISHES equals the dishes of RECIPES in order and excludes the failed dish', () => {
   assert.deepEqual(DISHES, RECIPES.map((r) => r.dish));
-  assert.deepEqual(DISHES, k('hamburger', 'cheeseburger', 'pizza_margherita', 'salami_pizza', 'ramen', 'potato_soup'));
+  assert.deepEqual(DISHES, k('hamburger', 'cheeseburger', 'doner', 'sushi', 'pizza_margherita', 'salami_pizza', 'ramen', 'potato_soup', 'fried_noodles'));
   assert.ok(isDish(FAILED));
   assert.ok(!DISHES.includes(FAILED));
 });

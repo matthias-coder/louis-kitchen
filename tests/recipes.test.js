@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { evaluateAssembly, evaluateFor, RECIPES, DISHES, FAILED } from '../packs/BP/scripts/logic/recipes.js';
-import { POT } from '../packs/BP/scripts/logic/processes.js';
+import { POT, WOK } from '../packs/BP/scripts/logic/processes.js';
 
 const k = (/** @type {string[]} */ ...ids) => ids.map((i) => `kochmod:${i}`);
 
@@ -27,15 +27,18 @@ test('failures', () => {
 });
 
 test('recipes list stations', () => {
-  assert.equal(RECIPES.length, 6);
+  assert.equal(RECIPES.length, 9);
   for (const r of RECIPES.slice(0, 2)) assert.deepEqual(r.stations, ['grill', 'cutting_board', 'counter']);
-  for (const r of RECIPES.slice(2, 4)) assert.deepEqual(r.stations, ['counter', 'oven']);
-  assert.deepEqual(RECIPES[4].stations, ['pot']);
-  assert.deepEqual(RECIPES[5].stations, ['cutting_board', 'pot']);
+  assert.deepEqual(RECIPES[2].stations, ['spit', 'cutting_board', 'counter']);
+  assert.deepEqual(RECIPES[3].stations, ['pot', 'cutting_board', 'counter']);
+  for (const r of RECIPES.slice(4, 6)) assert.deepEqual(r.stations, ['counter', 'oven']);
+  assert.deepEqual(RECIPES[6].stations, ['pot']);
+  assert.deepEqual(RECIPES[7].stations, ['cutting_board', 'pot']);
+  assert.deepEqual(RECIPES[8].stations, ['cutting_board', 'wok']);
 });
 
-test('dishes: assembled ones first, then the ones an oven bakes, then the pot dishes (cooked rice is not a dish)', () => {
-  assert.deepEqual(DISHES, k('hamburger', 'cheeseburger', 'pizza_margherita', 'salami_pizza', 'ramen', 'potato_soup'));
+test('dishes: assembled ones first, then the ones an oven bakes, then the pot and wok dishes (cooked rice is not a dish)', () => {
+  assert.deepEqual(DISHES, k('hamburger', 'cheeseburger', 'doner', 'sushi', 'pizza_margherita', 'salami_pizza', 'ramen', 'potato_soup', 'fried_noodles'));
   assert.deepEqual(RECIPES.find((r) => r.dish === 'kochmod:salami_pizza')?.parts, k('raw_salami_pizza'));
 });
 
@@ -61,4 +64,19 @@ test('pot recipes evaluate in any order; cooked rice from rice; anything else fa
   assert.equal(evaluateFor(POT, k('rice', 'rice')), FAILED);
   assert.equal(evaluateFor(POT, k('broth', 'noodles', 'egg')), FAILED);
   assert.ok(!DISHES.includes('kochmod:cooked_rice'));
+});
+
+test('doner and sushi are assembled on the counter in any order', () => {
+  assert.equal(evaluateAssembly(k('pita', 'doner_meat', 'lettuce', 'tomato_slices', 'onion_rings', 'doner_sauce')), 'kochmod:doner');
+  assert.equal(evaluateAssembly(k('doner_sauce', 'onion_rings', 'tomato_slices', 'lettuce', 'doner_meat', 'pita')), 'kochmod:doner');
+  assert.equal(evaluateAssembly(k('pita', 'doner_meat_raw', 'lettuce', 'tomato_slices', 'onion_rings', 'doner_sauce')), FAILED);
+  assert.equal(evaluateAssembly(k('nori', 'cooked_rice', 'salmon_strips')), 'kochmod:sushi');
+  assert.equal(evaluateAssembly(k('salmon_strips', 'nori', 'cooked_rice')), 'kochmod:sushi');
+  assert.equal(evaluateAssembly(k('nori', 'rice', 'salmon_strips')), FAILED);
+  assert.equal(evaluateAssembly(k('nori', 'cooked_rice', 'salmon')), FAILED);
+});
+
+test('wok recipes evaluate in any order; anything else fails', () => {
+  assert.equal(evaluateFor(WOK, k('soy_sauce', 'noodles', 'spring_onion', 'egg', 'carrot_slices')), 'kochmod:fried_noodles');
+  assert.equal(evaluateFor(WOK, k('noodles', 'egg', 'carrot', 'spring_onion', 'soy_sauce')), FAILED);
 });

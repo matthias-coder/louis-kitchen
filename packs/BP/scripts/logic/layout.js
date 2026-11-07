@@ -108,6 +108,7 @@ function buildRestaurant() {
   put(right, 1, back - 1, 'kochmod:crate_tools');
   put(right, 1, back, 'kochmod:crate_all');
   // 5. stations along the back wall
+  put(1, 1, back, 'kochmod:spit');
   put(2, 1, back, 'kochmod:pot');
   put(5, 1, back, 'kochmod:grill');
   put(6, 1, back, 'kochmod:cutting_board');
@@ -115,6 +116,7 @@ function buildRestaurant() {
   put(8, 1, back, 'kochmod:oven');
   put(9, 1, back, 'kochmod:dishwasher', { 'minecraft:cardinal_direction': 'south' });
   put(10, 1, back, 'kochmod:dish_cabinet', { 'minecraft:cardinal_direction': 'south', 'kochmod:plates': CABINET_MAX });
+  put(11, 1, back, 'kochmod:wok');
   // 6. the bell last, so no guest is called before the chairs exist
   put(BELL_POS.x, BELL_POS.y, BELL_POS.z, 'kochmod:bell');
   return { width: WIDTH, depth: DEPTH, height: HEIGHT, blocks };

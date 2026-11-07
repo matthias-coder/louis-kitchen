@@ -1,6 +1,7 @@
 import { BlockPermutation, system } from '@minecraft/server';
 import {
-  migrateStationState, grill as grillStation, oven as ovenStation, pot as potStation,
+  migrateStationState, grill as grillStation, oven as ovenStation, pot as potStation, wok as wokStation,
+  spit as spitStation,
   boardInteract, boardView, boardDrops,
   counterInteract, counterView, counterDrops,
   dishwasherInteract, dishwasherView, dishwasherDrops,
@@ -58,8 +59,8 @@ const COOKING = [['grill', grill, grillStation], ['oven', oven, ovenStation]];
 /** @typedef {ReturnType<typeof import('../logic/stations.js').potStation>} PotStation */
 
 /**
- * A pot station block (pot; the wok later): block state `kochmod:state` shows the view.
- * @param {'pot'} kind registry name and saved-state kind
+ * A pot station block (pot, wok): block state `kochmod:state` shows the view.
+ * @param {'pot' | 'wok'} kind registry name and saved-state kind
  * @param {PotStation} station
  * @returns {StationDef<PotState>}
  */
@@ -73,9 +74,20 @@ const potDef = (kind, station) => ({
 });
 
 const pot = potDef('pot', potStation);
+const wok = potDef('wok', wokStation);
 
 /** Pot stations ticked by tickStations: registry kind, block def, rules. @type {[string, StationDef<PotState>, PotStation][]} */
-const POTS = [['pot', pot, potStation]];
+const POTS = [['pot', pot, potStation], ['wok', wok, wokStation]];
+
+/** Doner spit: block state `kochmod:content` shows empty / raw / cooked. @type {StationDef<import('../logic/stations.js').SpitState>} */
+const spit = {
+  typeId: 'kochmod:spit',
+  initial: spitStation.INITIAL,
+  interact: spitStation.interact,
+  states: (s) => ({ 'kochmod:content': spitStation.view(s) }),
+  drops: spitStation.drops,
+  migrate: (saved) => migrateStationState('spit', saved),
+};
 
 /** @type {StationDef<import('../logic/stations.js').BoardState>} */
 const cuttingBoard = {
@@ -247,6 +259,8 @@ const BY_TYPE = {
   [grill.typeId]: ['grill', grill],
   [oven.typeId]: ['oven', oven],
   [pot.typeId]: ['pot', pot],
+  [wok.typeId]: ['wok', wok],
+  [spit.typeId]: ['spit', spit],
   [cuttingBoard.typeId]: ['cutting_board', cuttingBoard],
   [counter.typeId]: ['counter', counter],
   [dishwasher.typeId]: ['dishwasher', dishwasher],
@@ -314,7 +328,7 @@ function tickIo(kind, def, statesOf) {
 }
 
 /**
- * Advances every loaded grill, oven, pot and dishwasher by `dt` ticks. Stations in unloaded chunks pause.
+ * Advances every loaded grill, oven, pot, wok, doner spit and dishwasher by `dt` ticks. Stations in unloaded chunks pause.
  * @param {number} dt
  */
 export function tickStations(dt) {
@@ -324,6 +338,7 @@ export function tickStations(dt) {
   for (const [kind, def, station] of POTS) {
     tickTimedStation(worldStore.registryList(kind), dt, tickIo(kind, def, (view) => ({ 'kochmod:state': view })), def.typeId, kind, station);
   }
+  tickTimedStation(worldStore.registryList('spit'), dt, tickIo('spit', spit, (view) => ({ 'kochmod:content': view })), spit.typeId, 'spit', spitStation);
   tickDishwashers(
     worldStore.registryList('dishwasher'), dt,
     tickIo('dishwasher', dishwasher, (view) => ({ 'kochmod:state': view })), DISHWASHER_ID,

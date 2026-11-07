@@ -172,3 +172,28 @@ test('tickTimedStation: cooks loaded pots with the pot rules, an empty pot stays
   assert.deepEqual(w.views, { a: 'cooking', c: 'done' });
   assert.deepEqual(w.warnings, []);
 });
+
+test('tickTimedStation: roasts loaded spits up to done, an empty or done spit stays as it is', async () => {
+  const { spit } = await import('../packs/BP/scripts/logic/stations.js');
+  const SPIT = 'kochmod:spit';
+  const w = fakeWorld({ a: SPIT, b: SPIT, c: SPIT }, {
+    a: { meat: true, ticks: 155, slices: 6 },
+    b: { meat: false, ticks: 0, slices: 0 },
+    c: { meat: true, ticks: 160, slices: 4 },
+  });
+  tickTimedStation(['a', 'b', 'c'], 10, w.io, SPIT, 'spit', spit);
+  assert.deepEqual(w.states.a, { meat: true, ticks: 160, slices: 6 });
+  assert.deepEqual(w.states.b, { meat: false, ticks: 0, slices: 0 });
+  assert.deepEqual(w.states.c, { meat: true, ticks: 160, slices: 4 });
+  assert.deepEqual(w.views, { a: 'cooked' });
+  assert.deepEqual(w.warnings, []);
+});
+
+test('tickTimedStation: cooks loaded woks with the wok rules', async () => {
+  const { wok } = await import('../packs/BP/scripts/logic/stations.js');
+  const WOK = 'kochmod:wok';
+  const w = fakeWorld({ a: WOK }, { a: { items: ['kochmod:egg'], ticks: 155 } });
+  tickTimedStation(['a'], 10, w.io, WOK, 'wok', wok);
+  assert.deepEqual(w.states.a, { items: ['kochmod:egg'], ticks: 165 });
+  assert.deepEqual(w.views, { a: 'done' });
+});

@@ -137,6 +137,42 @@ export const block_pot = icon('pot', {
   px(5, 1, 's'); px(6, 0, 's'); px(10, 1, 's'); px(9, 0, 's');
 });
 
+export const block_spit = icon('spit', {
+  i: '#9ea2a8', l: '#d4d7dc', k: '#2b2d31', o: '#e8641e', b: '#8a5a2e', B: '#5e3a1a', c: '#c08048',
+}, ({ rect, px }) => {
+  // base plate, heater at the back, rod
+  rect(2, 14, 13, 15, 'i');
+  rect(10, 3, 13, 13, 'k');
+  for (const y of [4, 6, 8, 10, 12]) rect(11, y, 12, y, 'o');
+  rect(6, 0, 6, 13, 'l');
+  // roasted meat cone, widest near the top
+  rect(4, 2, 8, 3, 'b');
+  rect(3, 4, 9, 7, 'b');
+  rect(4, 8, 8, 10, 'b');
+  rect(5, 11, 7, 12, 'b');
+  for (const y of [3, 6, 9]) rect(3 + (y === 6 ? 0 : 1), y, 9 - (y === 6 ? 0 : 1), y, 'B');
+  px(5, 5, 'c'); px(8, 8, 'c');
+});
+
+export const block_wok = icon('wok', {
+  k: '#2b2d31', K: '#44474d', u: '#4a8ae8', x: '#1e1f22', X: '#34363a', h: '#6b4a2e', n: '#e8b84a', v: '#4fae3a', t: '#f08a25', s: '#f4f4f4',
+}, ({ rect, px }) => {
+  // burner with blue flames
+  rect(2, 12, 13, 15, 'k');
+  rect(2, 12, 13, 12, 'K');
+  px(4, 11, 'u'); px(7, 11, 'u'); px(10, 11, 'u');
+  // wide shallow wok with handles and stir-fry
+  rect(1, 6, 14, 7, 'X');
+  rect(2, 8, 13, 9, 'x');
+  rect(4, 10, 11, 10, 'x');
+  rect(0, 6, 0, 6, 'h');
+  rect(15, 6, 15, 6, 'h');
+  rect(3, 5, 12, 5, 'n');
+  px(5, 4, 'v'); px(8, 5, 't'); px(10, 4, 'n'); px(6, 4, 'n');
+  // steam
+  px(6, 1, 's'); px(7, 0, 's'); px(9, 2, 's'); px(10, 1, 's');
+});
+
 export const block_crate_tools = crateIcon(blocks.crate_tools);
 export const block_crate_all = crateIcon(blocks.crate_all);
 

@@ -43,6 +43,9 @@ export const guestLayout = {
   bubble_salami_pizza: [84, 20, 20, 20],
   bubble_ramen: [64, 40, 20, 20],
   bubble_potato_soup: [84, 40, 20, 20],
+  bubble_doner: [104, 4, 20, 20],
+  bubble_sushi: [104, 24, 20, 20],
+  bubble_fried_noodles: [104, 44, 20, 20],
   bubble_edge: [104, 0, 1, 1],
   dot: [106, 0, 2, 2],
 };
@@ -94,7 +97,7 @@ function toSprite(name, px) {
   const palette = {};
   /** @type {Map<string, string>} */
   const chars = new Map();
-  const alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!#$%&*+-/:;<=>?@^_~';
   const rows = px.map((row) => row.map((c) => {
     if (!c) return '.';
     let ch = chars.get(c);
@@ -199,6 +202,10 @@ function drawGuest() {
   drawBubble(p, L.bubble_salami_pizza, items.salami_pizza);
   drawBubble(p, L.bubble_ramen, items.ramen);
   drawBubble(p, L.bubble_potato_soup, items.potato_soup);
+  // placeholders until the real stage 2 bubbles
+  drawBubble(p, L.bubble_doner, items.doner);
+  drawBubble(p, L.bubble_sushi, items.sushi);
+  drawBubble(p, L.bubble_fried_noodles, items.fried_noodles);
   p.fill(L.bubble_edge, C.outline);
   p.fill(L.dot, C.bubble);
   return px;

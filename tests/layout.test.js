@@ -13,7 +13,7 @@ import { TIMED } from '../packs/BP/scripts/logic/processes.js';
 /** @type {Direction[]} */
 const FACINGS = ['north', 'east', 'south', 'west'];
 const { blocks, width, depth, height } = RESTAURANT;
-const STATIONS = ['grill', 'cutting_board', 'counter', 'oven', 'pot', 'dishwasher', 'dish_cabinet'];
+const STATIONS = ['grill', 'cutting_board', 'counter', 'oven', 'pot', 'spit', 'wok', 'dishwasher', 'dish_cabinet'];
 const CABINETS = ['fridge', 'pantry'];
 const CRATES = ['crate_tools', 'crate_all'];
 
@@ -59,6 +59,14 @@ test('the pot stands on the back kitchen row at x=2, next to the fridge', () => 
   const at = (/** @type {string} */ id) => ofId(id)[0];
   assert.deepEqual([at('pot').x, at('pot').y, at('pot').z], [2, 1, at('counter').z]);
   assert.equal(at('fridge').x, 3);
+});
+
+test('the doner spit stands on the back row at x=1, the wok at x=11; x=12 stays free', () => {
+  const at = (/** @type {string} */ id) => ofId(id)[0];
+  const z = at('counter').z;
+  assert.deepEqual([at('spit').x, at('spit').y, at('spit').z], [1, 1, z]);
+  assert.deepEqual([at('wok').x, at('wok').y, at('wok').z], [11, 1, z]);
+  assert.ok(!blocks.some((b) => b.x === 12 && b.y === 1 && b.z === z));
 });
 
 test('the dish cabinet starts with 8 plates', () => {

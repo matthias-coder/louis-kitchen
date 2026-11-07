@@ -277,6 +277,35 @@ export const layouts = {
     contents_done: /** @type {Region} */ ([36, 32, 8, 8]),
     contents_burnt: /** @type {Region} */ ([46, 32, 8, 8]),
   },
+  spit: {
+    plate_top: /** @type {Region} */ ([0, 0, 12, 12]),
+    plate_side: /** @type {Region} */ ([0, 12, 12, 1]),
+    collar: /** @type {Region} */ ([14, 0, 3, 3]),
+    rod: /** @type {Region} */ ([18, 0, 1, 21]),
+    heater_front: /** @type {Region} */ ([20, 0, 10, 19]),
+    heater_side: /** @type {Region} */ ([32, 0, 10, 19]),
+    heater_top: /** @type {Region} */ ([44, 0, 10, 3]),
+    meat_raw_top: /** @type {Region} */ ([0, 24, 7, 7]),
+    meat_raw_side: /** @type {Region} */ ([8, 24, 7, 5]),
+    meat_cooked_top: /** @type {Region} */ ([16, 24, 7, 7]),
+    meat_cooked_side: /** @type {Region} */ ([24, 24, 7, 5]),
+  },
+  wok: {
+    stove_side: /** @type {Region} */ ([0, 0, 12, 5]),
+    stove_front: /** @type {Region} */ ([0, 6, 12, 5]),
+    stove_top: /** @type {Region} */ ([16, 0, 12, 12]),
+    burner_top: /** @type {Region} */ ([32, 0, 8, 8]),
+    burner_side: /** @type {Region} */ ([32, 10, 8, 1]),
+    handle: /** @type {Region} */ ([44, 0, 2, 2]),
+    steam: /** @type {Region} */ ([48, 0, 1, 3]),
+    wok_side: /** @type {Region} */ ([0, 16, 12, 2]),
+    wok_rim: /** @type {Region} */ ([16, 16, 12, 10]),
+    wok_inner: /** @type {Region} */ ([32, 16, 8, 8]),
+    contents_raw: /** @type {Region} */ ([0, 32, 8, 8]),
+    contents_cooking: /** @type {Region} */ ([10, 32, 8, 8]),
+    contents_done: /** @type {Region} */ ([20, 32, 8, 8]),
+    contents_burnt: /** @type {Region} */ ([30, 32, 8, 8]),
+  },
 };
 
 // ---- Grill: dark metal box, red knobs, silver grate over glowing coals
@@ -1112,4 +1141,104 @@ export const pot = {
     x: '#1a1614', X: '#2e2723', s: '#ffffff', S: '#dfe8ee',
   },
   rows: drawPot(),
+};
+
+// ---- Doner spit: steel plate and rod, a heater with glowing bars at the back, the meat cone raw or roasted
+
+function drawSpit() {
+  const L = layouts.spit;
+  const c = canvas();
+  c.fill(L.plate_top, 'i');
+  c.border(L.plate_top, 'I');
+  c.speckle(L.plate_top, 'i', 'l', 0.1, 51);
+  c.fill(L.plate_side, 'I');
+  c.fill(L.collar, 'd');
+  c.fill(L.rod, 'l');
+  c.px(L.rod, 0, 0, 'w');
+  // heater: dark steel frame with three glowing bars facing the meat
+  c.fill(L.heater_front, 'k');
+  c.border(L.heater_front, 'K');
+  for (const x of [2, 4, 6]) for (let y = 2; y < 17; y++) c.px(L.heater_front, x + (y % 4 === 0 ? 1 : 0), y, y % 3 === 0 ? 'O' : 'o');
+  c.fill(L.heater_side, 'K');
+  c.row(L.heater_side, 0, 'I');
+  c.fill(L.heater_top, 'I');
+  // meat: raw pink-grey with fat streaks, cooked brown with a crisp crust
+  c.fill(L.meat_raw_top, 'p');
+  c.speckle(L.meat_raw_top, 'p', 'f', 0.2, 52);
+  c.fill(L.meat_raw_side, 'p');
+  for (const y of [1, 3]) c.row(L.meat_raw_side, y, 'q');
+  c.speckle(L.meat_raw_side, 'p', 'f', 0.15, 53);
+  c.fill(L.meat_cooked_top, 'b');
+  c.speckle(L.meat_cooked_top, 'b', 'B', 0.25, 54);
+  c.fill(L.meat_cooked_side, 'b');
+  for (const y of [1, 3]) c.row(L.meat_cooked_side, y, 'B');
+  c.speckle(L.meat_cooked_side, 'b', 'c', 0.2, 55);
+  return c.rows();
+}
+
+/** @type {Sprite} */
+export const spit = {
+  name: 'spit',
+  palette: {
+    i: '#9ea2a8', I: '#6f7378', l: '#d4d7dc', w: '#ffffff', d: '#55585d', k: '#2b2d31', K: '#44474d',
+    o: '#e8641e', O: '#ffb040', p: '#c99a9a', q: '#a88080', f: '#eadada', b: '#8a5a2e', B: '#5e3a1a', c: '#c08048',
+  },
+  rows: drawSpit(),
+};
+
+// ---- Wok: small gas burner, wide black wok with handles, stir-fry contents per state
+
+function drawWok() {
+  const L = layouts.wok;
+  const c = canvas();
+  c.fill(L.stove_side, 'k');
+  c.row(L.stove_side, 0, 'K');
+  c.fill(L.stove_front, 'k');
+  c.row(L.stove_front, 0, 'K');
+  c.px(L.stove_front, 5, 2, 'r');
+  c.px(L.stove_front, 6, 2, 'r');
+  c.px(L.stove_front, 5, 3, 'R');
+  c.px(L.stove_front, 6, 3, 'R');
+  c.fill(L.stove_top, 'k');
+  c.border(L.stove_top, 'K');
+  // burner: blue gas flames around a dark ring
+  c.fill(L.burner_top, 'a');
+  c.border(L.burner_top, 'u');
+  c.fill(L.burner_side, 'u');
+  c.fill(L.handle, 'h');
+  // wok: black steel, a little shine on the rim
+  c.fill(L.wok_side, 'x');
+  c.row(L.wok_side, 0, 'X');
+  c.fill(L.wok_rim, 'X');
+  c.speckle(L.wok_rim, 'X', 'g', 0.1, 61);
+  c.fill(L.wok_inner, 'x');
+  // contents: raw (pale noodles with veg), cooking (golden), done (glazed brown with green and orange), burnt
+  c.fill(L.contents_raw, 'n');
+  c.speckle(L.contents_raw, 'n', 'e', 0.2, 62);
+  c.speckle(L.contents_raw, 'n', 'v', 0.1, 63);
+  c.fill(L.contents_cooking, 'y');
+  c.speckle(L.contents_cooking, 'y', 'v', 0.12, 64);
+  c.speckle(L.contents_cooking, 'y', 't', 0.1, 65);
+  c.fill(L.contents_done, 'm');
+  c.speckle(L.contents_done, 'm', 'M', 0.2, 66);
+  c.speckle(L.contents_done, 'm', 'v', 0.12, 67);
+  c.speckle(L.contents_done, 'm', 't', 0.1, 68);
+  c.fill(L.contents_burnt, 'z');
+  c.speckle(L.contents_burnt, 'z', 'Z', 0.3, 69);
+  c.px(L.steam, 0, 0, 's');
+  c.px(L.steam, 0, 1, 'S');
+  c.px(L.steam, 0, 2, 'S');
+  return c.rows();
+}
+
+/** @type {Sprite} */
+export const wok = {
+  name: 'wok',
+  palette: {
+    k: '#2b2d31', K: '#44474d', r: '#d0302a', R: '#8f1f1a', a: '#18191b', u: '#4a8ae8', h: '#6b4a2e',
+    x: '#1e1f22', X: '#34363a', g: '#5a5d63',
+    n: '#f0d890', e: '#ffffff', v: '#4fae3a', y: '#e8b84a', t: '#f08a25', m: '#b8782a', M: '#8a5418',
+    z: '#1a1614', Z: '#2e2723', s: '#ffffff', S: '#dfe8ee',
+  },
+  rows: drawWok(),
 };

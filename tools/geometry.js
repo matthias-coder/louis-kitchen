@@ -256,6 +256,73 @@ export const models = {
       ],
     },
   ],
+  // Steel base plate with a vertical rod; a meat cone hangs on the rod in front of a glowing heater at the
+  // back (raw: pink-grey, cooked: brown). Highest point 22 px.
+  spit: [
+    {
+      name: 'base',
+      cubes: [
+        cube([-6, 0, -6], [12, 1, 12], 'plate_top', 'plate_side'),
+        cube([-1.5, 1, -1.5], [3, 2, 3], 'collar', 'collar'), // drip tray under the cone
+      ],
+    },
+    { name: 'rod', cubes: [cube([-0.5, 1, -0.5], [1, 21, 1], 'rod', 'rod')] },
+    {
+      name: 'heater',
+      cubes: [
+        { origin: [-5, 1, 4], size: [10, 19, 2], top: 'heater_top', side: 'heater_side', front: 'heater_front' },
+        cube([-5, 20, 3], [10, 1, 3], 'heater_top', 'heater_top'), // hood
+      ],
+    },
+    ...['raw', 'cooked'].map((kind) => ({
+      name: `meat_${kind}`,
+      cubes: [
+        cube([-2, 4, -2], [4, 3, 4], `meat_${kind}_top`, `meat_${kind}_side`),
+        cube([-3, 7, -3], [6, 4, 6], `meat_${kind}_top`, `meat_${kind}_side`),
+        cube([-3.5, 11, -3.5], [7, 5, 7], `meat_${kind}_top`, `meat_${kind}_side`),
+        cube([-3, 16, -3], [6, 3, 6], `meat_${kind}_top`, `meat_${kind}_side`),
+      ],
+    })),
+  ],
+  // Small gas burner with a wide, shallow black wok and two handles; the contents show per state and steam
+  // rises while cooking or done. Highest point 15 px.
+  wok: [
+    {
+      name: 'burner',
+      cubes: [
+        { origin: [-6, 0, -6], size: [12, 5, 12], top: 'stove_top', side: 'stove_side', front: 'stove_front' },
+        cube([-4, 5, -4], [8, 1, 8], 'burner_top', 'burner_side'),
+      ],
+    },
+    {
+      name: 'wok',
+      cubes: [
+        cube([-4, 6, -4], [8, 1, 8], 'wok_inner', 'wok_side'), // floor
+        cube([-5, 7, -5], [10, 2, 1], 'wok_rim', 'wok_side'), // lower ring
+        cube([-5, 7, 4], [10, 2, 1], 'wok_rim', 'wok_side'),
+        cube([-5, 7, -4], [1, 2, 8], 'wok_rim', 'wok_side'),
+        cube([4, 7, -4], [1, 2, 8], 'wok_rim', 'wok_side'),
+        cube([-6, 9, -6], [12, 2, 1], 'wok_rim', 'wok_side'), // upper, wider ring
+        cube([-6, 9, 5], [12, 2, 1], 'wok_rim', 'wok_side'),
+        cube([-6, 9, -5], [1, 2, 10], 'wok_rim', 'wok_side'),
+        cube([5, 9, -5], [1, 2, 10], 'wok_rim', 'wok_side'),
+        cube([6, 10, -1], [2, 1, 2], 'handle', 'handle'), // handles
+        cube([-8, 10, -1], [2, 1, 2], 'handle', 'handle'),
+      ],
+    },
+    ...['raw', 'cooking', 'done', 'burnt'].map((kind) => ({
+      name: `contents_${kind}`,
+      cubes: [cube([-4, 7, -4], [8, 2, 8], `contents_${kind}`, `contents_${kind}`)],
+    })),
+    {
+      name: 'steam',
+      cubes: [
+        cube([-2, 10, -2], [1, 3, 1], 'steam', 'steam'),
+        cube([1, 11, 0], [1, 3, 1], 'steam', 'steam'),
+        cube([-1, 13, 1], [1, 2, 1], 'steam', 'steam'),
+      ],
+    },
+  ],
   bell: [
     {
       name: 'bell',
@@ -402,7 +469,7 @@ export const guestModel = [
     pivot: [0, 30, 0],
     cubes: [solid([2, 29.5, -0.5], [1, 1, 1], 'dot'), solid([3.5, 31, -0.75], [1.5, 1.5, 1.5], 'dot')],
   },
-  ...['hamburger', 'cheeseburger', 'pizza_margherita', 'salami_pizza', 'ramen', 'potato_soup'].map((wish) => (/** @type {EntityBone} */ ({
+  ...['hamburger', 'cheeseburger', 'pizza_margherita', 'salami_pizza', 'ramen', 'potato_soup', 'doner', 'sushi', 'fried_noodles'].map((wish) => (/** @type {EntityBone} */ ({
     name: `bubble_${wish}`,
     parent: 'bubble',
     pivot: [0, 40, 0],

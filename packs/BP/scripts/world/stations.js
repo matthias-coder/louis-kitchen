@@ -1,6 +1,6 @@
 import { BlockPermutation, system } from '@minecraft/server';
 import {
-  migrateStationState, grill as grillStation, oven as ovenStation,
+  migrateStationState, grill as grillStation, oven as ovenStation, pot as potStation,
   boardInteract, boardView, boardDrops,
   counterInteract, counterView, counterDrops,
   dishwasherInteract, dishwasherView, dishwasherDrops,
@@ -53,6 +53,29 @@ const oven = cookingDef('oven', ovenStation);
 
 /** Cooking stations ticked by tickStations: registry kind, block def, rules. @type {[string, StationDef<TimedState>, CookingStation][]} */
 const COOKING = [['grill', grill, grillStation], ['oven', oven, ovenStation]];
+
+/** @typedef {import('../logic/stations.js').PotState} PotState */
+/** @typedef {ReturnType<typeof import('../logic/stations.js').potStation>} PotStation */
+
+/**
+ * A pot station block (pot; the wok later): block state `kochmod:state` shows the view.
+ * @param {'pot'} kind registry name and saved-state kind
+ * @param {PotStation} station
+ * @returns {StationDef<PotState>}
+ */
+const potDef = (kind, station) => ({
+  typeId: `kochmod:${kind}`,
+  initial: station.INITIAL,
+  interact: station.interact,
+  states: (s) => ({ 'kochmod:state': station.view(s) }),
+  drops: station.drops,
+  migrate: (saved) => migrateStationState(kind, saved),
+});
+
+const pot = potDef('pot', potStation);
+
+/** Pot stations ticked by tickStations: registry kind, block def, rules. @type {[string, StationDef<PotState>, PotStation][]} */
+const POTS = [['pot', pot, potStation]];
 
 /** @type {StationDef<import('../logic/stations.js').BoardState>} */
 const cuttingBoard = {
@@ -223,6 +246,7 @@ function stationComponent(kind, def) {
 const BY_TYPE = {
   [grill.typeId]: ['grill', grill],
   [oven.typeId]: ['oven', oven],
+  [pot.typeId]: ['pot', pot],
   [cuttingBoard.typeId]: ['cutting_board', cuttingBoard],
   [counter.typeId]: ['counter', counter],
   [dishwasher.typeId]: ['dishwasher', dishwasher],
@@ -290,12 +314,15 @@ function tickIo(kind, def, statesOf) {
 }
 
 /**
- * Advances every loaded grill, oven and dishwasher by `dt` ticks. Stations in unloaded chunks pause.
+ * Advances every loaded grill, oven, pot and dishwasher by `dt` ticks. Stations in unloaded chunks pause.
  * @param {number} dt
  */
 export function tickStations(dt) {
   for (const [kind, def, station] of COOKING) {
     tickTimedStation(worldStore.registryList(kind), dt, tickIo(kind, def, (view) => ({ 'kochmod:content': view })), def.typeId, kind, station);
+  }
+  for (const [kind, def, station] of POTS) {
+    tickTimedStation(worldStore.registryList(kind), dt, tickIo(kind, def, (view) => ({ 'kochmod:state': view })), def.typeId, kind, station);
   }
   tickDishwashers(
     worldStore.registryList('dishwasher'), dt,

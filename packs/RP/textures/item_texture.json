@@ -38,6 +38,9 @@
     "kochmod_block_pantry": {
       "textures": "textures/items/block_pantry"
     },
+    "kochmod_block_pot": {
+      "textures": "textures/items/block_pot"
+    },
     "kochmod_block_table": {
       "textures": "textures/items/block_table"
     },

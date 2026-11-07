@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { evaluateAssembly, RECIPES, DISHES, FAILED } from '../packs/BP/scripts/logic/recipes.js';
+import { evaluateAssembly, evaluateFor, RECIPES, DISHES, FAILED } from '../packs/BP/scripts/logic/recipes.js';
+import { POT } from '../packs/BP/scripts/logic/processes.js';
 
 const k = (/** @type {string[]} */ ...ids) => ids.map((i) => `kochmod:${i}`);
 
@@ -26,13 +27,15 @@ test('failures', () => {
 });
 
 test('recipes list stations', () => {
-  assert.equal(RECIPES.length, 4);
+  assert.equal(RECIPES.length, 6);
   for (const r of RECIPES.slice(0, 2)) assert.deepEqual(r.stations, ['grill', 'cutting_board', 'counter']);
-  for (const r of RECIPES.slice(2)) assert.deepEqual(r.stations, ['counter', 'oven']);
+  for (const r of RECIPES.slice(2, 4)) assert.deepEqual(r.stations, ['counter', 'oven']);
+  assert.deepEqual(RECIPES[4].stations, ['pot']);
+  assert.deepEqual(RECIPES[5].stations, ['cutting_board', 'pot']);
 });
 
-test('dishes: assembled ones first, then the ones an oven bakes', () => {
-  assert.deepEqual(DISHES, k('hamburger', 'cheeseburger', 'pizza_margherita', 'salami_pizza'));
+test('dishes: assembled ones first, then the ones an oven bakes, then the pot dishes (cooked rice is not a dish)', () => {
+  assert.deepEqual(DISHES, k('hamburger', 'cheeseburger', 'pizza_margherita', 'salami_pizza', 'ramen', 'potato_soup'));
   assert.deepEqual(RECIPES.find((r) => r.dish === 'kochmod:salami_pizza')?.parts, k('raw_salami_pizza'));
 });
 
@@ -49,4 +52,13 @@ test('evaluateAssembly does not mutate input', () => {
   const copy = [...items];
   evaluateAssembly(items);
   assert.deepEqual(items, copy);
+});
+
+test('pot recipes evaluate in any order; cooked rice from rice; anything else fails', () => {
+  assert.equal(evaluateFor(POT, k('egg', 'spring_onion', 'noodles', 'broth')), 'kochmod:ramen');
+  assert.equal(evaluateFor(POT, k('cream', 'potato_cubes', 'carrot_slices')), 'kochmod:potato_soup');
+  assert.equal(evaluateFor(POT, k('rice')), 'kochmod:cooked_rice');
+  assert.equal(evaluateFor(POT, k('rice', 'rice')), FAILED);
+  assert.equal(evaluateFor(POT, k('broth', 'noodles', 'egg')), FAILED);
+  assert.ok(!DISHES.includes('kochmod:cooked_rice'));
 });

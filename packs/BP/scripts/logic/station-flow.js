@@ -97,13 +97,15 @@ export function tickTimed(keys, dt, io, typeId, def) {
 const DISHWASHER_TIMER = { name: 'dishwasher', initial: INITIAL.dishwasher, tick: dishwasherTick, view: dishwasherView };
 
 /**
- * Advances every registered station of one cooking kind (grill, oven) by `dt` (see tickTimed).
+ * Advances every registered station of one cooking kind (grill, oven, pot) by `dt` (see tickTimed).
+ * @template {{ ticks: number }} S
+ * @template V
  * @param {string[]} keys
  * @param {number} dt
- * @param {TickIo<GrillState, ReturnType<CookingStation['view']>>} io
+ * @param {TickIo<S, V>} io
  * @param {string} typeId
  * @param {string} name station kind, for warnings
- * @param {CookingStation} station
+ * @param {{ INITIAL: S, tick: (state: S, dt: number) => S, view: (state: S) => V }} station
  */
 export function tickTimedStation(keys, dt, io, typeId, name, station) {
   tickTimed(keys, dt, io, typeId, { name, initial: station.INITIAL, tick: station.tick, view: station.view });

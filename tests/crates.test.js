@@ -16,7 +16,7 @@ const NEEDED = ['kochmod:bun', 'kochmod:raw_patty', 'kochmod:lettuce', 'kochmod:
 const { crate_all: ALL, ...SUPPLY } = CRATES;
 const entries = Object.values(SUPPLY).flatMap((c) => c.entries);
 const ALL_ITEM_IDS = Object.keys(ITEMS).filter((id) => ITEMS[id].menu !== false).map((id) => id.replace('kochmod:', ''));
-const ALL_BLOCK_IDS = ['grill', 'cutting_board', 'counter', 'oven', 'crate_tools', 'crate_all', 'fridge', 'pantry', 'dishwasher', 'dish_cabinet', 'table', 'chair', 'bell'];
+const ALL_BLOCK_IDS = ['grill', 'cutting_board', 'counter', 'oven', 'pot', 'crate_tools', 'crate_all', 'fridge', 'pantry', 'dishwasher', 'dish_cabinet', 'table', 'chair', 'bell'];
 
 test('there are exactly the four crates', () => {
   assert.deepEqual(Object.keys(CRATES).sort(), ['crate_all', 'crate_tools', 'fridge', 'pantry']);

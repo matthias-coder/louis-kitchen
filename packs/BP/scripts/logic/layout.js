@@ -108,6 +108,7 @@ function buildRestaurant() {
   put(right, 1, back - 1, 'kochmod:crate_tools');
   put(right, 1, back, 'kochmod:crate_all');
   // 5. stations along the back wall
+  put(2, 1, back, 'kochmod:pot');
   put(5, 1, back, 'kochmod:grill');
   put(6, 1, back, 'kochmod:cutting_board');
   put(7, 1, back, 'kochmod:counter');

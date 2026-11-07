@@ -214,6 +214,48 @@ export const models = {
       cubes: [cube([-3.5, 8.1, -4.5], [7, 0.5, 7], `pizza_${kind}_top`, `pizza_${kind}_side`)],
     })),
   ],
+  // Small stove with a burner; the iron pot with handles stands on it, the lid is pushed to the back half
+  // so the contents show in front; steam rises from the open part. Highest point 22 px.
+  pot: [
+    {
+      name: 'stove',
+      cubes: [
+        { origin: [-7, 0, -7], size: [14, 6, 14], top: 'stove_top', side: 'stove_side', front: 'stove_front' },
+        cube([-5, 6, -5], [10, 1, 10], 'burner_top', 'burner_side'),
+      ],
+    },
+    {
+      name: 'pot',
+      cubes: [
+        cube([-5, 7, -5], [10, 9, 1], 'pot_rim', 'pot_side'), // front wall
+        cube([-5, 7, 4], [10, 9, 1], 'pot_rim', 'pot_side'), // back wall
+        cube([-5, 7, -4], [1, 9, 8], 'pot_rim', 'pot_side'), // side walls
+        cube([4, 7, -4], [1, 9, 8], 'pot_rim', 'pot_side'),
+        cube([-4, 7, -4], [8, 1, 8], 'pot_inner', 'pot_inner'), // floor
+        cube([-7, 13, -1], [2, 1, 2], 'handle', 'handle'), // handles
+        cube([5, 13, -1], [2, 1, 2], 'handle', 'handle'),
+      ],
+    },
+    {
+      name: 'lid',
+      cubes: [
+        cube([-5.5, 16, -0.5], [11, 1, 6], 'lid_top', 'lid_side'),
+        cube([-1, 17, 1.5], [2, 1, 2], 'handle', 'handle'),
+      ],
+    },
+    ...['raw', 'cooking', 'done', 'burnt'].map((kind) => ({
+      name: `contents_${kind}`,
+      cubes: [cube([-4, 8, -4], [8, 7, 8], `contents_${kind}`, `contents_${kind}`)],
+    })),
+    {
+      name: 'steam',
+      cubes: [
+        cube([-2, 17, -3], [1, 3, 1], 'steam', 'steam'),
+        cube([1, 18, -2], [1, 3, 1], 'steam', 'steam'),
+        cube([-1, 20, -4], [1, 2, 1], 'steam', 'steam'),
+      ],
+    },
+  ],
   bell: [
     {
       name: 'bell',
@@ -360,7 +402,7 @@ export const guestModel = [
     pivot: [0, 30, 0],
     cubes: [solid([2, 29.5, -0.5], [1, 1, 1], 'dot'), solid([3.5, 31, -0.75], [1.5, 1.5, 1.5], 'dot')],
   },
-  ...['hamburger', 'cheeseburger', 'pizza_margherita', 'salami_pizza'].map((wish) => (/** @type {EntityBone} */ ({
+  ...['hamburger', 'cheeseburger', 'pizza_margherita', 'salami_pizza', 'ramen', 'potato_soup'].map((wish) => (/** @type {EntityBone} */ ({
     name: `bubble_${wish}`,
     parent: 'bubble',
     pivot: [0, 40, 0],

@@ -41,6 +41,8 @@ export const guestLayout = {
   bubble_cheeseburger: [84, 0, 20, 20],
   bubble_pizza_margherita: [64, 20, 20, 20],
   bubble_salami_pizza: [84, 20, 20, 20],
+  bubble_ramen: [64, 40, 20, 20],
+  bubble_potato_soup: [84, 40, 20, 20],
   bubble_edge: [104, 0, 1, 1],
   dot: [106, 0, 2, 2],
 };
@@ -195,6 +197,8 @@ function drawGuest() {
   drawBubble(p, L.bubble_cheeseburger, items.cheeseburger);
   drawBubble(p, L.bubble_pizza_margherita, items.pizza_margherita);
   drawBubble(p, L.bubble_salami_pizza, items.salami_pizza);
+  drawBubble(p, L.bubble_ramen, items.ramen);
+  drawBubble(p, L.bubble_potato_soup, items.potato_soup);
   p.fill(L.bubble_edge, C.outline);
   p.fill(L.dot, C.bubble);
   return px;

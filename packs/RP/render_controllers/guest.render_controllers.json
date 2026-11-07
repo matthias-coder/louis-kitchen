@@ -11,7 +11,9 @@
         { "bubble_hamburger": "q.property('kochmod:wish') == 'hamburger'" },
         { "bubble_cheeseburger": "q.property('kochmod:wish') == 'cheeseburger'" },
         { "bubble_pizza_margherita": "q.property('kochmod:wish') == 'pizza_margherita'" },
-        { "bubble_salami_pizza": "q.property('kochmod:wish') == 'salami_pizza'" }
+        { "bubble_salami_pizza": "q.property('kochmod:wish') == 'salami_pizza'" },
+        { "bubble_ramen": "q.property('kochmod:wish') == 'ramen'" },
+        { "bubble_potato_soup": "q.property('kochmod:wish') == 'potato_soup'" }
       ]
     }
   }

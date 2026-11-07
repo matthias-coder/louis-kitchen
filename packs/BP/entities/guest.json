@@ -8,7 +8,7 @@
       "properties": {
         "kochmod:wish": {
           "type": "enum",
-          "values": ["none", "hamburger", "cheeseburger", "pizza_margherita", "salami_pizza"],
+          "values": ["none", "hamburger", "cheeseburger", "pizza_margherita", "salami_pizza", "ramen", "potato_soup"],
           "default": "none",
           "client_sync": true
         },

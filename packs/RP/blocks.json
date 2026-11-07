@@ -16,6 +16,9 @@
   "kochmod:oven": {
     "sound": "stone"
   },
+  "kochmod:pot": {
+    "sound": "metal"
+  },
   "kochmod:crate_tools": {
     "sound": "metal"
   },

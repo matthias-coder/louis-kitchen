@@ -117,6 +117,26 @@ export const block_oven = icon('oven', {
   rect(6, 9, 9, 9, 'R');
 });
 
+export const block_pot = icon('pot', {
+  k: '#2b2d31', K: '#44474d', r: '#d0302a', i: '#7d7f84', I: '#6a6c71', l: '#b4b7bc', d: '#45474b', a: '#18191b', s: '#f4f4f4',
+}, ({ rect, px }) => {
+  // stove with two knobs
+  rect(1, 11, 14, 15, 'k');
+  rect(1, 11, 14, 11, 'K');
+  px(4, 13, 'r'); px(11, 13, 'r');
+  // iron pot with handles and a lid
+  rect(3, 4, 12, 10, 'i');
+  rect(3, 4, 12, 4, 'l');
+  rect(3, 9, 12, 9, 'I');
+  rect(3, 10, 12, 10, 'd');
+  rect(1, 6, 2, 6, 'a');
+  rect(13, 6, 14, 6, 'a');
+  rect(3, 3, 12, 3, 'l');
+  rect(7, 2, 8, 2, 'a');
+  // steam
+  px(5, 1, 's'); px(6, 0, 's'); px(10, 1, 's'); px(9, 0, 's');
+});
+
 export const block_crate_tools = crateIcon(blocks.crate_tools);
 export const block_crate_all = crateIcon(blocks.crate_all);
 

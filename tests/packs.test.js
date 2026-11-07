@@ -302,3 +302,44 @@ test('oven: name, hints and sound exist', () => {
   const sounds = JSON.parse(fs.readFileSync(path.join(root, 'packs/RP/sounds/sound_definitions.json'), 'utf8')).sound_definitions;
   assert.ok(sounds['kochmod.oven']?.sounds?.length > 0);
 });
+
+test('pot: state enum, contents per state, steam while cooking or done, nothing above 23 px, collision within the block', () => {
+  const { block, geo, vis, bones } = blockWithGeometry('pot');
+  assert.equal(block.description.identifier, 'kochmod:pot');
+  assert.deepEqual(block.description.states, { 'kochmod:state': ['empty', 'raw', 'cooking', 'done', 'burnt'] });
+  assert.deepEqual(vis, {
+    contents_raw: "q.block_state('kochmod:state') == 'raw'",
+    contents_cooking: "q.block_state('kochmod:state') == 'cooking'",
+    contents_done: "q.block_state('kochmod:state') == 'done'",
+    contents_burnt: "q.block_state('kochmod:state') == 'burnt'",
+    steam: "q.block_state('kochmod:state') == 'cooking' || q.block_state('kochmod:state') == 'done'",
+  });
+  for (const bone of ['stove', 'pot', 'lid']) assert.ok(bones.includes(bone), bone);
+  assert.equal(block.components['minecraft:geometry'].identifier, 'geometry.kochmod.pot');
+  assert.deepEqual(block.components['minecraft:material_instances']['*'], { texture: 'kochmod_pot', render_method: 'alpha_test' });
+  assert.ok('kochmod:pot' in block.components);
+  assert.match(block.components['minecraft:map_color'], /^#[0-9a-f]{6}$/i);
+  for (const box of ['minecraft:collision_box', 'minecraft:selection_box']) {
+    const { origin, size } = block.components[box];
+    assert.ok(origin[1] + size[1] <= 16, box);
+  }
+  for (const bone of geo.bones) {
+    for (const cube of bone.cubes) assert.ok(cube.origin[1] + cube.size[1] <= 23, `${bone.name} reaches above 23 px`);
+  }
+});
+
+test('pot: name, hints and sound exist', () => {
+  for (const lang of ['de_DE', 'en_US']) {
+    const text = fs.readFileSync(path.join(root, 'packs/RP/texts', `${lang}.lang`), 'utf8');
+    for (const line of [
+      'tile.kochmod:pot.name=Suppentopf', 'kochmod.hint.pot_full=Der Topf ist voll.', 'kochmod.hint.pot_cooking=Das kocht noch.',
+      'kochmod.hint.need_bowl=Nimm eine Schüssel!', 'kochmod.hint.pot_empty=Der Topf ist leer.',
+    ]) {
+      assert.ok(text.split(/\r?\n/).includes(line), `${lang}: ${line}`);
+    }
+  }
+  const sounds = JSON.parse(fs.readFileSync(path.join(root, 'packs/RP/sounds/sound_definitions.json'), 'utf8')).sound_definitions;
+  assert.ok(sounds['kochmod.bubble']?.sounds?.length > 0);
+  const rpBlocks = JSON.parse(fs.readFileSync(path.join(root, 'packs/RP/blocks.json'), 'utf8'));
+  assert.ok(rpBlocks['kochmod:pot']?.sound);
+});

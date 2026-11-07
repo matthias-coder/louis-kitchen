@@ -1,7 +1,7 @@
-import { BURNT_AT, cookStage } from './cooking.js';
-import { evaluateAssembly } from './recipes.js';
+import { BURNT_AT, COOKED_AT, cookStage } from './cooking.js';
+import { evaluateAssembly, evaluateFor, FAILED } from './recipes.js';
 import { ITEMS } from './catalog.js';
-import { CUTTABLE, TIMED } from './processes.js';
+import { CUTTABLE, TIMED, POT_DEF } from './processes.js';
 
 /**
  * take: consume one held item. give: item id handed to the player, `count` of them
@@ -11,6 +11,8 @@ import { CUTTABLE, TIMED } from './processes.js';
  */
 /** item: what lies on the station (null when empty); ticks: cooking time so far. @typedef {{ item: string | null, ticks: number }} TimedState */
 /** @typedef {TimedState} GrillState */
+/** items: what is in the pot, in order; ticks: cooking time so far. @typedef {{ items: string[], ticks: number }} PotState */
+/** @typedef {import('./processes.js').PotDef} PotDef */
 /** @typedef {typeof TIMED[string]} TimedDef */
 /** @typedef {{ item: string | null }} BoardState */
 /** @typedef {{ items: string[] }} CounterState */
@@ -42,12 +44,12 @@ const ID = {
   cleanPlate: 'kochmod:clean_plate',
 };
 
-/** The counter takes every ingredient and prepared item of the catalog (no tools, dishes or plates). */
-function acceptsOnCounter(/** @type {string} */ id) {
+/** Every ingredient and prepared item of the catalog (no tools, dishes or plates): what counter and pot take. */
+function isFood(/** @type {string} */ id) {
   return Object.hasOwn(ITEMS, id) && (ITEMS[id].kind === 'ingredient' || ITEMS[id].kind === 'prepared');
 }
 
-// ---- Timed stations (grill, oven; pot and wok later)
+// ---- Timed stations (grill, oven)
 
 /**
  * A station that cooks one item by time, built from a `TIMED` row. Unknown stored items never throw:
@@ -116,10 +118,78 @@ export const grillDrops = grill.drops;
 
 export const oven = timedStation(TIMED.oven);
 
-/** @type {{ grill: GrillState, oven: TimedState, board: BoardState, counter: CounterState, dishwasher: DishwasherState, cabinet: CabinetState }} */
+// ---- Pot stations (soup pot; the wok later)
+
+/**
+ * A station that cooks a mix of up to `def.max` items by time; the tool scoops out what the mix has become.
+ * Unknown stored items never throw: they make a failed dish and drop unchanged.
+ * @param {PotDef} def
+ */
+export function potStation(def) {
+  /** @type {PotState} */
+  const initial = { items: [], ticks: 0 };
+  return {
+    INITIAL: initial,
+    /**
+     * @param {PotState} state
+     * @param {string | null} held
+     * @returns {Result<PotState>}
+     */
+    interact(state, held) {
+      const { items, ticks } = state;
+      if (held === def.tool) {
+        if (items.length === 0) return { state, hint: def.hints.empty };
+        if (ticks < COOKED_AT) return { state, hint: def.hints.cooking };
+        const give = cookStage(ticks) === 'burnt' ? FAILED : evaluateFor(def.recipes, items);
+        return { state: initial, take: true, give };
+      }
+      if (held === null) return items.length === 0 ? { state } : { state, hint: def.hints.needTool };
+      if (!isFood(held)) return { state };
+      if (items.length >= def.max) return { state, hint: def.hints.full };
+      if (ticks >= COOKED_AT) return { state, hint: def.hints.cooking };
+      return { state: { items: [...items, held], ticks }, take: true, sound: def.sound };
+    },
+    /**
+     * @param {PotState} state
+     * @param {number} dt
+     * @returns {PotState}
+     */
+    tick(state, dt) {
+      if (state.items.length === 0) return state;
+      return { items: state.items, ticks: Math.min(state.ticks + dt, BURNT_AT) };
+    },
+    /**
+     * @param {PotState} state
+     * @returns {'empty' | 'raw' | 'cooking' | 'done' | 'burnt'}
+     */
+    view(state) {
+      if (state.items.length === 0) return 'empty';
+      if (state.ticks < COOKED_AT / 2) return 'raw';
+      if (state.ticks < COOKED_AT) return 'cooking';
+      return state.ticks < BURNT_AT ? 'done' : 'burnt';
+    },
+    /**
+     * @param {PotState} state
+     * @returns {string[]}
+     */
+    drops(state) {
+      return [...state.items];
+    },
+  };
+}
+
+export const POT_MAX = POT_DEF.max;
+export const pot = potStation(POT_DEF);
+export const potInteract = pot.interact;
+export const potTick = pot.tick;
+export const potView = pot.view;
+export const potDrops = pot.drops;
+
+/** @type {{ grill: GrillState, oven: TimedState, pot: PotState, board: BoardState, counter: CounterState, dishwasher: DishwasherState, cabinet: CabinetState }} */
 export const INITIAL = {
   grill: grill.INITIAL,
   oven: oven.INITIAL,
+  pot: pot.INITIAL,
   board: { item: null },
   counter: { items: [] },
   dishwasher: { plates: 0, ticks: 0 },
@@ -178,7 +248,7 @@ export function counterInteract(state, held) {
     if (state.items.length === 0) return { state };
     return { state: { items: [] }, give: evaluateAssembly(state.items), sound: 'kochmod.plate' };
   }
-  if (!acceptsOnCounter(held)) return { state };
+  if (!isFood(held)) return { state };
   if (state.items.length >= COUNTER_MAX) return { state, hint: 'kochmod.hint.counter_full' };
   return { state: { items: [...state.items, held] }, take: true };
 }
@@ -301,6 +371,7 @@ const validTimed = (/** @type {Record<string, unknown>} */ s) => (s.item === nul
 const VALID = {
   grill: validTimed,
   oven: validTimed,
+  pot: (s) => Array.isArray(s.items) && s.items.every((i) => typeof i === 'string') && isCount(s.ticks),
   board: (s) => s.item === null || typeof s.item === 'string',
   counter: (s) => Array.isArray(s.items) && s.items.every((i) => typeof i === 'string'),
   dishwasher: (s) => isCount(s.plates) && isCount(s.ticks),

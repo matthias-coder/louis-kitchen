@@ -156,3 +156,19 @@ test('tickTimedStation: bakes loaded ovens with the oven rules and switches the 
   assert.deepEqual(w.forgotten, ['c']);
   assert.deepEqual(w.warnings, []);
 });
+
+test('tickTimedStation: cooks loaded pots with the pot rules, an empty pot stays as it is', async () => {
+  const { pot } = await import('../packs/BP/scripts/logic/stations.js');
+  const POT = 'kochmod:pot';
+  const w = fakeWorld({ a: POT, b: POT, c: POT }, {
+    a: { items: ['kochmod:rice'], ticks: 75 },
+    b: { items: [], ticks: 0 },
+    c: { items: ['kochmod:rice'], ticks: 155 },
+  });
+  tickTimedStation(['a', 'b', 'c'], 10, w.io, POT, 'pot', pot);
+  assert.deepEqual(w.states.a, { items: ['kochmod:rice'], ticks: 85 });
+  assert.deepEqual(w.states.b, { items: [], ticks: 0 });
+  assert.deepEqual(w.states.c, { items: ['kochmod:rice'], ticks: 165 });
+  assert.deepEqual(w.views, { a: 'cooking', c: 'done' });
+  assert.deepEqual(w.warnings, []);
+});

@@ -259,6 +259,24 @@ export const layouts = {
     pizza_burnt_top: /** @type {Region} */ ([16, 32, 7, 7]),
     pizza_burnt_side: /** @type {Region} */ ([16, 40, 7, 1]),
   },
+  pot: {
+    stove_side: /** @type {Region} */ ([0, 0, 14, 6]),
+    stove_front: /** @type {Region} */ ([0, 6, 14, 6]),
+    stove_top: /** @type {Region} */ ([16, 0, 14, 14]),
+    burner_top: /** @type {Region} */ ([32, 0, 10, 10]),
+    burner_side: /** @type {Region} */ ([32, 10, 10, 1]),
+    handle: /** @type {Region} */ ([44, 0, 2, 2]),
+    steam: /** @type {Region} */ ([48, 0, 1, 3]),
+    pot_side: /** @type {Region} */ ([0, 16, 10, 9]),
+    pot_rim: /** @type {Region} */ ([16, 16, 10, 8]),
+    pot_inner: /** @type {Region} */ ([32, 16, 8, 8]),
+    lid_top: /** @type {Region} */ ([0, 32, 11, 6]),
+    lid_side: /** @type {Region} */ ([0, 40, 11, 1]),
+    contents_raw: /** @type {Region} */ ([16, 32, 8, 8]),
+    contents_cooking: /** @type {Region} */ ([26, 32, 8, 8]),
+    contents_done: /** @type {Region} */ ([36, 32, 8, 8]),
+    contents_burnt: /** @type {Region} */ ([46, 32, 8, 8]),
+  },
 };
 
 // ---- Grill: dark metal box, red knobs, silver grate over glowing coals
@@ -1027,4 +1045,71 @@ export const oven = {
     x: '#1a1614', X: '#2e2723', a: '#4a403b',
   },
   rows: drawOven(),
+};
+
+// ---- Soup pot: small black stove with knobs and a burner, grey iron pot with handles, lid pushed to the back
+
+function drawPot() {
+  const L = layouts.pot;
+  const c = canvas();
+  // stove: dark enamel, lighter top edge, two red knobs on the front
+  c.fill(L.stove_side, 'k');
+  c.row(L.stove_side, 0, 'K');
+  c.row(L.stove_side, 5, 'a');
+  c.fill(L.stove_front, 'k');
+  c.row(L.stove_front, 0, 'K');
+  c.row(L.stove_front, 5, 'a');
+  for (const x of [3, 10]) {
+    c.px(L.stove_front, x, 2, 'r');
+    c.px(L.stove_front, x + 1, 2, 'r');
+    c.px(L.stove_front, x, 3, 'R');
+    c.px(L.stove_front, x + 1, 3, 'R');
+  }
+  c.fill(L.stove_top, 'k');
+  c.border(L.stove_top, 'K');
+  // burner: dark ring of iron with a faint glow
+  c.fill(L.burner_top, 'a');
+  c.border(L.burner_top, 'g');
+  for (const [x, y] of [[2, 2], [7, 2], [2, 7], [7, 7]]) c.px(L.burner_top, x, y, 'o');
+  c.fill(L.burner_side, 'g');
+  c.fill(L.handle, 'a');
+  // iron pot: grey walls with a light rim and a darker band
+  c.fill(L.pot_side, 'i');
+  c.speckle(L.pot_side, 'i', 'I', 0.15, 41);
+  c.row(L.pot_side, 0, 'l');
+  c.row(L.pot_side, 6, 'I');
+  c.row(L.pot_side, 8, 'd');
+  c.fill(L.pot_rim, 'l');
+  c.fill(L.pot_inner, 'd');
+  // lid: lighter grey with a ring
+  c.fill(L.lid_top, 'l');
+  c.border(L.lid_top, 'i');
+  c.fill(L.lid_side, 'i');
+  // contents: raw (pale water with bits), cooking (orange with bubbles), done (rich orange), burnt (black)
+  c.fill(L.contents_raw, 'w');
+  c.speckle(L.contents_raw, 'w', 'W', 0.3, 42);
+  c.fill(L.contents_cooking, 'c');
+  for (const [x, y] of [[1, 1], [5, 2], [2, 5], [6, 6], [4, 4]]) c.px(L.contents_cooking, x, y, 'C');
+  c.fill(L.contents_done, 'f');
+  c.speckle(L.contents_done, 'f', 'F', 0.2, 43);
+  c.speckle(L.contents_done, 'f', 'G', 0.08, 44);
+  c.fill(L.contents_burnt, 'x');
+  c.speckle(L.contents_burnt, 'x', 'X', 0.3, 45);
+  // steam: white wisps, fading upwards
+  c.px(L.steam, 0, 0, 's');
+  c.px(L.steam, 0, 1, 'S');
+  c.px(L.steam, 0, 2, 'S');
+  return c.rows();
+}
+
+/** @type {Sprite} */
+export const pot = {
+  name: 'pot',
+  palette: {
+    k: '#2b2d31', K: '#44474d', a: '#18191b', g: '#5a5d63', o: '#c8501a', r: '#d0302a', R: '#8f1f1a',
+    i: '#7d7f84', I: '#6a6c71', l: '#b4b7bc', d: '#45474b',
+    w: '#e8dcc0', W: '#d4c49e', c: '#ea8a2c', C: '#ffc878', f: '#c85a16', F: '#a8460e', G: '#5aa83a',
+    x: '#1a1614', X: '#2e2723', s: '#ffffff', S: '#dfe8ee',
+  },
+  rows: drawPot(),
 };

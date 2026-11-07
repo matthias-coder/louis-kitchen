@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { ITEMS } from '../packs/BP/scripts/logic/catalog.js';
-import { stepsFor, stationsFor, CUTTABLE, TIMED } from '../packs/BP/scripts/logic/processes.js';
+import { stepsFor, stationsFor, CUTTABLE, TIMED, POT, POT_DEF } from '../packs/BP/scripts/logic/processes.js';
 
 const k = (/** @type {string} */ id) => `kochmod:${id}`;
 
@@ -75,4 +75,43 @@ test('every CUTTABLE key and value is a catalog item', () => {
     assert.ok(raw in ITEMS, raw);
     assert.ok(cut in ITEMS, cut);
   }
+});
+
+test('pot recipes: ramen, potato soup and cooked rice', () => {
+  assert.deepEqual(POT, [
+    { dish: k('ramen'), parts: ['broth', 'noodles', 'egg', 'spring_onion'].map(k) },
+    { dish: k('potato_soup'), parts: ['potato_cubes', 'carrot_slices', 'cream'].map(k) },
+    { dish: k('cooked_rice'), parts: [k('rice')] },
+  ]);
+  for (const r of POT) for (const id of [r.dish, ...r.parts]) assert.ok(id in ITEMS, id);
+});
+
+test('pot def: recipes, bowl, six items, hints and the bubble sound', () => {
+  assert.deepEqual(POT_DEF, {
+    recipes: POT,
+    tool: k('bowl'),
+    max: 6,
+    hints: { full: 'kochmod.hint.pot_full', cooking: 'kochmod.hint.pot_cooking', needTool: 'kochmod.hint.need_bowl', empty: 'kochmod.hint.pot_empty' },
+    sound: 'kochmod.bubble',
+  });
+});
+
+test('ramen steps: only the pot step with the bowl (all parts come from fridge and pantry)', () => {
+  assert.deepEqual(stepsFor(k('ramen')), [
+    { item: k('ramen'), station: 'pot', tool: k('bowl'), parts: ['broth', 'noodles', 'egg', 'spring_onion'].map(k) },
+  ]);
+  assert.deepEqual(stationsFor(k('ramen')), ['pot']);
+});
+
+test('potato soup steps: cut potato and carrot, then the pot step with the bowl', () => {
+  assert.deepEqual(stepsFor(k('potato_soup')), [
+    { item: k('potato'), station: 'cutting_board', tool: k('knife'), result: k('potato_cubes') },
+    { item: k('carrot'), station: 'cutting_board', tool: k('knife'), result: k('carrot_slices') },
+    { item: k('potato_soup'), station: 'pot', tool: k('bowl'), parts: ['potato_cubes', 'carrot_slices', 'cream'].map(k) },
+  ]);
+  assert.deepEqual(stationsFor(k('potato_soup')), ['cutting_board', 'pot']);
+});
+
+test('cooked rice is a prepared item, so it has no steps of its own as a dish', () => {
+  assert.deepEqual(stepsFor(k('cooked_rice')), []);
 });

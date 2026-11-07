@@ -54,6 +54,11 @@ test('availableDishes: pizzas need the oven (and the counter)', () => {
   assert.deepEqual(availableDishes(new Set(['oven'])), []);
 });
 
+test('availableDishes: ramen needs only the pot, potato soup also the cutting board', () => {
+  assert.deepEqual(availableDishes(new Set(['pot'])), ['kochmod:ramen']);
+  assert.deepEqual(availableDishes(new Set(['pot', 'cutting_board'])), ['kochmod:ramen', 'kochmod:potato_soup']);
+});
+
 test('pickWish', () => {
   assert.equal(pickWish([], () => 0), null);
   assert.equal(pickWish([HAM, CHEESE], () => 0), HAM);

@@ -8,6 +8,7 @@ import {
   boardInteract, boardView, boardDrops,
   counterInteract, counterView, counterDrops,
   timedStation, grill, oven, migrateStationState, COUNTER_LAYERS,
+  pot, POT_MAX, potInteract, potTick, potView, potDrops,
 } from '../packs/BP/scripts/logic/stations.js';
 import { CUTTABLE } from '../packs/BP/scripts/logic/processes.js';
 import { BURNT_AT, COOKED_AT } from '../packs/BP/scripts/logic/cooking.js';
@@ -405,4 +406,110 @@ test('reducers do not mutate input', () => {
   const c = Object.freeze({ plates: 1 });
   cabinetInteract(c, null);
   cabinetInteract(c, CLEAN);
+});
+
+// ---- Soup pot (pot-station factory with the POT recipes)
+
+const POT_EMPTY = { items: [], ticks: 0 };
+const RAMEN_PARTS = ['broth', 'noodles', 'egg', 'spring_onion'].map(k);
+const BOWL = k('bowl');
+
+test('pot: INITIAL and POT_MAX', () => {
+  assert.deepEqual(INITIAL.pot, POT_EMPTY);
+  assert.deepEqual(pot.INITIAL, POT_EMPTY);
+  assert.equal(POT_MAX, 6);
+});
+
+test('pot: ingredients and prepared items go in while not cooked, ticks unchanged, with the bubble sound', () => {
+  for (const held of [k('rice'), k('broth'), k('potato_cubes'), k('cooked_rice')]) {
+    assert.deepEqual(potInteract(POT_EMPTY, held), { state: { items: [held], ticks: 0 }, take: true, sound: 'kochmod.bubble' });
+  }
+  const s = { items: [k('broth')], ticks: COOKED_AT - 1 };
+  assert.deepEqual(potInteract(s, k('egg')), { state: { items: [k('broth'), k('egg')], ticks: COOKED_AT - 1 }, take: true, sound: 'kochmod.bubble' });
+});
+
+test('pot: a full pot says so and takes nothing', () => {
+  const s = { items: Array(POT_MAX).fill(k('rice')), ticks: 10 };
+  const r = potInteract(s, k('rice'));
+  assert.deepEqual(r, { state: s, hint: 'kochmod.hint.pot_full' });
+});
+
+test('pot: adding to a cooked pot says it is cooking and takes nothing', () => {
+  for (const ticks of [COOKED_AT, BURNT_AT]) {
+    const s = { items: [k('rice')], ticks };
+    assert.deepEqual(potInteract(s, k('egg')), { state: s, hint: 'kochmod.hint.pot_cooking' });
+  }
+});
+
+test('pot: tools other than the bowl, dishes, plates and unknown ids change nothing', () => {
+  const s = { items: [k('rice')], ticks: 20 };
+  for (const held of [k('knife'), k('spatula'), k('pizza_peel'), k('ramen'), k('failed_dish'), k('clean_plate'), k('dirty_plate'), k('nope')]) {
+    assert.deepEqual(potInteract(s, held), { state: s }, held);
+    assert.deepEqual(potInteract(POT_EMPTY, held), { state: POT_EMPTY }, held);
+  }
+  assert.deepEqual(potInteract(POT_EMPTY, null), { state: POT_EMPTY });
+});
+
+test('pot: empty hand on a filled pot asks for a bowl', () => {
+  const s = { items: [k('rice')], ticks: 300 };
+  assert.deepEqual(potInteract(s, null), { state: s, hint: 'kochmod.hint.need_bowl' });
+});
+
+test('pot: the bowl on an empty pot says it is empty, on an uncooked pot that it is cooking; nothing consumed', () => {
+  assert.deepEqual(potInteract(POT_EMPTY, BOWL), { state: POT_EMPTY, hint: 'kochmod.hint.pot_empty' });
+  const s = { items: RAMEN_PARTS, ticks: COOKED_AT - 1 };
+  assert.deepEqual(potInteract(s, BOWL), { state: s, hint: 'kochmod.hint.pot_cooking' });
+});
+
+for (const [parts, ticks, out] of /** @type {[string[], number, string][]} */ ([
+  [RAMEN_PARTS, COOKED_AT, k('ramen')],
+  [['spring_onion', 'egg', 'broth', 'noodles'].map(k), BURNT_AT - 1, k('ramen')],
+  [['potato_cubes', 'carrot_slices', 'cream'].map(k), 400, k('potato_soup')],
+  [[k('rice')], COOKED_AT, k('cooked_rice')],
+  [[k('rice'), k('rice')], COOKED_AT, k('failed_dish')],
+  [['potato', 'carrot', 'cream'].map(k), COOKED_AT, k('failed_dish')],
+  [RAMEN_PARTS, BURNT_AT, k('failed_dish')],
+  [[k('rice')], BURNT_AT, k('failed_dish')],
+  [[k('mystery')], COOKED_AT, k('failed_dish')],
+])) {
+  test(`pot: the bowl scoops ${out} from ${parts.join('+')} after ${ticks} ticks, takes one bowl, empties the pot`, () => {
+    assert.deepEqual(potInteract({ items: parts, ticks }, BOWL), { state: POT_EMPTY, take: true, give: out });
+  });
+}
+
+test('pot: tick accumulates only with items, capped at BURNT_AT', () => {
+  assert.equal(potTick(POT_EMPTY, 50), POT_EMPTY);
+  assert.deepEqual(potTick({ items: [k('rice')], ticks: 10 }, 20), { items: [k('rice')], ticks: 30 });
+  assert.deepEqual(potTick({ items: [k('rice')], ticks: 700 }, 500), { items: [k('rice')], ticks: BURNT_AT });
+});
+
+test('pot: view by items and cooking time', () => {
+  const v = (/** @type {number} */ ticks) => potView({ items: [k('rice')], ticks });
+  assert.equal(potView(POT_EMPTY), 'empty');
+  assert.equal(potView({ items: [], ticks: 300 }), 'empty');
+  assert.deepEqual([v(0), v(COOKED_AT / 2 - 1)], ['raw', 'raw']);
+  assert.deepEqual([v(COOKED_AT / 2), v(COOKED_AT - 1)], ['cooking', 'cooking']);
+  assert.deepEqual([v(COOKED_AT), v(BURNT_AT - 1)], ['done', 'done']);
+  assert.equal(v(BURNT_AT), 'burnt');
+});
+
+test('pot: drops are the items as they are, unknown ids included', () => {
+  assert.deepEqual(potDrops(POT_EMPTY), []);
+  assert.deepEqual(potDrops({ items: [k('rice'), k('mystery')], ticks: 400 }), [k('rice'), k('mystery')]);
+});
+
+test('pot: reducers do not mutate input', () => {
+  const s = Object.freeze({ items: Object.freeze([k('broth')]), ticks: 0 });
+  potInteract(/** @type {any} */ (s), k('egg'));
+  potInteract(/** @type {any} */ (s), BOWL);
+  potTick(/** @type {any} */ (s), 10);
+  assert.deepEqual(s, { items: [k('broth')], ticks: 0 });
+});
+
+test('migrateStationState: pot states pass through, garbage becomes an empty pot', () => {
+  const s = { items: [k('rice')], ticks: 12 };
+  assert.equal(migrateStationState('pot', s), s);
+  for (const bad of [undefined, null, 42, [], {}, { items: 'no', ticks: 0 }, { items: [3], ticks: 0 }, { items: [], ticks: -1 }, { item: null, ticks: 0 }]) {
+    assert.deepEqual(migrateStationState('pot', bad), INITIAL.pot, JSON.stringify(bad));
+  }
 });

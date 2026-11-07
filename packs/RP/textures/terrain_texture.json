@@ -46,6 +46,9 @@
     "kochmod_pantry": {
       "textures": "textures/blocks/pantry"
     },
+    "kochmod_pot": {
+      "textures": "textures/blocks/pot"
+    },
     "kochmod_table": {
       "textures": "textures/blocks/table"
     }

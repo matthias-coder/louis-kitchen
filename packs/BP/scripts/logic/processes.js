@@ -52,13 +52,32 @@ export const ASSEMBLY = [
   { dish: 'kochmod:raw_pizza_margherita', parts: PIZZA_BASE },
   { dish: 'kochmod:raw_salami_pizza', parts: [...PIZZA_BASE, 'kochmod:salami'] },
 ];
-/** @type {DishRecipe[]} pot recipes (later tasks) */
-export const POT = [];
+/** @type {DishRecipe[]} pot recipes; a result need not be a dish (cooked rice is a prepared item) */
+export const POT = [
+  { dish: 'kochmod:ramen', parts: ['kochmod:broth', 'kochmod:noodles', 'kochmod:egg', 'kochmod:spring_onion'] },
+  { dish: 'kochmod:potato_soup', parts: ['kochmod:potato_cubes', 'kochmod:carrot_slices', 'kochmod:cream'] },
+  { dish: 'kochmod:cooked_rice', parts: ['kochmod:rice'] },
+];
+
+/**
+ * A station that cooks a mix of items by time and is emptied with a tool (pot; the wok later).
+ * hints: lang keys for full, still cooking, empty hand on a filled station, tool on an empty station.
+ * @typedef {{ recipes: DishRecipe[], tool: string, max: number,
+ *   hints: { full: string, cooking: string, needTool: string, empty: string }, sound: string }} PotDef
+ */
+/** @type {PotDef} */
+export const POT_DEF = {
+  recipes: POT,
+  tool: 'kochmod:bowl',
+  max: 6,
+  hints: { full: 'kochmod.hint.pot_full', cooking: 'kochmod.hint.pot_cooking', needTool: 'kochmod.hint.need_bowl', empty: 'kochmod.hint.pot_empty' },
+  sound: 'kochmod.bubble',
+};
 /** @type {DishRecipe[]} wok recipes (later tasks) */
 export const WOK = [];
 
-/** @type {[string, DishRecipe[]][]} assembling station -> its recipe list */
-const FINAL_STATIONS = [['counter', ASSEMBLY], ['pot', POT], ['wok', WOK]];
+/** @type {[string, DishRecipe[], string?][]} assembling station -> its recipe list and the tool that empties it */
+const FINAL_STATIONS = [['counter', ASSEMBLY], ['pot', POT, POT_DEF.tool], ['wok', WOK]];
 
 /** @type {DishRecipe[]} what timed stations make: cooked result <- the one raw item, in TIMED / accepts order */
 export const TIMED_RECIPES = Object.values(TIMED).flatMap((def) => (
@@ -89,9 +108,9 @@ function processStep(item) {
  */
 function stepsToMake(item) {
   if (!Object.hasOwn(ITEMS, item) || ITEMS[item].kind === 'ingredient') return [];
-  for (const [station, list] of FINAL_STATIONS) {
+  for (const [station, list, tool] of FINAL_STATIONS) {
     const recipe = list.find((r) => r.dish === item);
-    if (recipe) return [...recipe.parts.flatMap(stepsToMake), { item, station, parts: [...recipe.parts] }];
+    if (recipe) return [...recipe.parts.flatMap(stepsToMake), { item, station, ...(tool ? { tool } : {}), parts: [...recipe.parts] }];
   }
   const step = processStep(item);
   return step ? [...stepsToMake(step.item), step] : [];
@@ -99,7 +118,7 @@ function stepsToMake(item) {
 
 /**
  * @param {string} dishId
- * @returns {Step[]} preparation steps in part order, then the final step (assembly, or the oven for a pizza);
+ * @returns {Step[]} preparation steps in part order, then the final step (assembly, the pot, or the oven for a pizza);
  * [] for unknown dishes
  */
 export function stepsFor(dishId) {

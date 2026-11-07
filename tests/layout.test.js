@@ -13,7 +13,7 @@ import { TIMED } from '../packs/BP/scripts/logic/processes.js';
 /** @type {Direction[]} */
 const FACINGS = ['north', 'east', 'south', 'west'];
 const { blocks, width, depth, height } = RESTAURANT;
-const STATIONS = ['grill', 'cutting_board', 'counter', 'oven', 'dishwasher', 'dish_cabinet'];
+const STATIONS = ['grill', 'cutting_board', 'counter', 'oven', 'pot', 'dishwasher', 'dish_cabinet'];
 const CABINETS = ['fridge', 'pantry'];
 const CRATES = ['crate_tools', 'crate_all'];
 
@@ -53,6 +53,12 @@ test('the oven stands on the back row between counter and dishwasher', () => {
   assert.deepEqual([at('counter').x, at('oven').x, at('dishwasher').x], [7, 8, 9]);
   assert.equal(at('oven').z, at('counter').z);
   assert.equal(at('oven').y, 1);
+});
+
+test('the pot stands on the back kitchen row at x=2, next to the fridge', () => {
+  const at = (/** @type {string} */ id) => ofId(id)[0];
+  assert.deepEqual([at('pot').x, at('pot').y, at('pot').z], [2, 1, at('counter').z]);
+  assert.equal(at('fridge').x, 3);
 });
 
 test('the dish cabinet starts with 8 plates', () => {

@@ -518,22 +518,9 @@ function icon(item) {
 /** @typedef {{ pic: Pixels, x: number, y: number }} Pic */
 /** @type {Record<string, { mat: typeof WOOD, pics: Pic[], topPics?: Pic[] }>} */
 const CRATE_PICTURES = {
-  crate_vegetables: { mat: WOOD, pics: [{ pic: icon('lettuce'), x: 2, y: 0 }, { pic: icon('tomato'), x: 0, y: 2 }],
-    topPics: [{ pic: icon('tomato'), x: 0, y: 0 }, { pic: icon('lettuce'), x: 2, y: 2 }] },
-  crate_meat: { mat: WOOD, pics: [{ pic: icon('raw_patty'), x: 1, y: 1 }] },
-  crate_bread: { mat: WOOD, pics: [{ pic: icon('bun'), x: 1, y: 1 }] },
-  crate_dairy: { mat: WOOD, pics: [{ pic: icon('cheese'), x: 1, y: 1 }] },
   crate_tools: { mat: METAL, pics: [{ pic: icon('spatula'), x: 2, y: 2 }, { pic: flip(icon('knife')), x: 0, y: 0 }] },
 };
 
-/** @type {Sprite} */ export const crate_vegetables = crateFace('crate_vegetables', CRATE_PICTURES.crate_vegetables.mat, CRATE_PICTURES.crate_vegetables.pics, false);
-/** @type {Sprite} */ export const crate_vegetables_top = crateFace('crate_vegetables_top', CRATE_PICTURES.crate_vegetables.mat, CRATE_PICTURES.crate_vegetables.topPics ?? [], true);
-/** @type {Sprite} */ export const crate_meat = crateFace('crate_meat', CRATE_PICTURES.crate_meat.mat, CRATE_PICTURES.crate_meat.pics, false);
-/** @type {Sprite} */ export const crate_meat_top = crateFace('crate_meat_top', CRATE_PICTURES.crate_meat.mat, CRATE_PICTURES.crate_meat.pics, true);
-/** @type {Sprite} */ export const crate_bread = crateFace('crate_bread', CRATE_PICTURES.crate_bread.mat, CRATE_PICTURES.crate_bread.pics, false);
-/** @type {Sprite} */ export const crate_bread_top = crateFace('crate_bread_top', CRATE_PICTURES.crate_bread.mat, CRATE_PICTURES.crate_bread.pics, true);
-/** @type {Sprite} */ export const crate_dairy = crateFace('crate_dairy', CRATE_PICTURES.crate_dairy.mat, CRATE_PICTURES.crate_dairy.pics, false);
-/** @type {Sprite} */ export const crate_dairy_top = crateFace('crate_dairy_top', CRATE_PICTURES.crate_dairy.mat, CRATE_PICTURES.crate_dairy.pics, true);
 /** @type {Sprite} */ export const crate_tools = crateFace('crate_tools', CRATE_PICTURES.crate_tools.mat, CRATE_PICTURES.crate_tools.pics, false);
 /** @type {Sprite} */ export const crate_tools_top = crateFace('crate_tools_top', CRATE_PICTURES.crate_tools.mat, CRATE_PICTURES.crate_tools.pics, true);
 

@@ -1,12 +1,12 @@
 {
   "format_version": 2,
   "header": {
-    "name": "Kochmod 1.1.0",
+    "name": "Kochmod 1.2.0",
     "description": "Kochmod: Kochen und Restaurant",
     "uuid": "20777f2f-ee48-4ad7-b58b-284d1e857556",
     "version": [
       1,
-      1,
+      2,
       0
     ],
     "min_engine_version": [
@@ -21,7 +21,7 @@
       "uuid": "dfaccdc0-a3b1-461f-844a-f23cab739f1e",
       "version": [
         1,
-        1,
+        2,
         0
       ]
     },
@@ -32,7 +32,7 @@
       "entry": "scripts/main.js",
       "version": [
         1,
-        1,
+        2,
         0
       ]
     }
@@ -50,7 +50,7 @@
       "uuid": "6891c3bc-3375-4c46-9a93-9c85413adcd6",
       "version": [
         1,
-        1,
+        2,
         0
       ]
     }

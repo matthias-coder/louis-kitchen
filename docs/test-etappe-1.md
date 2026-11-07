@@ -12,9 +12,10 @@ Für Papa und Sohn. Hake ab, was klappt.
 
 ## Teil 2: Kochen
 
-- [ ] Im Kreativ-Inventar gibt es alle 15 Gegenstände (mit den zwei Tellern), 3 Stationen, die Kisten und Schränke, Spülmaschine, Geschirrschrank, Tisch, Stuhl und Glocke.
+- [ ] Im Kreativ-Inventar gibt es alle 15 Gegenstände (mit den zwei Tellern), 3 Stationen, 2 Kisten (Werkzeugkiste, Kochmod-Kiste), Kühlschrank, Vorratsschrank, Spülmaschine, Geschirrschrank, Tisch, Stuhl und Glocke.
 - [ ] Alle haben einen deutschen Namen und ein Bild.
-- [ ] Tippe eine Kiste an. Ein Menü mit Bildknöpfen erscheint.
+- [ ] Die Zutaten kommen aus dem Kühlschrank (Tomate, Salat, Frikadelle, Käse) und dem Vorratsschrank (Brötchen); die Werkzeugkiste gibt Messer, Pfannenwender und Teller. Die alten Zutaten-Kisten gibt es nicht mehr.
+- [ ] Tippe eine Kiste oder einen Schrank an. Ein Menü mit Bildknöpfen erscheint.
 - [ ] Wähle etwas im Kistenmenü. Man bekommt 4 Zutaten oder 1 Werkzeug.
 - [ ] Lege eine rohe Frikadelle auf den Grill. Sie liegt sichtbar da.
 - [ ] Nach ca. 8 Sekunden ist die Frikadelle braun.
@@ -104,7 +105,7 @@ Mit dem Restaurant-Baukasten steht in einer Sekunde ein fertiges Restaurant da.
 - [ ] Das Restaurant erscheint vor dir, der Eingang zeigt zu dir. Oben steht: „Dein Restaurant steht! Tipp die Glocke an."
 - [ ] Ist zu wenig Platz (Bäume, Hügel), steht oben: „Hier ist nicht genug Platz. Such eine freie, ebene Fläche." Dann passiert nichts und der Baukasten bleibt in der Hand.
 - [ ] Im Überlebensmodus ist der Baukasten danach weg, im Kreativmodus bleibt er.
-- [ ] Geh durch die Tür hinein: vorne vier Tische mit Stühlen, an der Theke die Glocke, hinten die Küche mit Grill, Schneidebrett, Anrichte, Spülmaschine, Geschirrschrank (voll mit 8 Tellern), Kühlschrank, Vorratsschrank und den Kisten.
+- [ ] Geh durch die Tür hinein: vorne vier Tische mit Stühlen, an der Theke die Glocke, hinten die Küche mit Grill, Schneidebrett, Anrichte, Spülmaschine, Geschirrschrank (voll mit 8 Tellern), Kühlschrank, Vorratsschrank und den 2 Kisten.
 - [ ] Alle Stühle schauen zu ihrem Tisch.
 - [ ] Tippe die Glocke an → ein Gast kommt und setzt sich.
 - [ ] Koche und serviere einmal ein Gericht, so wie in Teil 3.

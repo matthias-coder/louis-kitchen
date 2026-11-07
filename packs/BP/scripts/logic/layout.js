@@ -105,7 +105,6 @@ function buildRestaurant() {
   }
   put(3, 1, back, 'kochmod:fridge', { 'minecraft:cardinal_direction': 'south' });
   put(4, 1, back, 'kochmod:pantry', { 'minecraft:cardinal_direction': 'south' });
-  ['crate_vegetables', 'crate_meat', 'crate_bread', 'crate_dairy'].forEach((id, i) => put(1, 1, KITCHEN_Z + 1 + i, `kochmod:${id}`));
   put(right, 1, back - 1, 'kochmod:crate_tools');
   put(right, 1, back, 'kochmod:crate_all');
   // 5. stations along the back wall

@@ -6,16 +6,6 @@
 
 /** @type {Record<string, CrateDef>} keyed by block id (without namespace) */
 export const CRATES = {
-  crate_vegetables: {
-    title: 'kochmod.crate.vegetables',
-    entries: [
-      { item: 'kochmod:tomato', count: 4 },
-      { item: 'kochmod:lettuce', count: 4 },
-    ],
-  },
-  crate_meat: { title: 'kochmod.crate.meat', entries: [{ item: 'kochmod:raw_patty', count: 4 }] },
-  crate_bread: { title: 'kochmod.crate.bread', entries: [{ item: 'kochmod:bun', count: 4 }] },
-  crate_dairy: { title: 'kochmod.crate.dairy', entries: [{ item: 'kochmod:cheese', count: 4 }] },
   fridge: {
     title: 'kochmod.crate.fridge',
     entries: [
@@ -47,7 +37,7 @@ const ALL_ITEMS = [
 /** Every block of the add-on, in menu order (block items are handed out like items). */
 export const ALL_BLOCKS = [
   'grill', 'cutting_board', 'counter',
-  'crate_vegetables', 'crate_meat', 'crate_bread', 'crate_dairy', 'crate_tools', 'crate_all', 'fridge', 'pantry',
+  'crate_tools', 'crate_all', 'fridge', 'pantry',
   'dishwasher', 'dish_cabinet',
   'table', 'chair', 'bell',
 ];

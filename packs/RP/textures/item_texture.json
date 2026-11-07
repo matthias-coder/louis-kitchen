@@ -14,20 +14,8 @@
     "kochmod_block_crate_all": {
       "textures": "textures/items/block_crate_all"
     },
-    "kochmod_block_crate_bread": {
-      "textures": "textures/items/block_crate_bread"
-    },
-    "kochmod_block_crate_dairy": {
-      "textures": "textures/items/block_crate_dairy"
-    },
-    "kochmod_block_crate_meat": {
-      "textures": "textures/items/block_crate_meat"
-    },
     "kochmod_block_crate_tools": {
       "textures": "textures/items/block_crate_tools"
-    },
-    "kochmod_block_crate_vegetables": {
-      "textures": "textures/items/block_crate_vegetables"
     },
     "kochmod_block_cutting_board": {
       "textures": "textures/items/block_cutting_board"

@@ -7,7 +7,7 @@ Es ist für ein 7-jähriges Kind gemacht und komplett auf Deutsch.
 
 - 13 Gegenstände (Zutaten, Werkzeuge, Hamburger, Cheeseburger, Misslungenes Gericht)
 - 3 Stationen: Grill, Schneidebrett, Anrichte
-- 5 Kisten mit Zutaten und Werkzeugen
+- 2 Kisten (Werkzeuge, alles), dazu Kühlschrank und Vorratsschrank für die Zutaten
 - Tisch, Stuhl, Glocke und ein Gast, der einen Burger bestellt
 
 ## Befehle

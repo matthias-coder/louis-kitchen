@@ -13,7 +13,7 @@ const FACINGS = ['north', 'east', 'south', 'west'];
 const { blocks, width, depth, height } = RESTAURANT;
 const STATIONS = ['grill', 'cutting_board', 'counter', 'dishwasher', 'dish_cabinet'];
 const CABINETS = ['fridge', 'pantry'];
-const CRATES = ['crate_vegetables', 'crate_meat', 'crate_bread', 'crate_dairy', 'crate_tools', 'crate_all'];
+const CRATES = ['crate_tools', 'crate_all'];
 
 /** @param {{ x: number, y: number, z: number }} p */
 const key = (p) => `${p.x},${p.y},${p.z}`;

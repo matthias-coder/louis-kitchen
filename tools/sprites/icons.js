@@ -93,10 +93,6 @@ export const block_counter = icon('counter', {
   rect(6, 1, 9, 1, 'b');
 });
 
-export const block_crate_vegetables = crateIcon(blocks.crate_vegetables);
-export const block_crate_meat = crateIcon(blocks.crate_meat);
-export const block_crate_bread = crateIcon(blocks.crate_bread);
-export const block_crate_dairy = crateIcon(blocks.crate_dairy);
 export const block_crate_tools = crateIcon(blocks.crate_tools);
 export const block_crate_all = crateIcon(blocks.crate_all);
 

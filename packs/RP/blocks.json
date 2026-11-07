@@ -13,18 +13,6 @@
   "kochmod:counter": {
     "sound": "wood"
   },
-  "kochmod:crate_vegetables": {
-    "sound": "wood"
-  },
-  "kochmod:crate_meat": {
-    "sound": "wood"
-  },
-  "kochmod:crate_bread": {
-    "sound": "wood"
-  },
-  "kochmod:crate_dairy": {
-    "sound": "wood"
-  },
   "kochmod:crate_tools": {
     "sound": "metal"
   },

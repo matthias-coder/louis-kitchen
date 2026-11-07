@@ -2,6 +2,54 @@
   "resource_pack_name": "kochmod",
   "texture_name": "atlas.items",
   "texture_data": {
+    "kochmod_block_bell": {
+      "textures": "textures/items/block_bell"
+    },
+    "kochmod_block_chair": {
+      "textures": "textures/items/block_chair"
+    },
+    "kochmod_block_counter": {
+      "textures": "textures/items/block_counter"
+    },
+    "kochmod_block_crate_all": {
+      "textures": "textures/items/block_crate_all"
+    },
+    "kochmod_block_crate_bread": {
+      "textures": "textures/items/block_crate_bread"
+    },
+    "kochmod_block_crate_dairy": {
+      "textures": "textures/items/block_crate_dairy"
+    },
+    "kochmod_block_crate_meat": {
+      "textures": "textures/items/block_crate_meat"
+    },
+    "kochmod_block_crate_tools": {
+      "textures": "textures/items/block_crate_tools"
+    },
+    "kochmod_block_crate_vegetables": {
+      "textures": "textures/items/block_crate_vegetables"
+    },
+    "kochmod_block_cutting_board": {
+      "textures": "textures/items/block_cutting_board"
+    },
+    "kochmod_block_dish_cabinet": {
+      "textures": "textures/items/block_dish_cabinet"
+    },
+    "kochmod_block_dishwasher": {
+      "textures": "textures/items/block_dishwasher"
+    },
+    "kochmod_block_fridge": {
+      "textures": "textures/items/block_fridge"
+    },
+    "kochmod_block_grill": {
+      "textures": "textures/items/block_grill"
+    },
+    "kochmod_block_pantry": {
+      "textures": "textures/items/block_pantry"
+    },
+    "kochmod_block_table": {
+      "textures": "textures/items/block_table"
+    },
     "kochmod_bun": {
       "textures": "textures/items/bun"
     },

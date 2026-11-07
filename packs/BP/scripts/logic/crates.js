@@ -65,7 +65,8 @@ CRATES.crate_all = {
  */
 export function entryLook(item) {
   const id = item.replace('kochmod:', '');
-  if (ALL_BLOCKS.includes(id)) return { name: { translate: `tile.${item}.name` }, icon: `textures/blocks/${id}` };
+  // blocks get a dedicated 16x16 front-view icon (tools/sprites/icons.js), not their block atlas
+  if (ALL_BLOCKS.includes(id)) return { name: { translate: `tile.${item}.name` }, icon: `textures/items/block_${id}` };
   return { name: { translate: `item.${item}` }, icon: `textures/items/${id}` };
 }
 

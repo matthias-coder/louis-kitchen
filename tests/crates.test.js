@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { CRATES, BUSY_RETRIES, shouldRetryBusy } from '../packs/BP/scripts/logic/crates.js';
+import { CRATES, ALL_BLOCKS, BUSY_RETRIES, entryLook, shouldRetryBusy } from '../packs/BP/scripts/logic/crates.js';
 
 const lang = fs.readFileSync(new URL('../packs/RP/texts/de_DE.lang', import.meta.url), 'utf8');
 const SUPPLIED = ['raw_patty', 'bun', 'lettuce', 'tomato', 'cheese', 'knife', 'spatula'].map((i) => `kochmod:${i}`);
@@ -89,4 +89,20 @@ test('crate_failed hint exists in both lang files', () => {
     const t = fs.readFileSync(new URL(`../packs/RP/texts/${f}.lang`, import.meta.url), 'utf8');
     assert.ok(t.includes('\nkochmod.hint.crate_failed=Das hat nicht geklappt. Tippe die Kiste noch einmal an.'), f);
   }
+});
+
+test('every block in crate_all has a 16x16 menu icon and entryLook uses it', () => {
+  const blocks = ALL.entries.map((e) => e.item.replace('kochmod:', '')).filter((id) => ALL_BLOCKS.includes(id));
+  assert.deepEqual(blocks, ALL_BLOCK_IDS);
+  for (const id of blocks) {
+    const look = entryLook(`kochmod:${id}`);
+    assert.equal(look.icon, `textures/items/block_${id}`);
+    const png = fs.readFileSync(new URL(`../packs/RP/${look.icon}.png`, import.meta.url));
+    assert.equal(png.readUInt32BE(16), 16, `${id} width`);
+    assert.equal(png.readUInt32BE(20), 16, `${id} height`);
+  }
+});
+
+test('items keep their item texture as menu icon', () => {
+  assert.deepEqual(entryLook('kochmod:clean_plate'), { name: { translate: 'item.kochmod:clean_plate' }, icon: 'textures/items/clean_plate' });
 });

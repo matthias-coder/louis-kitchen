@@ -28,6 +28,9 @@
   "kochmod:crate_tools": {
     "sound": "metal"
   },
+  "kochmod:crate_all": {
+    "sound": "stone"
+  },
   "kochmod:table": {
     "sound": "wood"
   },

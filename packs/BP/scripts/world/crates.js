@@ -1,6 +1,6 @@
 import { ItemStack, system } from '@minecraft/server';
 import { ActionFormData } from '@minecraft/server-ui';
-import { CRATES, BUSY_RETRY_TICKS, shouldRetryBusy } from '../logic/crates.js';
+import { CRATES, entryLook, BUSY_RETRY_TICKS, shouldRetryBusy } from '../logic/crates.js';
 import { giveOrDrop } from '../logic/give.js';
 
 /** @typedef {import('@minecraft/server').Player} Player */
@@ -47,8 +47,8 @@ async function openCrate(player, crate, retriesDone) {
   try {
     const form = new ActionFormData().title({ translate: crate.title });
     for (const { item } of crate.entries) {
-      const id = item.replace('kochmod:', '');
-      form.button({ translate: `item.${item}` }, `textures/items/${id}`);
+      const look = entryLook(item);
+      form.button(look.name, look.icon);
     }
     response = await form.show(player);
   } catch (error) {

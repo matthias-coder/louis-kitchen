@@ -9,10 +9,13 @@ const TOOLS = ['kochmod:knife', 'kochmod:spatula'];
 // Stage 1 recipes need these; cooked patty and tomato slices are produced at stations.
 const NEEDED = ['kochmod:bun', 'kochmod:raw_patty', 'kochmod:lettuce', 'kochmod:tomato', 'kochmod:cheese', ...TOOLS];
 
-const entries = Object.values(CRATES).flatMap((c) => c.entries);
+const { crate_all: ALL, ...SUPPLY } = CRATES;
+const entries = Object.values(SUPPLY).flatMap((c) => c.entries);
+const ALL_ITEM_IDS = ['bun', 'raw_patty', 'cooked_patty', 'burnt_patty', 'lettuce', 'tomato', 'tomato_slices', 'cheese', 'knife', 'spatula', 'hamburger', 'cheeseburger', 'failed_dish'];
+const ALL_BLOCK_IDS = ['grill', 'cutting_board', 'counter', 'crate_vegetables', 'crate_meat', 'crate_bread', 'crate_dairy', 'crate_tools', 'crate_all', 'table', 'chair', 'bell'];
 
-test('there are exactly the five crates', () => {
-  assert.deepEqual(Object.keys(CRATES).sort(), ['crate_bread', 'crate_dairy', 'crate_meat', 'crate_tools', 'crate_vegetables']);
+test('there are exactly the six crates', () => {
+  assert.deepEqual(Object.keys(CRATES).sort(), ['crate_all', 'crate_bread', 'crate_dairy', 'crate_meat', 'crate_tools', 'crate_vegetables']);
 });
 
 test('crates only hand out the seven supply items, and together all that stage 1 needs', () => {
@@ -24,6 +27,12 @@ test('crates only hand out the seven supply items, and together all that stage 1
 test('tools come singly, ingredients in fours, and no crate is empty', () => {
   for (const c of Object.values(CRATES)) assert.ok(c.entries.length > 0);
   for (const e of entries) assert.equal(e.count, TOOLS.includes(e.item) ? 1 : 4, e.item);
+});
+
+test('crate_all lists every item and every block exactly once, in order', () => {
+  assert.deepEqual(ALL.entries.map((e) => e.item), [...ALL_ITEM_IDS, ...ALL_BLOCK_IDS].map((i) => `kochmod:${i}`));
+  assert.equal(ALL.entries.length, 25);
+  ALL.entries.forEach((e, i) => assert.equal(e.count, i < 8 ? 4 : 1, e.item));
 });
 
 test('every crate title exists in de_DE.lang', () => {

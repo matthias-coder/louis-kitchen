@@ -13,6 +13,12 @@
     "kochmod_counter": {
       "textures": "textures/blocks/counter"
     },
+    "kochmod_crate_all": {
+      "textures": "textures/blocks/crate_all"
+    },
+    "kochmod_crate_all_top": {
+      "textures": "textures/blocks/crate_all_top"
+    },
     "kochmod_crate_bread": {
       "textures": "textures/blocks/crate_bread"
     },

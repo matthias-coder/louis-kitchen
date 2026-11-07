@@ -509,6 +509,43 @@ const CRATE_PICTURES = {
 /** @type {Sprite} */ export const crate_tools = crateFace('crate_tools', CRATE_PICTURES.crate_tools.mat, CRATE_PICTURES.crate_tools.pics, false);
 /** @type {Sprite} */ export const crate_tools_top = crateFace('crate_tools_top', CRATE_PICTURES.crate_tools.mat, CRATE_PICTURES.crate_tools.pics, true);
 
+/**
+ * Ender-chest style crate face: dark green-black body, lighter frame, purple glowing latch.
+ * @param {string} name
+ * @param {boolean} top the top shows a glowing eye instead of the front latch
+ * @returns {import('./util.js').Sprite}
+ */
+function enderCrateFace(name, top) {
+  const BODY = ['#0f1a17', '#14231f', '#0b1311'];
+  const FRAME = '#2f5a4e';
+  const FRAME_LIGHT = '#3f7767';
+  const GLOW = '#c77dff';
+  const CORE = '#f1d4ff';
+  const px = emptyPixels();
+  for (let y = 0; y < 16; y++) {
+    for (let x = 0; x < 16; x++) px[y][x] = BODY[(x * 7 + y * 13 + (x ^ y)) % 5 === 0 ? 1 : (x + 2 * y) % 11 === 0 ? 2 : 0];
+  }
+  for (let i = 0; i < 16; i++) {
+    px[0][i] = FRAME; px[15][i] = FRAME; px[i][0] = FRAME; px[i][15] = FRAME;
+    px[1][i] = FRAME_LIGHT; px[i][1] = FRAME_LIGHT;
+  }
+  if (top) {
+    // glowing eye in the middle
+    for (const [x, y] of [[5, 7], [6, 6], [7, 6], [8, 6], [9, 6], [10, 7], [6, 9], [7, 9], [8, 9], [9, 9], [5, 8], [10, 8]]) px[y][x] = GLOW;
+    for (const [x, y] of [[7, 7], [8, 7], [7, 8], [8, 8]]) px[y][x] = CORE;
+  } else {
+    // horizontal band with a purple glowing latch
+    for (let x = 2; x < 14; x++) { px[6][x] = FRAME; px[9][x] = FRAME; }
+    for (let y = 5; y < 11; y++) { for (let x = 6; x < 10; x++) px[y][x] = GLOW; }
+    for (const [x, y] of [[7, 7], [8, 7], [7, 8], [8, 8]]) px[y][x] = CORE;
+    for (const [x, y] of [[2, 2], [13, 2], [2, 13], [13, 13]]) px[y][x] = FRAME_LIGHT;
+  }
+  return toSprite(name, px);
+}
+
+/** @type {Sprite} */ export const crate_all = enderCrateFace('crate_all', false);
+/** @type {Sprite} */ export const crate_all_top = enderCrateFace('crate_all_top', true);
+
 // ---- Table: light wooden four-leg table; plate with dish variants
 
 function drawTable() {

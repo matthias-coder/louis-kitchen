@@ -36,11 +36,12 @@ export const CRATES = {
   },
 };
 
-/** Items of the crate_all menu with the amount handed out: ingredients and plates x4, tools and dishes x1. */
+/** Items of the crate_all menu with the amount handed out: ingredients and plates x4, tools, dishes and the restaurant kit x1. */
 const ALL_ITEMS = [
   ...['bun', 'raw_patty', 'cooked_patty', 'burnt_patty', 'lettuce', 'tomato', 'tomato_slices', 'cheese'].map((id) => ({ id, count: 4 })),
   ...['knife', 'spatula', 'hamburger', 'cheeseburger', 'failed_dish'].map((id) => ({ id, count: 1 })),
   { id: 'clean_plate', count: 4 },
+  { id: 'restaurant_kit', count: 1 },
 ];
 /** Every block of the add-on, in menu order (block items are handed out like items). */
 export const ALL_BLOCKS = [

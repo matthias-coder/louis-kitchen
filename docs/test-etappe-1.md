@@ -92,3 +92,25 @@ Bitte aufschreiben:
 - Welcher Punkt von oben war es?
 - Was ist stattdessen passiert?
 - Welche Meldung steht im Inhaltsprotokoll?
+
+## Teil 6 – Musterrestaurant
+
+Mit dem Restaurant-Baukasten steht in einer Sekunde ein fertiges Restaurant da.
+
+- [ ] Öffne die Kochmod-Kiste und nimm den **Restaurant-Baukasten** (das Häuschen mit der Kochmütze).
+- [ ] Stell dich auf eine freie, ebene Fläche (Wiese ist gut, Blumen und Gras stören nicht). Platz nach vorne: etwa 15 Blöcke breit und 13 Blöcke tief.
+- [ ] Schau geradeaus und tippe mit dem Baukasten auf den Boden vor dir.
+- [ ] Das Restaurant erscheint vor dir, der Eingang zeigt zu dir. Oben steht: „Dein Restaurant steht! Tipp die Glocke an."
+- [ ] Ist zu wenig Platz (Bäume, Hügel), steht oben: „Hier ist nicht genug Platz. Such eine freie, ebene Fläche." Dann passiert nichts und der Baukasten bleibt in der Hand.
+- [ ] Im Überlebensmodus ist der Baukasten danach weg, im Kreativmodus bleibt er.
+- [ ] Geh durch die Tür hinein: vorne vier Tische mit Stühlen, an der Theke die Glocke, hinten die Küche mit Grill, Schneidebrett, Anrichte, Spülmaschine, Geschirrschrank (voll mit 8 Tellern), Kühlschrank, Vorratsschrank und den Kisten.
+- [ ] Alle Stühle schauen zu ihrem Tisch.
+- [ ] Tippe die Glocke an → ein Gast kommt und setzt sich.
+- [ ] Koche und serviere einmal ein Gericht, so wie in Teil 3.
+
+### Die Welt als Vorlage speichern (am PC)
+
+- [ ] Verlasse die Welt. Tippe in der Weltenliste neben der Welt auf den Stift (**Welt bearbeiten**).
+- [ ] Scrolle in den Einstellungen nach unten und wähle **„Welt exportieren"**. Speichere die Datei, sie endet auf `.mcworld`.
+- [ ] Schicke die `.mcworld`-Datei aufs Tablet, genauso wie in Teil 4 die `.mcaddon`-Datei.
+- [ ] Tippe sie auf dem Tablet an und öffne sie mit Minecraft. Die Welt mit dem fertigen Restaurant erscheint in der Weltenliste. Kochmod muss auf dem Tablet installiert sein (Teil 4).

@@ -5,7 +5,7 @@ import { recolor, spriteToRgba } from '../tools/sprites/util.js';
 
 const ITEM_IDS = [
   'bun', 'raw_patty', 'cooked_patty', 'burnt_patty', 'lettuce', 'tomato', 'tomato_slices',
-  'cheese', 'knife', 'spatula', 'hamburger', 'cheeseburger', 'failed_dish', 'clean_plate', 'dirty_plate',
+  'cheese', 'knife', 'spatula', 'hamburger', 'cheeseburger', 'failed_dish', 'clean_plate', 'dirty_plate', 'restaurant_kit',
 ];
 
 /** @type {import('../tools/sprites/util.js').Sprite[]} */

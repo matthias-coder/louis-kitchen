@@ -329,3 +329,30 @@ export const clean_plate = {
 };
 
 export const dirty_plate = recolor(clean_plate, 'dirty_plate', { s: '#8a5a2b', c: '#f1ece2' });
+
+/** Restaurant-Baukasten: a small restaurant with a chef's hat on the roof. */
+/** @type {Sprite} */
+export const restaurant_kit = {
+  name: 'restaurant_kit',
+  palette: {
+    k: '#2a2320', w: '#ffffff', g: '#c9ccd1', r: '#d8402f', d: '#9c2a1e', y: '#f3e3b5', b: '#7a4a24', c: '#7cc4ec',
+  },
+  rows: [
+    '.....kkkkkk.....',
+    '....kwwwwwwk....',
+    '...kwwwgwwwwk...',
+    '...kwwwwwwgwk...',
+    '....kwwwwwwk....',
+    '.....kggggk.....',
+    '....kkrrrrkk....',
+    '...krrrrrrrrk...',
+    '..krrddrrddrrk..',
+    '.krrrrrrrrrrrrk.',
+    'kkkkkkkkkkkkkkkk',
+    '.kyyyyyyyyyyyyk.',
+    '.kyccyybbyyccyk.',
+    '.kyccyybbyyccyk.',
+    '.kyyyyybbyyyyyk.',
+    '.kkkkkkkkkkkkkk.',
+  ],
+};

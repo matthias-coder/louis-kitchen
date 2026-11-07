@@ -86,6 +86,9 @@
     "kochmod_raw_patty": {
       "textures": "textures/items/raw_patty"
     },
+    "kochmod_restaurant_kit": {
+      "textures": "textures/items/restaurant_kit"
+    },
     "kochmod_spatula": {
       "textures": "textures/items/spatula"
     },

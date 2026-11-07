@@ -35,6 +35,7 @@ npm run deploy    # kopiert beide Pakete in den Minecraft-Ordner (Minecraft muss
 
 ## Weitere Dateien
 
+- **Kochbuch – Anleitung für jedes Gericht: [docs/kochbuch.md](docs/kochbuch.md)**
 - Konzept: `docs/superpowers/specs/2026-11-05-kochmod-design.md`
 - Plan: `docs/superpowers/plans/2026-11-05-kochmod-etappe-1-burger.md`
 - Plan Etappe 2: `docs/superpowers/plans/2026-11-07-kochmod-etappe-2-gerichte.md`

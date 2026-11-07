@@ -122,8 +122,8 @@ Baue jedes Restaurant einmal auf einer freien, ebenen Fläche (im Überlebensmod
 - [ ] Restaurant: wie in Etappe 1, alle Geräte: Dönerspieß, Suppentopf, Grill, Schneidebrett, Anrichte, Pizzaofen, Spülmaschine, Geschirrschrank, Wok und Mülleimer.
 - [ ] Mega-Restaurant: zwei Stockwerke mit Treppe, unten die Küche, oben und unten je 4 Tische und eine Glocke.
 - [ ] Jedes Restaurant hat Kühlschrank, Vorratsschrank, Werkzeugkiste, Kochmod-Kiste, Restaurant-Kiste, Spülmaschine und Geschirrschrank.
-- [ ] In jeder Küchenreihe an der Rückwand steht genau ein Mülleimer, und er funktioniert gleich nach dem Bauen.
-- [ ] Im Restaurant und im Döner-Imbiss steht die Kochmod-Kiste in der Ecke hinter dem Mülleimer: Man kann sie schräg von vorn oben antippen.
+- [ ] In jeder Küche steht genau ein Mülleimer, und er funktioniert gleich nach dem Bauen.
+- [ ] Im Restaurant und im Döner-Imbiss steht der Mülleimer an der linken Wand der Küche, nicht in der Küchenreihe; an die Kochmod-Kiste in der Ecke kommt man direkt heran.
 - [ ] Alles ist begehbar. Man kommt an jedes Gerät, jede Kiste und jeden Stuhl. Im Mega-Restaurant kommt man über die Treppe nach oben.
 - [ ] Tippe die Glocke an. Ein Gast kommt und setzt sich. Im Mega-Restaurant kommen auch oben Gäste (obere Glocke läuten).
 - [ ] Ein alter „Restaurant-Baukasten" aus Etappe 1 baut weiterhin das Restaurant.

@@ -174,7 +174,9 @@ Hints: `kochmod.hint.need_peel` „Nimm den Pizzaschieber!", `kochmod.hint.oven_
 
 **Recipe book**: item `kochmod:recipe_book` (stack 1, in tools crate and crate_all). On use (`onUse` item custom component, or `itemUse` after-event): `ActionFormData` titled „Rezeptbuch" with one button per dish in `DISHES` (dish icon + German name). Selecting a dish opens a second form titled with the dish name whose buttons are its steps from `stepsFor(dish)`: label `„${n}. ${name(item)} ➜ ${name(station)}${tool ? ' (' + name(tool) + ')' : ''}"`, icon = the item's texture; last button „Zurück" returns to the list. Pure helper `bookPages(dishId): { title, buttons: { label: RawMessage, icon: string }[] }` in `logic/recipe-book.js` with tests; `name()` uses `{ translate: 'item.kochmod:<id>' }` / `tile.kochmod:<id>.name` raw messages, the station names being the block names.
 
-- [ ] **Step 1: Tests**: guest wish enum equals `['none', ...DISHES.map(plateName)]`; a bubble texture file exists per dish; `bookPages` for cheeseburger and ramen produce the expected button count and icon paths; `availableDishes` picks dishes by their derived stations.
+**Several guests at once (user request 2026-11-07):** the bell state becomes `{ guests: Record<seatKey, guestId>, cooldown }` instead of one `guestId`. Ringing the bell spawns one guest for EVERY free seat in range (free = chair with a table, not claimed by any bell), staggered 10 ticks apart so they do not stack; the automatic spawner keeps filling free seats one per cooldown. Each guest keeps its own phase/timer on its entity dynamic properties as today; cleanup, orphan sweep and the per-bell try/catch work per seat. `guestAvailability` returns `ok` when at least one seat is free; the bell hint for a full house is `kochmod.hint.bell_full` „Alle Plätze sind besetzt." Migrate stage 1 bell state (`guestId`) into the new shape.
+
+- [ ] **Step 1: Tests**: guest wish enum equals `['none', ...DISHES.map(plateName)]`; ringing with 3 free seats spawns 3 guests staggered by 10 ticks and a 4th ring spawns none (`bell_full`); a guest leaving frees exactly its seat; the spawner fills one free seat per cooldown; old `guestId` bell state is migrated; a bubble texture file exists per dish; `bookPages` for cheeseburger and ramen produce the expected button count and icon paths; `availableDishes` picks dishes by their derived stations.
 - [ ] **Step 2–4:** RED → implement → PASS.
 - [ ] **Step 5: Commit** `feat: guests wish for every dish; picture recipe book`.
 
@@ -237,4 +239,5 @@ Every theme has fridge, pantry, crate_tools, crate_all, dishwasher and dish_cabi
 - All dishes, including soups, need a clean plate to be served (one rule for the child).
 - Burnt pizza is a distinct item (so the child sees what went wrong); other burnt outcomes stay `failed_dish`.
 - Six themed restaurants (user idea 2026-11-07) come as six Baukasten items handed out by their own Restaurant-Kiste; a theme only has the devices of its cuisine, so guests order accordingly.
+- The bell seats as many guests as there are free chairs (user request 2026-11-07), pulled forward from Etappe 3.
 - A Mülleimer (user idea 2026-11-07) destroys one held item per tap, refuses tools, and stands in every kitchen.

@@ -14,6 +14,9 @@
     "kochmod_block_crate_all": {
       "textures": "textures/items/block_crate_all"
     },
+    "kochmod_block_crate_kits": {
+      "textures": "textures/items/block_crate_kits"
+    },
     "kochmod_block_crate_tools": {
       "textures": "textures/items/block_crate_tools"
     },
@@ -118,6 +121,24 @@
     },
     "kochmod_hamburger": {
       "textures": "textures/items/hamburger"
+    },
+    "kochmod_kit_burger": {
+      "textures": "textures/items/kit_burger"
+    },
+    "kochmod_kit_classic": {
+      "textures": "textures/items/kit_classic"
+    },
+    "kochmod_kit_doner": {
+      "textures": "textures/items/kit_doner"
+    },
+    "kochmod_kit_italian": {
+      "textures": "textures/items/kit_italian"
+    },
+    "kochmod_kit_japanese": {
+      "textures": "textures/items/kit_japanese"
+    },
+    "kochmod_kit_mega": {
+      "textures": "textures/items/kit_mega"
     },
     "kochmod_knife": {
       "textures": "textures/items/knife"

@@ -1,6 +1,6 @@
 import { BlockPermutation, Direction, GameMode, Player, system } from '@minecraft/server';
 import {
-  RESTAURANT, rotateLayout, placementOrigin, facingFromView, clearanceOffsets, floorOffsets, isReplaceable, isOverwritable, hasSpace,
+  LEGACY_KIT, themeForKit, rotateLayout, placementOrigin, facingFromView, clearanceOffsets, floorOffsets, isReplaceable, isOverwritable, hasSpace,
 } from '../logic/layout.js';
 import { registerStationBlock } from './stations.js';
 import { registerFurnitureBlock } from './furniture.js';
@@ -11,8 +11,10 @@ import { removeOneItem } from './effects.js';
 /** @typedef {import('@minecraft/server').Vector3} Vector3 */
 /** @typedef {import('@minecraft/server').ItemComponentRegistry} ItemComponentRegistry */
 /** @typedef {import('../logic/layout.js').LayoutBlock} LayoutBlock */
+/** @typedef {import('../logic/layout.js').Layout} Layout */
 
-const KIT_ID = 'kochmod:restaurant_kit';
+/** Item custom component shared by the six themed Baukasten items; the theme follows from the item id. */
+const KIT_COMPONENT = 'kochmod:kit';
 const AIR = 'minecraft:air';
 /** Block changes per tick while building (the job continues on the next tick). */
 const BLOCKS_PER_TICK = 96;
@@ -97,9 +99,10 @@ function place(dimension, loc, id, states) {
  * Clears the inside, then places the blocks in layout order (floor, walls, roof, furniture, stations, bell).
  * @param {Player} player @param {Dimension} dimension @param {Vector3} origin
  * @param {Vector3[]} cells clearance cells (offsets) @param {LayoutBlock[]} blocks rotated layout
+ * @param {string} kitId the Baukasten item that was used (one is taken away outside creative mode)
  * @returns {Generator<void, void, void>}
  */
-function* buildJob(player, dimension, origin, cells, blocks) {
+function* buildJob(player, dimension, origin, cells, blocks, kitId) {
   let failures = 0;
   let done = 0;
   try {
@@ -117,7 +120,7 @@ function* buildJob(player, dimension, origin, cells, blocks) {
     }
     if (failures > 0) console.warn(`kochmod kit: ${failures} block(s) could not be placed`);
     if (player.isValid) {
-      if (player.getGameMode() !== GameMode.Creative) removeOneItem(player, KIT_ID);
+      if (player.getGameMode() !== GameMode.Creative) removeOneItem(player, kitId);
       hint(player, HINT.built);
     }
   } finally {
@@ -126,49 +129,57 @@ function* buildJob(player, dimension, origin, cells, blocks) {
 }
 
 /**
- * Builds the restaurant in front of the player, its door facing them.
- * @param {Player} player @param {Block} tapped
+ * Builds a restaurant in front of the player, its door facing them.
+ * @param {Player} player @param {Block} tapped @param {Layout} layout @param {string} kitId
  */
-function buildFor(player, tapped) {
+function buildFor(player, tapped, layout, kitId) {
   if (building) return;
   const dimension = tapped.dimension;
   // tapping a flower or grass means the ground below it
   const ground = isReplaceable(tapped.typeId) ? tapped.below() ?? tapped : tapped;
   const facing = facingFromView(player.getViewDirection());
-  const origin = placementOrigin(ground.location, facing);
-  const cells = clearanceOffsets(RESTAURANT, facing);
-  const { protectedCount, blocked } = inspectFootprint(dimension, origin, floorOffsets(RESTAURANT, facing), cells);
+  const origin = placementOrigin(ground.location, facing, layout);
+  const cells = clearanceOffsets(layout, facing);
+  const { protectedCount, blocked } = inspectFootprint(dimension, origin, floorOffsets(layout, facing), cells);
   if (protectedCount > 0 || !hasSpace(blocked, cells.length)) {
     hint(player, HINT.noSpace);
     return;
   }
   building = true;
   try {
-    system.runJob(buildJob(player, dimension, origin, cells, rotateLayout(RESTAURANT, facing)));
+    system.runJob(buildJob(player, dimension, origin, cells, rotateLayout(layout, facing), kitId));
   } catch (error) {
     building = false;
     console.warn(`kochmod kit: build failed: ${error}`);
   }
 }
 
+/** @type {import('@minecraft/server').ItemCustomComponent} */
+const kitComponent = {
+  onUseOn({ source, block, blockFace, itemStack }) {
+    if (!(source instanceof Player)) return;
+    const kitId = itemStack.typeId;
+    const theme = themeForKit(kitId);
+    if (!theme) return;
+    if (blockFace !== Direction.Up) {
+      hint(source, HINT.tapFloor);
+      return;
+    }
+    // build outside the event callback, which may not allow world changes
+    system.run(() => {
+      try {
+        buildFor(source, block, theme.layout, kitId);
+      } catch (error) {
+        building = false;
+        console.warn(`kochmod kit: ${error}`);
+      }
+    });
+  },
+};
+
 /** @param {ItemComponentRegistry} itemComponentRegistry */
 export function registerKit(itemComponentRegistry) {
-  itemComponentRegistry.registerCustomComponent(KIT_ID, {
-    onUseOn({ source, block, blockFace }) {
-      if (!(source instanceof Player)) return;
-      if (blockFace !== Direction.Up) {
-        hint(source, HINT.tapFloor);
-        return;
-      }
-      // build outside the event callback, which may not allow world changes
-      system.run(() => {
-        try {
-          buildFor(source, block);
-        } catch (error) {
-          building = false;
-          console.warn(`kochmod kit: ${error}`);
-        }
-      });
-    },
-  });
+  itemComponentRegistry.registerCustomComponent(KIT_COMPONENT, kitComponent);
+  // the stage 1 item keeps its own component name; themeForKit maps it to the classic restaurant
+  itemComponentRegistry.registerCustomComponent(LEGACY_KIT, kitComponent);
 }

@@ -59,3 +59,17 @@ test('clean and dirty plate share their shape; the dirty one has brown smears', 
   assert.equal(clean.palette.s, clean.palette.c, 'no smears on the clean plate');
   assert.notEqual(dirty.palette.s, dirty.palette.c);
 });
+
+test('the six kit icons are the Baukasten picture with a different theme badge each', () => {
+  const kits = ['burger', 'italian', 'japanese', 'doner', 'classic', 'mega'].map((id) => /** @type {any} */ (items)[`kit_${id}`]);
+  const px = (/** @type {any} */ s) => s.rows.map((/** @type {string} */ r) => [...r].map((ch) => (ch === '.' ? '.' : s.palette[ch])).join(','));
+  const base = px(items.restaurant_kit);
+  const looks = new Set();
+  for (const kit of kits) {
+    const own = px(kit);
+    assert.deepEqual(own.slice(5), base.slice(5), `${kit.name}: the building below the badge is unchanged`);
+    assert.notDeepEqual(own, base, `${kit.name} has a badge`);
+    looks.add(own.join('|'));
+  }
+  assert.equal(looks.size, kits.length, 'every badge differs');
+});

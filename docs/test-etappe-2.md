@@ -23,6 +23,7 @@ Für Papa und Sohn. Hake ab, was klappt. Erst am PC, dann am Tablet.
 - [ ] Der Kühlschrank enthält: Tomate, Salat, Rohe Frikadelle, Käse, Salami, Ei, Lachs, Sahne, Zwiebel, Karotte, Kartoffel, Frühlingszwiebel, Dönerfleisch (roh).
 - [ ] Der Vorratsschrank enthält: Brötchen, Pizzateig, Tomatensoße, Nudeln, Reis, Brühe, Algenblatt, Dönertasche, Dönersoße, Sojasoße.
 - [ ] Die Werkzeugkiste enthält: Messer, Pfannenwender, Schüssel, Pizzaschieber, Wokwender, Rezeptbuch und Sauberer Teller.
+- [ ] Die Kochmod-Kiste enthält auch die Restaurant-Kiste und die sechs Baukästen.
 - [ ] Alle haben einen deutschen Namen und ein Bild.
 
 ## Teil 3: Jedes Gerät einmal
@@ -55,7 +56,7 @@ Für Papa und Sohn. Hake ab, was klappt. Erst am PC, dann am Tablet.
 ### Dönerspieß
 
 - [ ] Hänge rohes Dönerfleisch an den Spieß. Es dreht sich.
-- [ ] Nach 8 Sekunden mit dem Messer antippen: 6 Scheiben Dönerfleisch.
+- [ ] Nach 8 Sekunden mit dem Messer antippen: Jedes Antippen gibt eine Scheibe Dönerfleisch, insgesamt 6 Scheiben.
 - [ ] Zweites Fleisch an den vollen Spieß: Hinweis „Da hängt schon Fleisch.".
 - [ ] Mit dem Messer, bevor es fertig ist: Hinweis „Das Fleisch ist noch nicht fertig.".
 - [ ] Leeren Spieß antippen: Hinweis „Häng Dönerfleisch an den Spieß.".
@@ -97,12 +98,25 @@ Für Papa und Sohn. Hake ab, was klappt. Erst am PC, dann am Tablet.
 - [ ] Serviere jedes Gericht einmal mit einem sauberen Teller. Der Gast isst und lässt Smaragde da.
 - [ ] Baue den Pizzaofen ab. Jetzt wünscht sich kein Gast mehr eine Pizza.
 
-## Teil 7: Restaurant-Baukasten
+## Teil 7: Restaurant-Kiste und Baukästen
 
-- [ ] Tippe mit dem Restaurant-Baukasten auf den Boden. Das Restaurant entsteht.
-- [ ] In der Küche stehen alle Geräte: Dönerspieß, Suppentopf, Grill, Schneidebrett, Anrichte, Pizzaofen, Spülmaschine, Geschirrschrank und Wok.
-- [ ] Die ganze Küche ist begehbar. Man kommt an jedes Gerät, jede Kiste und jeden Stuhl.
-- [ ] Tippe die Glocke an. Ein Gast kommt und setzt sich.
+- [ ] Stell die Restaurant-Kiste hin (aus der Kochmod-Kiste). Sie sieht aus wie eine Holzkiste mit Haus und Bauplan.
+- [ ] Tippe sie an: Sechs Knöpfe mit Bild: Burger-Laden, Pizzeria, Sushi-Bar, Döner-Imbiss, Restaurant, Mega-Restaurant.
+- [ ] Jeder Knopf gibt genau einen Baukasten, zum Beispiel „Baukasten: Pizzeria". Jeder Baukasten hat ein eigenes Bild.
+
+Baue jedes Restaurant einmal auf einer freien, ebenen Fläche (im Überlebensmodus verschwindet der Baukasten danach):
+
+- [ ] Burger-Laden: rot-weiße Wände, Schachbrett-Boden, 4 Tische. Küche: Grill, Schneidebrett, Anrichte. Gäste wünschen sich nur Hamburger und Cheeseburger.
+- [ ] Pizzeria: Ziegelwände, grün-weiß-rote Markise über der Tür, 4 Tische. Küche: Pizzaofen, Suppentopf, Schneidebrett, Anrichte. Gäste wünschen sich Pizza, Ramen, Kartoffelsuppe und Sushi.
+- [ ] Sushi-Bar: dunkles Holz, weiße Wände, Laternen, 4 Tische als Theke in einer Reihe. Küche: Suppentopf, Wok, Schneidebrett, Anrichte. Gäste wünschen sich Sushi, Ramen, Kartoffelsuppe und Bratnudeln.
+- [ ] Döner-Imbiss: klein, hell, gekachelt, 3 Tische. Küche: Dönerspieß, Schneidebrett, Anrichte. Gäste wünschen sich nur Döner.
+- [ ] Restaurant: wie in Etappe 1, alle Geräte: Dönerspieß, Suppentopf, Grill, Schneidebrett, Anrichte, Pizzaofen, Spülmaschine, Geschirrschrank und Wok.
+- [ ] Mega-Restaurant: zwei Stockwerke mit Treppe, unten die Küche, oben und unten je 4 Tische und eine Glocke.
+- [ ] Jedes Restaurant hat Kühlschrank, Vorratsschrank, Werkzeugkiste, Kochmod-Kiste, Restaurant-Kiste, Spülmaschine und Geschirrschrank.
+- [ ] In jeder Küchenreihe an der Rückwand ist ein Platz frei (dort kommt später der Mülleimer hin).
+- [ ] Alles ist begehbar. Man kommt an jedes Gerät, jede Kiste und jeden Stuhl. Im Mega-Restaurant kommt man über die Treppe nach oben.
+- [ ] Tippe die Glocke an. Ein Gast kommt und setzt sich. Im Mega-Restaurant kommen auch oben Gäste (obere Glocke läuten).
+- [ ] Ein alter „Restaurant-Baukasten" aus Etappe 1 baut weiterhin das Restaurant.
 
 ## Teil 8: Tablet
 

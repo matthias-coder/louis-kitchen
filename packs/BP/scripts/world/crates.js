@@ -46,8 +46,8 @@ async function openCrate(player, crate, retriesDone) {
   let response;
   try {
     const form = new ActionFormData().title({ translate: crate.title });
-    for (const { item } of crate.entries) {
-      const look = entryLook(item);
+    for (const entry of crate.entries) {
+      const look = entryLook(entry);
       form.button(look.name, look.icon);
     }
     response = await form.show(player);

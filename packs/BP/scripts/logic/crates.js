@@ -1,8 +1,10 @@
 import { ITEMS, itemsFrom } from './catalog.js';
+import { THEMES, THEME_IDS } from './layout.js';
 
 /**
  * Supply crates: tapping one opens a picture menu; every entry hands out `count` of `item`, forever.
- * @typedef {{ item: string, count: number }} CrateEntry
+ * `label` and `icon` replace the item's own button name and picture.
+ * @typedef {{ item: string, count: number, label?: import('@minecraft/server').RawMessage, icon?: string }} CrateEntry
  * @typedef {{ title: string, entries: CrateEntry[] }} CrateDef
  */
 
@@ -17,12 +19,22 @@ export const CRATES = {
   // Dry goods; stage 2 adds noodles, rice and so on here.
   pantry: { title: 'kochmod.crate.pantry', entries: crateEntries('pantry') },
   crate_tools: { title: 'kochmod.crate.tools', entries: crateEntries('tools') },
+  // Restaurant-Kiste: one Baukasten per theme, the button shows the theme name and one of its dishes
+  crate_kits: {
+    title: 'kochmod.crate.kits',
+    entries: THEME_IDS.map((id) => ({
+      item: THEMES[id].kit,
+      count: 1,
+      label: { translate: THEMES[id].name },
+      icon: `textures/items/${THEMES[id].icon.replace('kochmod:', '')}`,
+    })),
+  },
 };
 
 /** Every block of the add-on, in menu order (block items are handed out like items). */
 export const ALL_BLOCKS = [
   'grill', 'cutting_board', 'counter', 'oven', 'pot', 'spit', 'wok',
-  'crate_tools', 'crate_all', 'fridge', 'pantry',
+  'crate_tools', 'crate_all', 'crate_kits', 'fridge', 'pantry',
   'dishwasher', 'dish_cabinet',
   'table', 'chair', 'bell',
 ];
@@ -39,15 +51,18 @@ CRATES.crate_all = {
 };
 
 /**
- * Button label and icon of a crate entry (block item or plain item).
- * @param {string} item namespaced id
+ * Button label and icon of a crate entry (block item or plain item); the entry's own label and icon win.
+ * @param {string | CrateEntry} entry crate entry or a namespaced item id
  * @returns {{ name: import('@minecraft/server').RawMessage, icon: string }}
  */
-export function entryLook(item) {
+export function entryLook(entry) {
+  const { item, label, icon } = typeof entry === 'string' ? { item: entry, label: undefined, icon: undefined } : entry;
   const id = item.replace('kochmod:', '');
   // blocks get a dedicated 16x16 front-view icon (tools/sprites/icons.js), not their block atlas
-  if (ALL_BLOCKS.includes(id)) return { name: { translate: `tile.${item}.name` }, icon: `textures/items/block_${id}` };
-  return { name: { translate: `item.${item}` }, icon: `textures/items/${id}` };
+  const own = ALL_BLOCKS.includes(id)
+    ? { name: { translate: `tile.${item}.name` }, icon: `textures/items/block_${id}` }
+    : { name: { translate: `item.${item}` }, icon: `textures/items/${id}` };
+  return { name: label ?? own.name, icon: icon ?? own.icon };
 }
 
 export const BUSY_RETRIES = 5;

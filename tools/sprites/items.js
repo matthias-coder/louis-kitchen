@@ -357,6 +357,28 @@ export const restaurant_kit = {
   ],
 };
 
+/**
+ * Themed Baukasten: the restaurant_kit picture with a 5x5 theme badge in the top right corner.
+ * @param {string} name
+ * @param {Record<string, string>} palette extra colours (upper-case keys, so they never clash with the kit's)
+ * @param {string[]} inner the badge's 3x3 inside, outlined in 'k'
+ * @returns {Sprite}
+ */
+function kitWithBadge(name, palette, inner) {
+  const rows = restaurant_kit.rows.map((r) => [...r]);
+  for (let y = 0; y < 5; y++) {
+    for (let x = 11; x < 16; x++) rows[y][x] = y === 0 || y === 4 || x === 11 || x === 15 ? 'k' : inner[y - 1][x - 12];
+  }
+  return { name, palette: { ...restaurant_kit.palette, ...palette }, rows: rows.map((r) => r.join('')) };
+}
+
+export const kit_burger = kitWithBadge('kit_burger', { O: '#e8a33a', B: '#6b3a1e' }, ['OOO', 'BBB', 'OOO']);
+export const kit_italian = kitWithBadge('kit_italian', { G: '#2e9e47' }, ['Gwr', 'Gwr', 'Gwr']);
+export const kit_japanese = kitWithBadge('kit_japanese', {}, ['www', 'wrw', 'www']);
+export const kit_doner = kitWithBadge('kit_doner', { Y: '#f6d548', B: '#8a4a22' }, ['YBY', 'BBB', 'YBY']);
+export const kit_classic = kitWithBadge('kit_classic', {}, ['ccc', 'cwc', 'ccc']);
+export const kit_mega = kitWithBadge('kit_mega', { Y: '#f2c230' }, ['YYY', 'kkk', 'YYY']);
+
 // ---- Stage 2 sprites: drawn with the canvas helper, outlined in 'k' ----
 
 /**

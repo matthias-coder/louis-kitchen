@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { ITEMS } from '../packs/BP/scripts/logic/catalog.js';
 import { CRATES, ALL_BLOCKS, BUSY_RETRIES, entryLook, shouldRetryBusy } from '../packs/BP/scripts/logic/crates.js';
+import { THEMES, THEME_IDS } from '../packs/BP/scripts/logic/layout.js';
 
 const lang = fs.readFileSync(new URL('../packs/RP/texts/de_DE.lang', import.meta.url), 'utf8');
 const SUPPLIED = ['raw_patty', 'bun', 'lettuce', 'tomato', 'cheese', 'knife', 'spatula', 'clean_plate',
@@ -13,13 +14,13 @@ const TOOLS = ['kochmod:knife', 'kochmod:spatula', 'kochmod:bowl', 'kochmod:pizz
 // Stage 1 recipes need these; cooked patty and tomato slices are produced at stations.
 const NEEDED = ['kochmod:bun', 'kochmod:raw_patty', 'kochmod:lettuce', 'kochmod:tomato', 'kochmod:cheese', ...TOOLS];
 
-const { crate_all: ALL, ...SUPPLY } = CRATES;
+const { crate_all: ALL, crate_kits: KITS, ...SUPPLY } = CRATES;
 const entries = Object.values(SUPPLY).flatMap((c) => c.entries);
 const ALL_ITEM_IDS = Object.keys(ITEMS).filter((id) => ITEMS[id].menu !== false).map((id) => id.replace('kochmod:', ''));
-const ALL_BLOCK_IDS = ['grill', 'cutting_board', 'counter', 'oven', 'pot', 'spit', 'wok', 'crate_tools', 'crate_all', 'fridge', 'pantry', 'dishwasher', 'dish_cabinet', 'table', 'chair', 'bell'];
+const ALL_BLOCK_IDS = ['grill', 'cutting_board', 'counter', 'oven', 'pot', 'spit', 'wok', 'crate_tools', 'crate_all', 'crate_kits', 'fridge', 'pantry', 'dishwasher', 'dish_cabinet', 'table', 'chair', 'bell'];
 
-test('there are exactly the four crates', () => {
-  assert.deepEqual(Object.keys(CRATES).sort(), ['crate_all', 'crate_tools', 'fridge', 'pantry']);
+test('there are exactly the five crates', () => {
+  assert.deepEqual(Object.keys(CRATES).sort(), ['crate_all', 'crate_kits', 'crate_tools', 'fridge', 'pantry']);
 });
 
 test('crates only hand out the supply items, and together all that stage 1 needs', () => {
@@ -35,7 +36,7 @@ test('tools come singly, ingredients in fours, and no crate is empty', () => {
 
 test('crate_all lists every item and every block exactly once, in order', () => {
   assert.deepEqual(ALL.entries.map((e) => e.item), [...ALL_ITEM_IDS, ...ALL_BLOCK_IDS].map((i) => `kochmod:${i}`));
-  assert.equal(ALL.entries.length, 53 + ALL_BLOCK_IDS.length);
+  assert.equal(ALL.entries.length, 58 + ALL_BLOCK_IDS.length);
   for (const e of ALL.entries) {
     const kind = ITEMS[e.item]?.kind;
     assert.equal(e.count, ['ingredient', 'prepared', 'plate'].includes(kind) ? 4 : 1, e.item);
@@ -121,4 +122,35 @@ test('crate_tools also hands out four clean plates', () => {
     { item: 'kochmod:knife', count: 1 }, { item: 'kochmod:spatula', count: 1 }, { item: 'kochmod:bowl', count: 1 },
     { item: 'kochmod:pizza_peel', count: 1 }, { item: 'kochmod:wok_spatula', count: 1 }, { item: 'kochmod:recipe_book', count: 1 }, { item: 'kochmod:clean_plate', count: 4 },
   ]);
+});
+
+test('the Restaurant-Kiste hands out one Baukasten per theme, labelled with the theme name and a dish of the theme', () => {
+  assert.equal(KITS.title, 'kochmod.crate.kits');
+  assert.deepEqual(KITS.entries, THEME_IDS.map((id) => ({
+    item: `kochmod:kit_${id}`, count: 1, label: { translate: `kochmod.theme.${id}` }, icon: `textures/items/${THEMES[id].icon.replace('kochmod:', '')}`,
+  })));
+  for (const e of KITS.entries) {
+    assert.ok(fs.existsSync(new URL(`../packs/RP/${e.icon}.png`, import.meta.url)), e.icon);
+    assert.deepEqual(entryLook(e), { name: e.label, icon: e.icon });
+  }
+});
+
+test('entryLook takes a crate entry: without overrides it looks like the plain item', () => {
+  assert.deepEqual(entryLook({ item: 'kochmod:knife', count: 1 }), entryLook('kochmod:knife'));
+  assert.deepEqual(entryLook({ item: 'kochmod:crate_kits', count: 1 }), { name: { translate: 'tile.kochmod:crate_kits.name' }, icon: 'textures/items/block_crate_kits' });
+  assert.deepEqual(entryLook({ item: 'kochmod:knife', count: 1, icon: 'textures/items/spatula' }).icon, 'textures/items/spatula');
+});
+
+test('crate_all lists the six kits but not the old restaurant_kit', () => {
+  const items = ALL.entries.map((e) => e.item);
+  for (const id of THEME_IDS) assert.equal(items.filter((i) => i === `kochmod:kit_${id}`).length, 1, id);
+  assert.ok(!items.includes('kochmod:restaurant_kit'));
+});
+
+test('Restaurant-Kiste: names in both lang files', () => {
+  for (const f of ['de_DE', 'en_US']) {
+    const t = fs.readFileSync(new URL(`../packs/RP/texts/${f}.lang`, import.meta.url), 'utf8');
+    assert.ok(t.includes('\ntile.kochmod:crate_kits.name=Restaurant-Kiste\n'), f);
+    assert.ok(t.includes('\nkochmod.crate.kits=Restaurant-Kiste\n'), f);
+  }
 });

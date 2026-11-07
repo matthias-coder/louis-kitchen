@@ -19,6 +19,12 @@
     "kochmod_crate_all_top": {
       "textures": "textures/blocks/crate_all_top"
     },
+    "kochmod_crate_kits": {
+      "textures": "textures/blocks/crate_kits"
+    },
+    "kochmod_crate_kits_top": {
+      "textures": "textures/blocks/crate_kits_top"
+    },
     "kochmod_crate_tools": {
       "textures": "textures/blocks/crate_tools"
     },

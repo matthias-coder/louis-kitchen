@@ -47,8 +47,8 @@ test('itemsOf, isDish and plateName', () => {
   assert.equal(plateName('kochmod:cheeseburger'), 'cheeseburger');
 });
 
-test('tools stack to 1, everything else to 64', () => {
-  for (const [id, def] of Object.entries(ITEMS)) assert.equal(def.stack, def.kind === 'tool' ? 1 : 64, id);
+test('tools and Baukästen stack to 1, everything else to 64', () => {
+  for (const [id, def] of Object.entries(ITEMS)) assert.equal(def.stack, ['tool', 'misc'].includes(def.kind) ? 1 : 64, id);
 });
 
 const read = (/** @type {string} */ rel) => fs.readFileSync(new URL(`../${rel}`, import.meta.url), 'utf8');
@@ -65,8 +65,8 @@ test('every catalog id has an item JSON, a name in both lang files, an icon text
     const item = JSON.parse(read(`packs/BP/items/${short}.json`))['minecraft:item'];
     assert.equal(item.description.identifier, id);
     assert.equal(item.components['minecraft:icon'].textures.default, `kochmod_${short}`);
-    // stage 1 plates and the kit keep their own (smaller) stack sizes in the item JSON
-    if (!['plate', 'misc'].includes(def.kind)) assert.equal(item.components['minecraft:max_stack_size'], def.stack, id);
+    // stage 1 plates keep their own (smaller) stack size in the item JSON
+    if (def.kind !== 'plate') assert.equal(item.components['minecraft:max_stack_size'], def.stack, id);
     assert.equal(item.description.menu_category.category, def.kind === 'tool' ? 'equipment' : 'items', id);
     if (def.kind === 'dish') assert.equal(item.components['minecraft:food'].nutrition, id === FAILED ? 1 : 8, id);
     if (['ingredient', 'prepared', 'tool'].includes(def.kind)) assert.ok(!('minecraft:food' in item.components), id);
@@ -75,4 +75,11 @@ test('every catalog id has an item JSON, a name in both lang files, an icon text
     assert.ok(spriteNames.has(short), `sprite ${id}`);
     assert.ok(textures[`kochmod_${short}`], `texture ${id}`);
   }
+});
+
+test('six Baukasten items: misc, stack 1, in the menu; the old restaurant_kit stays as a hidden alias', () => {
+  for (const id of ['burger', 'italian', 'japanese', 'doner', 'classic', 'mega']) {
+    assert.deepEqual(ITEMS[`kochmod:kit_${id}`], { kind: 'misc', stack: 1 }, id);
+  }
+  assert.deepEqual(ITEMS['kochmod:restaurant_kit'], { kind: 'misc', stack: 1, menu: false });
 });

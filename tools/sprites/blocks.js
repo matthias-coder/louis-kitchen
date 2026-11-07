@@ -644,14 +644,30 @@ function icon(item) {
   return half(pixelsOf(/** @type {import('./util.js').Sprite} */ (/** @type {any} */ (items)[item])));
 }
 
+/**
+ * Small picture from rows of palette characters ('.' is transparent).
+ * @param {string[]} rows @param {Record<string, string>} palette
+ * @returns {Pixels}
+ */
+function art(rows, palette) {
+  return rows.map((r) => [...r].map((ch) => (ch === '.' ? null : palette[ch])));
+}
+
+/** Restaurant-Kiste picture: a little house in front of a blueprint. */
+const BLUEPRINT = art(['bbbbbb', 'bwbwwb', 'bwbbwb', 'bwwwwb', 'bbbbbb'], { b: '#2f6fc4', w: '#e8f2ff' });
+const HOUSE = art(['..rr..', '.rrrr.', 'rrrrrr', '.yyyy.', '.ydyy.', '.ydyy.'], { r: '#c0392b', y: '#f3e3b5', d: '#7a4a24' });
+
 /** @typedef {{ pic: Pixels, x: number, y: number }} Pic */
 /** @type {Record<string, { mat: typeof WOOD, pics: Pic[], topPics?: Pic[] }>} */
 const CRATE_PICTURES = {
   crate_tools: { mat: METAL, pics: [{ pic: icon('spatula'), x: 2, y: 2 }, { pic: flip(icon('knife')), x: 0, y: 0 }] },
+  crate_kits: { mat: WOOD, pics: [{ pic: BLUEPRINT, x: 0, y: 5 }, { pic: HOUSE, x: 4, y: 0 }] },
 };
 
 /** @type {Sprite} */ export const crate_tools = crateFace('crate_tools', CRATE_PICTURES.crate_tools.mat, CRATE_PICTURES.crate_tools.pics, false);
 /** @type {Sprite} */ export const crate_tools_top = crateFace('crate_tools_top', CRATE_PICTURES.crate_tools.mat, CRATE_PICTURES.crate_tools.pics, true);
+/** @type {Sprite} */ export const crate_kits = crateFace('crate_kits', CRATE_PICTURES.crate_kits.mat, CRATE_PICTURES.crate_kits.pics, false);
+/** @type {Sprite} */ export const crate_kits_top = crateFace('crate_kits_top', CRATE_PICTURES.crate_kits.mat, CRATE_PICTURES.crate_kits.pics, true);
 
 /**
  * Ender-chest style crate face: dark green-black body, lighter frame, purple glowing latch.

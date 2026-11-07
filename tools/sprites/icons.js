@@ -175,6 +175,7 @@ export const block_wok = icon('wok', {
 
 export const block_crate_tools = crateIcon(blocks.crate_tools);
 export const block_crate_all = crateIcon(blocks.crate_all);
+export const block_crate_kits = crateIcon(blocks.crate_kits);
 
 export const block_fridge = icon('fridge', {
   W: '#f1f4f6', L: '#cfd5da', S: '#9aa3aa', H: '#3b4147', B: '#5aa9e6', D: '#4a4f55',

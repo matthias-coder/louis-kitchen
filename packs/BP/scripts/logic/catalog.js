@@ -66,7 +66,14 @@ export const ITEMS = {
   'kochmod:fried_noodles': { kind: 'dish', stack: 64 },
   'kochmod:clean_plate': { kind: 'plate', source: 'tools', stack: 64 },
   'kochmod:dirty_plate': { kind: 'plate', stack: 64, menu: false },
-  'kochmod:restaurant_kit': { kind: 'misc', stack: 64 },
+  // stage 1 Baukasten: hidden alias of kit_classic so old worlds keep working
+  'kochmod:restaurant_kit': { kind: 'misc', stack: 1, menu: false },
+  'kochmod:kit_burger': { kind: 'misc', stack: 1 },
+  'kochmod:kit_italian': { kind: 'misc', stack: 1 },
+  'kochmod:kit_japanese': { kind: 'misc', stack: 1 },
+  'kochmod:kit_doner': { kind: 'misc', stack: 1 },
+  'kochmod:kit_classic': { kind: 'misc', stack: 1 },
+  'kochmod:kit_mega': { kind: 'misc', stack: 1 },
 };
 
 /**

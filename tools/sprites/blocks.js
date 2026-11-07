@@ -244,6 +244,21 @@ export const layouts = {
     cap_top: /** @type {Region} */ ([16, 4, 4, 4]),
     knob: /** @type {Region} */ ([24, 0, 2, 2]),
   },
+  oven: {
+    body_side: /** @type {Region} */ ([0, 0, 16, 8]),
+    body_top: /** @type {Region} */ ([16, 0, 16, 16]),
+    body_bottom: /** @type {Region} */ ([32, 0, 16, 16]),
+    roof: /** @type {Region} */ ([48, 0, 16, 16]),
+    brick: /** @type {Region} */ ([0, 16, 16, 16]),
+    ember: /** @type {Region} */ ([16, 16, 8, 2]),
+    flame: /** @type {Region} */ ([24, 16, 2, 3]),
+    pizza_raw_top: /** @type {Region} */ ([0, 32, 7, 7]),
+    pizza_raw_side: /** @type {Region} */ ([0, 40, 7, 1]),
+    pizza_cooked_top: /** @type {Region} */ ([8, 32, 7, 7]),
+    pizza_cooked_side: /** @type {Region} */ ([8, 40, 7, 1]),
+    pizza_burnt_top: /** @type {Region} */ ([16, 32, 7, 7]),
+    pizza_burnt_side: /** @type {Region} */ ([16, 40, 7, 1]),
+  },
 };
 
 // ---- Grill: dark metal box, red knobs, silver grate over glowing coals
@@ -924,4 +939,92 @@ export const dish_cabinet = {
     w: '#ffffff', r: '#9fd3f2', v: '#d6f0ff', s: '#5f8fb0',
   },
   rows: drawDishCabinet(),
+};
+
+// ---- Pizza oven: stone plinth, brick chamber with an arched opening, embers at the back, a round pizza
+
+/** Round 7x7 disc: X where the pizza is, '.' at the cut-off corners. */
+const DISC = ['..XXX..', '.XXXXX.', 'XXXXXXX', 'XXXXXXX', 'XXXXXXX', '.XXXXX.', '..XXX..'];
+/** @param {number} x @param {number} y */
+const inDisc = (x, y) => y >= 0 && y < 7 && x >= 0 && x < 7 && DISC[y][x] === 'X';
+
+/**
+ * @param {ReturnType<typeof canvas>} c
+ * @param {Region} top 7x7
+ * @param {Region} side 7x1
+ * @param {string} crust edge colour
+ * @param {string} fill inner colour
+ * @param {[number, number, string][]} dots toppings
+ */
+function drawPizza(c, top, side, crust, fill, dots) {
+  for (let y = 0; y < 7; y++) {
+    for (let x = 0; x < 7; x++) {
+      if (!inDisc(x, y)) continue;
+      const edge = !inDisc(x - 1, y) || !inDisc(x + 1, y) || !inDisc(x, y - 1) || !inDisc(x, y + 1);
+      c.px(top, x, y, edge ? crust : fill);
+    }
+  }
+  for (const [x, y, ch] of dots) c.px(top, x, y, ch);
+  c.row(side, 0, crust);
+}
+
+function drawOven() {
+  const L = layouts.oven;
+  const c = canvas();
+  // plinth: light stone blocks
+  c.fill(L.body_side, 's');
+  c.speckle(L.body_side, 's', 'S', 0.25, 31);
+  c.row(L.body_side, 0, 'k');
+  c.row(L.body_side, 4, 'k');
+  c.row(L.body_side, 7, 'k');
+  for (const x of [0, 8]) for (let y = 1; y < 4; y++) c.px(L.body_side, x, y, 'k');
+  for (const x of [4, 12]) for (let y = 5; y < 7; y++) c.px(L.body_side, x, y, 'k');
+  // top: stone rim around the dark, ashy hearth inside the chamber
+  c.fill(L.body_top, 's');
+  c.speckle(L.body_top, 's', 'S', 0.25, 32);
+  for (let y = 3; y < 13; y++) for (let x = 3; x < 13; x++) c.px(L.body_top, x, y, 'h');
+  c.speckle(L.body_top, 'h', 'H', 0.3, 33);
+  c.fill(L.body_bottom, 'k');
+  // chamber walls: warm bricks with light mortar
+  c.fill(L.brick, 'b');
+  c.speckle(L.brick, 'b', 'B', 0.2, 34);
+  for (let y = 0; y < 16; y++) {
+    if (y % 3 === 2) {
+      c.row(L.brick, y, 'm');
+      continue;
+    }
+    const shift = Math.floor(y / 3) % 2 === 0 ? 0 : 2;
+    for (let x = shift; x < 16; x += 4) c.px(L.brick, x, y, 'm');
+  }
+  // roof: darker bricks
+  c.fill(L.roof, 'r');
+  c.speckle(L.roof, 'r', 'B', 0.3, 35);
+  for (let y = 0; y < 16; y += 4) c.row(L.roof, y, 'm');
+  // fire
+  c.fill(L.ember, 'o');
+  for (const [x, y] of [[1, 0], [4, 0], [6, 1], [2, 1]]) c.px(L.ember, x, y, 'e');
+  c.px(L.ember, 5, 0, 'E');
+  c.fill(L.flame, 'e');
+  c.px(L.flame, 0, 0, 'E');
+  c.px(L.flame, 1, 0, 'Y');
+  c.px(L.flame, 1, 1, 'E');
+  // pizzas: raw (pale dough, red sauce), baked (golden, red and yellow), burnt (black)
+  drawPizza(c, L.pizza_raw_top, L.pizza_raw_side, 'D', 'R', [[2, 2, 'w'], [4, 3, 'w'], [3, 5, 'w'], [5, 4, 'w']]);
+  drawPizza(c, L.pizza_cooked_top, L.pizza_cooked_side, 'g', 'R', [[2, 2, 'y'], [3, 3, 'y'], [4, 2, 'y'], [2, 4, 'y'], [4, 4, 'y'], [3, 5, 'y'], [5, 3, 'y']]);
+  drawPizza(c, L.pizza_burnt_top, L.pizza_burnt_side, 'x', 'X', [[2, 3, 'a'], [4, 2, 'a'], [4, 4, 'a']]);
+  return c.rows();
+}
+
+/** @type {Sprite} */
+export const oven = {
+  name: 'oven',
+  palette: {
+    s: '#9a9a9a', S: '#858585', k: '#5e5e5e', h: '#3a2a22', H: '#241812',
+    b: '#b5654a', B: '#8f4a35', m: '#d8c8b0', r: '#9c5640',
+    o: '#8a1f0a', e: '#ff7a1a', E: '#ffc04d', Y: '#fff2a0',
+    D: '#e6cc94', R: '#d33a2a', w: '#fff4d0',
+    g: '#d9a24a', y: '#ffd23f',
+    x: '#1a1614', X: '#2e2723', a: '#4a403b',
+  },
+  rows: drawOven(),
 };

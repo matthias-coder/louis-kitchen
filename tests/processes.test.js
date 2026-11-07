@@ -32,9 +32,42 @@ test('process tables for stage 1', () => {
     [k('potato')]: k('potato_cubes'),
     [k('salmon')]: k('salmon_strips'),
   });
-  assert.deepEqual(Object.keys(TIMED), ['grill']);
+  assert.deepEqual(Object.keys(TIMED), ['grill', 'oven']);
   assert.deepEqual(TIMED.grill.accepts, { [k('raw_patty')]: { cooked: k('cooked_patty'), burnt: k('burnt_patty') } });
   assert.equal(TIMED.grill.tool, k('spatula'));
+});
+
+test('oven: both raw pizzas bake into their pizza and burn into the burnt pizza, with the peel', () => {
+  assert.deepEqual(TIMED.oven, {
+    accepts: {
+      [k('raw_pizza_margherita')]: { cooked: k('pizza_margherita'), burnt: k('burnt_pizza') },
+      [k('raw_salami_pizza')]: { cooked: k('salami_pizza'), burnt: k('burnt_pizza') },
+    },
+    tool: k('pizza_peel'),
+    hintTool: 'kochmod.hint.need_peel',
+    hintFull: 'kochmod.hint.oven_full',
+    sound: 'kochmod.oven',
+  });
+});
+
+test('salami pizza steps: assemble the raw pizza on the counter, then bake it in the oven', () => {
+  assert.deepEqual(stepsFor(k('salami_pizza')), [
+    { item: k('raw_salami_pizza'), station: 'counter', parts: ['dough', 'tomato_sauce', 'cheese', 'salami'].map(k) },
+    { item: k('raw_salami_pizza'), station: 'oven', tool: k('pizza_peel'), result: k('salami_pizza') },
+  ]);
+  assert.deepEqual(stationsFor(k('salami_pizza')), ['counter', 'oven']);
+  assert.deepEqual(stepsFor(k('pizza_margherita')), [
+    { item: k('raw_pizza_margherita'), station: 'counter', parts: ['dough', 'tomato_sauce', 'cheese'].map(k) },
+    { item: k('raw_pizza_margherita'), station: 'oven', tool: k('pizza_peel'), result: k('pizza_margherita') },
+  ]);
+  assert.deepEqual(stationsFor(k('pizza_margherita')), ['counter', 'oven']);
+});
+
+test('every TIMED input and output is a catalog item', () => {
+  for (const def of Object.values(TIMED)) {
+    for (const [raw, out] of Object.entries(def.accepts)) for (const id of [raw, out.cooked, out.burnt]) assert.ok(id in ITEMS, id);
+    assert.ok(def.tool in ITEMS, def.tool);
+  }
 });
 
 test('every CUTTABLE key and value is a catalog item', () => {

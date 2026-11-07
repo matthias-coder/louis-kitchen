@@ -7,7 +7,7 @@ import {
   cabinetInteract, cabinetView, cabinetDrops,
   boardInteract, boardView, boardDrops,
   counterInteract, counterView, counterDrops,
-  timedStation, grill, migrateStationState, COUNTER_LAYERS,
+  timedStation, grill, oven, migrateStationState, COUNTER_LAYERS,
 } from '../packs/BP/scripts/logic/stations.js';
 import { CUTTABLE } from '../packs/BP/scripts/logic/processes.js';
 import { BURNT_AT, COOKED_AT } from '../packs/BP/scripts/logic/cooking.js';
@@ -312,6 +312,66 @@ test('cabinet: view is the plate count, drops are the plates', () => {
 });
 
 // ---- Migration of stage 1 saved states
+// ---- Oven (timed-station factory with the pizza rows)
+
+const MARGHERITA = k('raw_pizza_margherita');
+const SALAMI = k('raw_salami_pizza');
+
+test('oven: empty + raw pizza is put in and starts baking', () => {
+  for (const raw of [MARGHERITA, SALAMI]) {
+    const r = oven.interact(INITIAL.oven, raw);
+    assert.deepEqual(r, { state: { item: raw, ticks: 0 }, take: true, sound: 'kochmod.oven' });
+  }
+});
+
+test('oven: occupied + raw pizza says the oven is full', () => {
+  const s = { item: MARGHERITA, ticks: 40 };
+  const r = oven.interact(s, SALAMI);
+  assert.equal(r.state, s);
+  assert.equal(r.hint, 'kochmod.hint.oven_full');
+  assert.equal(r.take, undefined);
+});
+
+test('oven: occupied + empty hand or other item needs the peel', () => {
+  const s = { item: SALAMI, ticks: 40 };
+  for (const held of [null, k('spatula'), k('cheese')]) {
+    const r = oven.interact(s, held);
+    assert.equal(r.state, s);
+    assert.equal(r.hint, 'kochmod.hint.need_peel');
+  }
+});
+
+for (const [raw, ticks, out] of [
+  [MARGHERITA, 0, MARGHERITA], [MARGHERITA, COOKED_AT, k('pizza_margherita')], [MARGHERITA, BURNT_AT, k('burnt_pizza')],
+  [SALAMI, COOKED_AT - 1, SALAMI], [SALAMI, 400, k('salami_pizza')], [SALAMI, BURNT_AT, k('burnt_pizza')],
+]) {
+  test(`oven: peel takes out ${out} after ${ticks} ticks of ${raw}`, () => {
+    const r = oven.interact({ item: /** @type {string} */ (raw), ticks: /** @type {number} */ (ticks) }, k('pizza_peel'));
+    assert.deepEqual(r, { state: INITIAL.oven, give: out });
+  });
+}
+
+test('oven: empty + anything but a raw pizza is unchanged; raw patty is not for the oven', () => {
+  for (const held of [null, k('raw_patty'), k('dough'), k('pizza_peel')]) assert.deepEqual(oven.interact(INITIAL.oven, held), { state: INITIAL.oven });
+});
+
+test('oven: view and drops by baking stage', () => {
+  assert.equal(oven.view(INITIAL.oven), 'empty');
+  assert.equal(oven.view({ item: SALAMI, ticks: 10 }), 'raw');
+  assert.equal(oven.view({ item: SALAMI, ticks: COOKED_AT }), 'cooked');
+  assert.equal(oven.view({ item: SALAMI, ticks: BURNT_AT }), 'burnt');
+  assert.deepEqual(oven.drops(INITIAL.oven), []);
+  assert.deepEqual(oven.drops({ item: MARGHERITA, ticks: 200 }), [k('pizza_margherita')]);
+  assert.deepEqual(oven.tick({ item: SALAMI, ticks: 700 }, 500), { item: SALAMI, ticks: BURNT_AT });
+});
+
+test('migrateStationState: oven states pass through, garbage becomes an empty oven', () => {
+  const s = { item: SALAMI, ticks: 12 };
+  assert.equal(migrateStationState('oven', s), s);
+  assert.deepEqual(INITIAL.oven, { item: null, ticks: 0 });
+  for (const bad of [null, { occupied: true }, { item: 3, ticks: 0 }]) assert.deepEqual(migrateStationState('oven', bad), INITIAL.oven);
+});
+
 test('migrateStationState: stage 1 grill shapes', () => {
   assert.deepEqual(migrateStationState('grill', { occupied: true, ticks: 300 }), { item: RAW, ticks: 300 });
   assert.deepEqual(migrateStationState('grill', { occupied: true }), { item: RAW, ticks: 0 });

@@ -182,6 +182,38 @@ export const models = {
       ],
     },
   ],
+  // Stone plinth with a brick chamber; the arched opening faces north (-z), embers glow at the back.
+  oven: [
+    { name: 'body', cubes: [{ origin: [-8, 0, -8], size: [16, 8, 16], top: 'body_top', side: 'body_side', bottom: 'body_bottom' }] },
+    {
+      name: 'chamber',
+      cubes: [
+        cube([-7, 8, 5], [14, 10, 2], 'brick', 'brick'), // back wall
+        cube([-7, 8, -7], [2, 10, 12], 'brick', 'brick'), // side walls
+        cube([5, 8, -7], [2, 10, 12], 'brick', 'brick'),
+        cube([-5, 8, -7], [1, 10, 2], 'brick', 'brick'), // front: jambs, lintel and arch corners around the opening
+        cube([4, 8, -7], [1, 10, 2], 'brick', 'brick'),
+        cube([-4, 15, -7], [8, 3, 2], 'brick', 'brick'),
+        cube([-4, 14, -7], [1, 1, 2], 'brick', 'brick'),
+        cube([3, 14, -7], [1, 1, 2], 'brick', 'brick'),
+        cube([-7, 18, -7], [14, 2, 14], 'roof', 'brick'), // roof, dome and chimney
+        cube([-5, 20, -5], [10, 2, 10], 'roof', 'brick'),
+        cube([2, 22, 2], [2, 1, 2], 'roof', 'brick'),
+      ],
+    },
+    {
+      name: 'fire',
+      cubes: [
+        cube([-4, 8, 3], [8, 1.5, 2], 'ember', 'ember'),
+        cube([-3, 9.5, 3.5], [2, 3, 1], 'flame', 'flame'),
+        cube([1, 9.5, 3.5], [2, 2.5, 1], 'flame', 'flame'),
+      ],
+    },
+    ...['raw', 'cooked', 'burnt'].map((kind) => ({
+      name: `pizza_${kind}`,
+      cubes: [cube([-3.5, 8.1, -4.5], [7, 0.5, 7], `pizza_${kind}_top`, `pizza_${kind}_side`)],
+    })),
+  ],
   bell: [
     {
       name: 'bell',
@@ -328,7 +360,7 @@ export const guestModel = [
     pivot: [0, 30, 0],
     cubes: [solid([2, 29.5, -0.5], [1, 1, 1], 'dot'), solid([3.5, 31, -0.75], [1.5, 1.5, 1.5], 'dot')],
   },
-  ...['hamburger', 'cheeseburger'].map((wish) => (/** @type {EntityBone} */ ({
+  ...['hamburger', 'cheeseburger', 'pizza_margherita', 'salami_pizza'].map((wish) => (/** @type {EntityBone} */ ({
     name: `bubble_${wish}`,
     parent: 'bubble',
     pivot: [0, 40, 0],

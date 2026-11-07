@@ -29,14 +29,28 @@ export const TIMED = {
     hintFull: 'kochmod.hint.grill_full',
     sound: 'kochmod.sizzle',
   },
+  oven: {
+    accepts: {
+      'kochmod:raw_pizza_margherita': { cooked: 'kochmod:pizza_margherita', burnt: 'kochmod:burnt_pizza' },
+      'kochmod:raw_salami_pizza': { cooked: 'kochmod:salami_pizza', burnt: 'kochmod:burnt_pizza' },
+    },
+    tool: 'kochmod:pizza_peel',
+    hintTool: 'kochmod.hint.need_peel',
+    hintFull: 'kochmod.hint.oven_full',
+    sound: 'kochmod.oven',
+  },
 };
 
 const BASE = ['kochmod:bun', 'kochmod:cooked_patty', 'kochmod:lettuce', 'kochmod:tomato_slices'];
 
-/** @type {DishRecipe[]} counter recipes */
+const PIZZA_BASE = ['kochmod:dough', 'kochmod:tomato_sauce', 'kochmod:cheese'];
+
+/** @type {DishRecipe[]} counter recipes; a result need not be a dish (a raw pizza still goes into the oven) */
 export const ASSEMBLY = [
   { dish: 'kochmod:hamburger', parts: BASE },
   { dish: 'kochmod:cheeseburger', parts: [...BASE, 'kochmod:cheese'] },
+  { dish: 'kochmod:raw_pizza_margherita', parts: PIZZA_BASE },
+  { dish: 'kochmod:raw_salami_pizza', parts: [...PIZZA_BASE, 'kochmod:salami'] },
 ];
 /** @type {DishRecipe[]} pot recipes (later tasks) */
 export const POT = [];
@@ -46,9 +60,14 @@ export const WOK = [];
 /** @type {[string, DishRecipe[]][]} assembling station -> its recipe list */
 const FINAL_STATIONS = [['counter', ASSEMBLY], ['pot', POT], ['wok', WOK]];
 
+/** @type {DishRecipe[]} what timed stations make: cooked result <- the one raw item, in TIMED / accepts order */
+export const TIMED_RECIPES = Object.values(TIMED).flatMap((def) => (
+  Object.entries(def.accepts).map(([raw, out]) => ({ dish: out.cooked, parts: [raw] }))
+));
+
 /**
  * @param {string} item
- * @returns {Step | null} the process step that makes a prepared item, or null
+ * @returns {Step | null} the cutting or cooking step that makes an item, or null
  */
 function processStep(item) {
   for (const [raw, cut] of Object.entries(CUTTABLE)) {
@@ -63,27 +82,28 @@ function processStep(item) {
 }
 
 /**
- * Steps that produce `item`, preparation of its inputs first.
+ * Steps that produce `item`, preparation of its inputs first: an assembly (counter, pot, wok) in part
+ * order, or a cutting / cooking step. Ingredients and unknown ids need no steps.
  * @param {string} item
  * @returns {Step[]}
  */
 function stepsToMake(item) {
-  if (ITEMS[item]?.kind !== 'prepared') return [];
+  if (!Object.hasOwn(ITEMS, item) || ITEMS[item].kind === 'ingredient') return [];
+  for (const [station, list] of FINAL_STATIONS) {
+    const recipe = list.find((r) => r.dish === item);
+    if (recipe) return [...recipe.parts.flatMap(stepsToMake), { item, station, parts: [...recipe.parts] }];
+  }
   const step = processStep(item);
   return step ? [...stepsToMake(step.item), step] : [];
 }
 
 /**
  * @param {string} dishId
- * @returns {Step[]} preparation steps in part order, then one final step at the assembling station; [] for unknown dishes
+ * @returns {Step[]} preparation steps in part order, then the final step (assembly, or the oven for a pizza);
+ * [] for unknown dishes
  */
 export function stepsFor(dishId) {
-  for (const [station, list] of FINAL_STATIONS) {
-    const recipe = list.find((r) => r.dish === dishId);
-    if (!recipe) continue;
-    return [...recipe.parts.flatMap(stepsToMake), { item: dishId, station, parts: [...recipe.parts] }];
-  }
-  return [];
+  return ITEMS[dishId]?.kind === 'dish' ? stepsToMake(dishId) : [];
 }
 
 /**

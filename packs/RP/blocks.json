@@ -13,6 +13,9 @@
   "kochmod:counter": {
     "sound": "wood"
   },
+  "kochmod:oven": {
+    "sound": "stone"
+  },
   "kochmod:crate_tools": {
     "sound": "metal"
   },

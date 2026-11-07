@@ -5,6 +5,10 @@
       "category": "block",
       "sounds": ["sounds/random/fizz"]
     },
+    "kochmod.oven": {
+      "category": "block",
+      "sounds": ["sounds/fire/ignite"]
+    },
     "kochmod.chop": {
       "category": "block",
       "sounds": ["sounds/dig/wood1", "sounds/dig/wood2"]

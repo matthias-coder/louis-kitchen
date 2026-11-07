@@ -47,6 +47,13 @@ test('availableDishes', () => {
   assert.deepEqual(availableDishes(new Set(['cutting_board', 'counter'])), []);
 });
 
+test('availableDishes: pizzas need the oven (and the counter)', () => {
+  const PIZZAS = ['kochmod:pizza_margherita', 'kochmod:salami_pizza'];
+  assert.deepEqual(availableDishes(new Set(['counter', 'oven'])), PIZZAS);
+  assert.deepEqual(availableDishes(new Set(['grill', 'cutting_board', 'counter', 'oven'])), [HAM, CHEESE, ...PIZZAS]);
+  assert.deepEqual(availableDishes(new Set(['oven'])), []);
+});
+
 test('pickWish', () => {
   assert.equal(pickWish([], () => 0), null);
   assert.equal(pickWish([HAM, CHEESE], () => 0), HAM);

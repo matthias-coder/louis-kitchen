@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { evaluateAssembly, RECIPES, FAILED } from '../packs/BP/scripts/logic/recipes.js';
+import { evaluateAssembly, RECIPES, DISHES, FAILED } from '../packs/BP/scripts/logic/recipes.js';
 
 const k = (/** @type {string[]} */ ...ids) => ids.map((i) => `kochmod:${i}`);
 
@@ -26,8 +26,22 @@ test('failures', () => {
 });
 
 test('recipes list stations', () => {
-  assert.equal(RECIPES.length, 2);
-  for (const r of RECIPES) assert.deepEqual(r.stations, ['grill', 'cutting_board', 'counter']);
+  assert.equal(RECIPES.length, 4);
+  for (const r of RECIPES.slice(0, 2)) assert.deepEqual(r.stations, ['grill', 'cutting_board', 'counter']);
+  for (const r of RECIPES.slice(2)) assert.deepEqual(r.stations, ['counter', 'oven']);
+});
+
+test('dishes: assembled ones first, then the ones an oven bakes', () => {
+  assert.deepEqual(DISHES, k('hamburger', 'cheeseburger', 'pizza_margherita', 'salami_pizza'));
+  assert.deepEqual(RECIPES.find((r) => r.dish === 'kochmod:salami_pizza')?.parts, k('raw_salami_pizza'));
+});
+
+test('raw pizzas are assembled on the counter in any order', () => {
+  assert.equal(evaluateAssembly(k('dough', 'tomato_sauce', 'cheese')), 'kochmod:raw_pizza_margherita');
+  assert.equal(evaluateAssembly(k('cheese', 'dough', 'tomato_sauce')), 'kochmod:raw_pizza_margherita');
+  assert.equal(evaluateAssembly(k('dough', 'tomato_sauce', 'cheese', 'salami')), 'kochmod:raw_salami_pizza');
+  assert.equal(evaluateAssembly(k('salami', 'cheese', 'tomato_sauce', 'dough')), 'kochmod:raw_salami_pizza');
+  assert.equal(evaluateAssembly(k('dough', 'tomato_sauce')), FAILED);
 });
 
 test('evaluateAssembly does not mutate input', () => {

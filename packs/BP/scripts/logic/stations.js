@@ -47,7 +47,7 @@ function acceptsOnCounter(/** @type {string} */ id) {
   return Object.hasOwn(ITEMS, id) && (ITEMS[id].kind === 'ingredient' || ITEMS[id].kind === 'prepared');
 }
 
-// ---- Timed stations (grill; pot and wok later)
+// ---- Timed stations (grill, oven; pot and wok later)
 
 /**
  * A station that cooks one item by time, built from a `TIMED` row. Unknown stored items never throw:
@@ -114,9 +114,12 @@ export const grillTick = grill.tick;
 export const grillView = grill.view;
 export const grillDrops = grill.drops;
 
-/** @type {{ grill: GrillState, board: BoardState, counter: CounterState, dishwasher: DishwasherState, cabinet: CabinetState }} */
+export const oven = timedStation(TIMED.oven);
+
+/** @type {{ grill: GrillState, oven: TimedState, board: BoardState, counter: CounterState, dishwasher: DishwasherState, cabinet: CabinetState }} */
 export const INITIAL = {
   grill: grill.INITIAL,
+  oven: oven.INITIAL,
   board: { item: null },
   counter: { items: [] },
   dishwasher: { plates: 0, ticks: 0 },
@@ -291,9 +294,13 @@ const isRecord = (v) => typeof v === 'object' && v !== null && !Array.isArray(v)
 /** @param {unknown} v @returns {v is number} */
 const isCount = (v) => typeof v === 'number' && Number.isFinite(v) && v >= 0;
 
+/** Saved shape of every timed station. */
+const validTimed = (/** @type {Record<string, unknown>} */ s) => (s.item === null || typeof s.item === 'string') && isCount(s.ticks);
+
 /** Shape checks of the current saved states. @type {{ [K in keyof typeof INITIAL]: (s: Record<string, unknown>) => boolean }} */
 const VALID = {
-  grill: (s) => (s.item === null || typeof s.item === 'string') && isCount(s.ticks),
+  grill: validTimed,
+  oven: validTimed,
   board: (s) => s.item === null || typeof s.item === 'string',
   counter: (s) => Array.isArray(s.items) && s.items.every((i) => typeof i === 'string'),
   dishwasher: (s) => isCount(s.plates) && isCount(s.ticks),

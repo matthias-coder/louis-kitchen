@@ -93,6 +93,30 @@ export const block_counter = icon('counter', {
   rect(6, 1, 9, 1, 'b');
 });
 
+export const block_oven = icon('oven', {
+  s: '#9a9a9a', k: '#5e5e5e', b: '#b5654a', B: '#8f4a35', m: '#d8c8b0', r: '#9c5640',
+  h: '#241812', o: '#8a1f0a', e: '#ff7a1a', E: '#ffc04d', D: '#e6cc94', R: '#d33a2a',
+}, ({ rect, px }) => {
+  rect(0, 11, 15, 15, 's');
+  rect(0, 11, 15, 11, 'k');
+  rect(0, 15, 15, 15, 'k');
+  rect(1, 3, 14, 10, 'b');
+  rect(2, 2, 13, 2, 'r');
+  rect(3, 1, 12, 1, 'r');
+  rect(10, 0, 11, 0, 'r');
+  for (const y of [4, 7]) rect(1, y, 14, y, 'm');
+  for (const [x, y] of [[3, 5], [12, 5], [2, 9], [13, 8]]) px(x, y, 'B');
+  // arched opening with glowing embers and a pizza
+  rect(4, 6, 11, 10, 'h');
+  rect(5, 5, 10, 5, 'h');
+  rect(5, 7, 10, 7, 'o');
+  px(6, 7, 'e');
+  px(9, 7, 'e');
+  px(7, 6, 'E');
+  rect(5, 10, 10, 10, 'D');
+  rect(6, 9, 9, 9, 'R');
+});
+
 export const block_crate_tools = crateIcon(blocks.crate_tools);
 export const block_crate_all = crateIcon(blocks.crate_all);
 

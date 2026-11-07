@@ -1,12 +1,12 @@
 import { isDish } from './catalog.js';
-import { ASSEMBLY, POT, WOK, stationsFor } from './processes.js';
+import { ASSEMBLY, TIMED_RECIPES, POT, WOK, stationsFor } from './processes.js';
 
 export const FAILED = 'kochmod:failed_dish';
 
 /** @typedef {{ dish: string, parts: string[], stations: string[] }} Recipe */
 
-/** @type {Recipe[]} every assembly / pot / wok entry whose result is a real dish */
-export const RECIPES = [...ASSEMBLY, ...POT, ...WOK]
+/** @type {Recipe[]} every assembly / timed-station / pot / wok entry whose result is a real dish */
+export const RECIPES = [...ASSEMBLY, ...TIMED_RECIPES, ...POT, ...WOK]
   .filter((r) => isDish(r.dish) && r.dish !== FAILED)
   .map((r) => ({ dish: r.dish, parts: r.parts, stations: stationsFor(r.dish) }));
 

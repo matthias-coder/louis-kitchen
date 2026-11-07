@@ -9,7 +9,9 @@
         { "*": true },
         { "bubble": "q.property('kochmod:wish') != 'none'" },
         { "bubble_hamburger": "q.property('kochmod:wish') == 'hamburger'" },
-        { "bubble_cheeseburger": "q.property('kochmod:wish') == 'cheeseburger'" }
+        { "bubble_cheeseburger": "q.property('kochmod:wish') == 'cheeseburger'" },
+        { "bubble_pizza_margherita": "q.property('kochmod:wish') == 'pizza_margherita'" },
+        { "bubble_salami_pizza": "q.property('kochmod:wish') == 'salami_pizza'" }
       ]
     }
   }

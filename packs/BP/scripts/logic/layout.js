@@ -111,6 +111,7 @@ function buildRestaurant() {
   put(5, 1, back, 'kochmod:grill');
   put(6, 1, back, 'kochmod:cutting_board');
   put(7, 1, back, 'kochmod:counter');
+  put(8, 1, back, 'kochmod:oven');
   put(9, 1, back, 'kochmod:dishwasher', { 'minecraft:cardinal_direction': 'south' });
   put(10, 1, back, 'kochmod:dish_cabinet', { 'minecraft:cardinal_direction': 'south', 'kochmod:plates': CABINET_MAX });
   // 6. the bell last, so no guest is called before the chairs exist

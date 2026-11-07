@@ -32,6 +32,9 @@
     "kochmod_block_grill": {
       "textures": "textures/items/block_grill"
     },
+    "kochmod_block_oven": {
+      "textures": "textures/items/block_oven"
+    },
     "kochmod_block_pantry": {
       "textures": "textures/items/block_pantry"
     },

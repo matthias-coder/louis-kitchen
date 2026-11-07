@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { ITEMS, itemsOf, itemsFrom, isDish, plateName } from '../packs/BP/scripts/logic/catalog.js';
 import { RECIPES, DISHES, FAILED } from '../packs/BP/scripts/logic/recipes.js';
-import { CRATES } from '../packs/BP/scripts/logic/crates.js';
+import { CRATES, ALL_BLOCKS } from '../packs/BP/scripts/logic/crates.js';
 import { CUTTABLE, TIMED, ASSEMBLY, POT, WOK } from '../packs/BP/scripts/logic/processes.js';
 
 const k = (/** @type {string[]} */ ...ids) => ids.map((i) => `kochmod:${i}`);
@@ -11,7 +11,7 @@ const k = (/** @type {string[]} */ ...ids) => ids.map((i) => `kochmod:${i}`);
 test('every id used by recipes, crates and processes exists in ITEMS', () => {
   const used = [
     ...RECIPES.flatMap((r) => [r.dish, ...r.parts]),
-    ...Object.values(CRATES).flatMap((c) => c.entries.map((e) => e.item)).filter((i) => !i.match(/kochmod:(grill|cutting_board|counter|crate_tools|crate_all|fridge|pantry|dishwasher|dish_cabinet|table|chair|bell)$/)),
+    ...Object.values(CRATES).flatMap((c) => c.entries.map((e) => e.item)).filter((i) => !ALL_BLOCKS.includes(i.slice('kochmod:'.length))),
     ...Object.entries(CUTTABLE).flat(),
     ...Object.values(TIMED).flatMap((t) => [t.tool, ...Object.entries(t.accepts).flatMap(([raw, o]) => [raw, o.cooked, o.burnt])]),
     ...[...ASSEMBLY, ...POT, ...WOK].flatMap((r) => [r.dish, ...r.parts]),
@@ -21,7 +21,7 @@ test('every id used by recipes, crates and processes exists in ITEMS', () => {
 
 test('DISHES equals the dishes of RECIPES in order and excludes the failed dish', () => {
   assert.deepEqual(DISHES, RECIPES.map((r) => r.dish));
-  assert.deepEqual(DISHES, k('hamburger', 'cheeseburger'));
+  assert.deepEqual(DISHES, k('hamburger', 'cheeseburger', 'pizza_margherita', 'salami_pizza'));
   assert.ok(isDish(FAILED));
   assert.ok(!DISHES.includes(FAILED));
 });

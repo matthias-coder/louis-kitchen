@@ -6,12 +6,14 @@ import {
   facingFromView, clearanceOffsets, floorOffsets, isReplaceable, isOverwritable, hasSpace,
 } from '../packs/BP/scripts/logic/layout.js';
 import { RADIUS, seatDirection, withinRadius, offset } from '../packs/BP/scripts/logic/restaurant.js';
+import { RECIPES } from '../packs/BP/scripts/logic/recipes.js';
+import { TIMED } from '../packs/BP/scripts/logic/processes.js';
 
 /** @typedef {import('../packs/BP/scripts/logic/restaurant.js').Direction} Direction */
 /** @type {Direction[]} */
 const FACINGS = ['north', 'east', 'south', 'west'];
 const { blocks, width, depth, height } = RESTAURANT;
-const STATIONS = ['grill', 'cutting_board', 'counter', 'dishwasher', 'dish_cabinet'];
+const STATIONS = ['grill', 'cutting_board', 'counter', 'oven', 'dishwasher', 'dish_cabinet'];
 const CABINETS = ['fridge', 'pantry'];
 const CRATES = ['crate_tools', 'crate_all'];
 
@@ -39,6 +41,18 @@ test('exactly one of each station, cabinet and crate, one bell, four tables and 
   for (const id of [...STATIONS, ...CABINETS, ...CRATES, 'bell']) assert.equal(ofId(id).length, 1, id);
   assert.equal(ofId('table').length, 4);
   assert.equal(ofId('chair').length, 4);
+});
+
+test('the kitchen has every station kind: every timed station and every station a dish needs', () => {
+  const kinds = new Set([...Object.keys(TIMED), ...RECIPES.flatMap((r) => r.stations)]);
+  for (const kind of kinds) assert.equal(ofId(kind).length, 1, kind);
+});
+
+test('the oven stands on the back row between counter and dishwasher', () => {
+  const at = (/** @type {string} */ id) => ofId(id)[0];
+  assert.deepEqual([at('counter').x, at('oven').x, at('dishwasher').x], [7, 8, 9]);
+  assert.equal(at('oven').z, at('counter').z);
+  assert.equal(at('oven').y, 1);
 });
 
 test('the dish cabinet starts with 8 plates', () => {

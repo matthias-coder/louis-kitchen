@@ -1,5 +1,7 @@
 import { INITIAL, grill, dishwasherTick, dishwasherView } from './stations.js';
 
+/** @typedef {ReturnType<typeof import('./stations.js').timedStation>} CookingStation */
+
 /** @typedef {import('./stations.js').GrillState} GrillState */
 /** @typedef {import('./stations.js').DishwasherState} DishwasherState */
 
@@ -91,10 +93,21 @@ export function tickTimed(keys, dt, io, typeId, def) {
   }
 }
 
-/** @type {TimedDef<GrillState, ReturnType<typeof grill.view>>} */
-const GRILL_TIMER = { name: 'grill', initial: grill.INITIAL, tick: grill.tick, view: grill.view };
 /** @type {TimedDef<DishwasherState, ReturnType<typeof dishwasherView>>} */
 const DISHWASHER_TIMER = { name: 'dishwasher', initial: INITIAL.dishwasher, tick: dishwasherTick, view: dishwasherView };
+
+/**
+ * Advances every registered station of one cooking kind (grill, oven) by `dt` (see tickTimed).
+ * @param {string[]} keys
+ * @param {number} dt
+ * @param {TickIo<GrillState, ReturnType<CookingStation['view']>>} io
+ * @param {string} typeId
+ * @param {string} name station kind, for warnings
+ * @param {CookingStation} station
+ */
+export function tickTimedStation(keys, dt, io, typeId, name, station) {
+  tickTimed(keys, dt, io, typeId, { name, initial: station.INITIAL, tick: station.tick, view: station.view });
+}
 
 /**
  * Advances every registered grill by `dt` (see tickTimed).
@@ -104,7 +117,7 @@ const DISHWASHER_TIMER = { name: 'dishwasher', initial: INITIAL.dishwasher, tick
  * @param {string} grillTypeId
  */
 export function tickGrills(keys, dt, io, grillTypeId) {
-  tickTimed(keys, dt, io, grillTypeId, GRILL_TIMER);
+  tickTimedStation(keys, dt, io, grillTypeId, 'grill', grill);
 }
 
 /**

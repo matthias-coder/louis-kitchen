@@ -1,14 +1,13 @@
 import { BlockPermutation, system } from '@minecraft/server';
 import {
-  INITIAL, migrateStationState,
-  grillInteract, grillView, grillDrops,
+  migrateStationState, grill as grillStation, oven as ovenStation,
   boardInteract, boardView, boardDrops,
   counterInteract, counterView, counterDrops,
   dishwasherInteract, dishwasherView, dishwasherDrops,
-  cabinetInteract, cabinetView, cabinetDrops,
+  cabinetInteract, cabinetView, cabinetDrops, INITIAL,
 } from '../logic/stations.js';
 import { locKey } from '../logic/store.js';
-import { interactStation, breakStation, tickGrills, tickDishwashers } from '../logic/station-flow.js';
+import { interactStation, breakStation, tickTimedStation, tickDishwashers } from '../logic/station-flow.js';
 import { worldStore, applyResult, heldItemId, dropItems, loadedBlock } from './effects.js';
 
 /** @typedef {import('@minecraft/server').Block} Block */
@@ -31,20 +30,29 @@ import { worldStore, applyResult, heldItemId, dropItems, loadedBlock } from './e
  * (for stations whose initial view differs from the block's default states)
  */
 
-const GRILL_ID = 'kochmod:grill';
+/** @typedef {import('../logic/stations.js').TimedState} TimedState */
+/** @typedef {import('../logic/station-flow.js').CookingStation} CookingStation */
 
-/** @param {import('../logic/stations.js').GrillState} s @returns {BlockStates} */
-const grillStates = (s) => ({ 'kochmod:content': grillView(s) });
+/**
+ * A cooking station block (grill, oven): block state `kochmod:content` shows the view.
+ * @param {'grill' | 'oven'} kind registry name and saved-state kind
+ * @param {CookingStation} station
+ * @returns {StationDef<TimedState>}
+ */
+const cookingDef = (kind, station) => ({
+  typeId: `kochmod:${kind}`,
+  initial: station.INITIAL,
+  interact: station.interact,
+  states: (s) => ({ 'kochmod:content': station.view(s) }),
+  drops: station.drops,
+  migrate: (saved) => migrateStationState(kind, saved),
+});
 
-/** @type {StationDef<import('../logic/stations.js').GrillState>} */
-const grill = {
-  typeId: GRILL_ID,
-  initial: INITIAL.grill,
-  interact: grillInteract,
-  states: grillStates,
-  drops: grillDrops,
-  migrate: (saved) => migrateStationState('grill', saved),
-};
+const grill = cookingDef('grill', grillStation);
+const oven = cookingDef('oven', ovenStation);
+
+/** Cooking stations ticked by tickStations: registry kind, block def, rules. @type {[string, StationDef<TimedState>, CookingStation][]} */
+const COOKING = [['grill', grill, grillStation], ['oven', oven, ovenStation]];
 
 /** @type {StationDef<import('../logic/stations.js').BoardState>} */
 const cuttingBoard = {
@@ -214,6 +222,7 @@ function stationComponent(kind, def) {
 /** @type {Record<string, [string, StationDef<any>]>} */
 const BY_TYPE = {
   [grill.typeId]: ['grill', grill],
+  [oven.typeId]: ['oven', oven],
   [cuttingBoard.typeId]: ['cutting_board', cuttingBoard],
   [counter.typeId]: ['counter', counter],
   [dishwasher.typeId]: ['dishwasher', dishwasher],
@@ -281,11 +290,13 @@ function tickIo(kind, def, statesOf) {
 }
 
 /**
- * Advances every loaded grill and dishwasher by `dt` ticks. Stations in unloaded chunks pause.
+ * Advances every loaded grill, oven and dishwasher by `dt` ticks. Stations in unloaded chunks pause.
  * @param {number} dt
  */
 export function tickStations(dt) {
-  tickGrills(worldStore.registryList('grill'), dt, tickIo('grill', grill, (view) => ({ 'kochmod:content': view })), GRILL_ID);
+  for (const [kind, def, station] of COOKING) {
+    tickTimedStation(worldStore.registryList(kind), dt, tickIo(kind, def, (view) => ({ 'kochmod:content': view })), def.typeId, kind, station);
+  }
   tickDishwashers(
     worldStore.registryList('dishwasher'), dt,
     tickIo('dishwasher', dishwasher, (view) => ({ 'kochmod:state': view })), DISHWASHER_ID,

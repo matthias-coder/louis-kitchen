@@ -269,3 +269,36 @@ test('counter: family enum and layer count, one stack of 6 layer bones per famil
     for (const cube of bone.cubes) assert.ok(cube.origin[1] + cube.size[1] <= 23, `${bone.name} reaches above 23 px`);
   }
 });
+
+test('oven: content states, fire and one pizza bone per stage, nothing above 23 px, collision within the block', () => {
+  const { block, geo, vis } = blockWithGeometry('oven');
+  assert.equal(block.description.identifier, 'kochmod:oven');
+  assert.deepEqual(block.description.states, { 'kochmod:content': ['empty', 'raw', 'cooked', 'burnt'] });
+  assert.deepEqual(vis, {
+    fire: "q.block_state('kochmod:content') != 'empty'",
+    pizza_raw: "q.block_state('kochmod:content') == 'raw'",
+    pizza_cooked: "q.block_state('kochmod:content') == 'cooked'",
+    pizza_burnt: "q.block_state('kochmod:content') == 'burnt'",
+  });
+  assert.equal(block.components['minecraft:geometry'].identifier, 'geometry.kochmod.oven');
+  assert.deepEqual(block.components['minecraft:material_instances']['*'], { texture: 'kochmod_oven', render_method: 'alpha_test' });
+  assert.ok('kochmod:oven' in block.components);
+  for (const box of ['minecraft:collision_box', 'minecraft:selection_box']) {
+    const { origin, size } = block.components[box];
+    assert.ok(origin[1] + size[1] <= 16, box);
+  }
+  for (const bone of geo.bones) {
+    for (const cube of bone.cubes) assert.ok(cube.origin[1] + cube.size[1] <= 23, `${bone.name} reaches above 23 px`);
+  }
+});
+
+test('oven: name, hints and sound exist', () => {
+  for (const lang of ['de_DE', 'en_US']) {
+    const text = fs.readFileSync(path.join(root, 'packs/RP/texts', `${lang}.lang`), 'utf8');
+    for (const line of ['tile.kochmod:oven.name=Pizzaofen', 'kochmod.hint.need_peel=Nimm den Pizzaschieber!', 'kochmod.hint.oven_full=Der Ofen ist belegt.']) {
+      assert.ok(text.split(/\r?\n/).includes(line), `${lang}: ${line}`);
+    }
+  }
+  const sounds = JSON.parse(fs.readFileSync(path.join(root, 'packs/RP/sounds/sound_definitions.json'), 'utf8')).sound_definitions;
+  assert.ok(sounds['kochmod.oven']?.sounds?.length > 0);
+});

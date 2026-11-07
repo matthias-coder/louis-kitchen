@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { interactStation, breakStation, tickGrills, tickDishwashers } from '../packs/BP/scripts/logic/station-flow.js';
+import { interactStation, breakStation, tickGrills, tickDishwashers, tickTimedStation } from '../packs/BP/scripts/logic/station-flow.js';
 import { INITIAL, WASH_TICKS, boardInteract, boardView, boardDrops, grillView } from '../packs/BP/scripts/logic/stations.js';
 
 const GRILL = 'kochmod:grill';
@@ -140,4 +140,19 @@ test('tickDishwashers: a loaded dishwasher without saved state is initialised; e
   assert.deepEqual(w.states.a, INITIAL.dishwasher);
   assert.equal(w.warnings.length, 1);
   assert.match(w.warnings[0], /dishwasher.*b/);
+});
+
+test('tickTimedStation: bakes loaded ovens with the oven rules and switches the view when done', async () => {
+  const { oven } = await import('../packs/BP/scripts/logic/stations.js');
+  const OVEN = 'kochmod:oven';
+  const w = fakeWorld({ a: OVEN, b: OVEN, c: 'minecraft:air' }, {
+    a: { item: 'kochmod:raw_salami_pizza', ticks: 150 },
+    b: { item: null, ticks: 0 },
+    c: { item: 'kochmod:raw_salami_pizza', ticks: 0 },
+  });
+  tickTimedStation(['a', 'b', 'c'], 10, w.io, OVEN, 'oven', oven);
+  assert.deepEqual(w.states.a, { item: 'kochmod:raw_salami_pizza', ticks: 160 });
+  assert.deepEqual(w.views, { a: 'cooked' });
+  assert.deepEqual(w.forgotten, ['c']);
+  assert.deepEqual(w.warnings, []);
 });

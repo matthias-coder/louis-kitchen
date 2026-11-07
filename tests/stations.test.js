@@ -573,8 +573,10 @@ for (const [parts, ticks, out] of /** @type {[string[], number, string][]} */ ([
   [['broth', 'noodles', 'egg', 'spring_onion'].map(k), COOKED_AT, k('failed_dish')],
   [[k('mystery')], COOKED_AT, k('failed_dish')],
 ])) {
-  test(`wok: the spatula serves ${out} from ${parts.join('+')} after ${ticks} ticks and empties the wok`, () => {
-    assert.deepEqual(wokInteract({ items: parts, ticks }, WOK_SPATULA), { state: WOK_EMPTY, take: true, give: out });
+  test(`wok: the spatula serves ${out} from ${parts.join('+')} after ${ticks} ticks, empties the wok and stays in the hand`, () => {
+    const r = wokInteract({ items: parts, ticks }, WOK_SPATULA);
+    assert.deepEqual(r, { state: WOK_EMPTY, give: out });
+    assert.equal('take' in r, false, 'the wok spatula is not consumed');
   });
 }
 
@@ -688,7 +690,7 @@ const TRASH_RESULT = { take: true, sound: 'kochmod.trash', particle: 'minecraft:
 
 test('trash: any food in hand disappears, one at a time, with sound, smoke and the lid popping up', () => {
   assert.deepEqual(trashInteract(k('burnt_pizza')), { state: { open: TRASH_LID_TICKS }, ...TRASH_RESULT });
-  assert.equal(TRASH_LID_TICKS, 10);
+  assert.equal(TRASH_LID_TICKS, 20, 'the lid is visible for 10–20 ticks with a station tick every 10');
   for (const id of ['failed_dish', 'burnt_pizza', 'burnt_patty', 'dirty_plate', 'clean_plate', 'hamburger', 'tomato', 'cooked_rice'].map(k)) {
     assert.deepEqual(trashInteract(id), { state: { open: TRASH_LID_TICKS }, ...TRASH_RESULT }, id);
   }
@@ -740,6 +742,9 @@ test('trash: the lid counts down to closed; view is the kochmod:open state', () 
   assert.deepEqual(trashView({ open: 0 }), { 'kochmod:open': false });
   assert.deepEqual(trashView({ open: 1 }), { 'kochmod:open': true });
   assert.deepEqual(trashView(trashInteract(k('burnt_pizza')).state), { 'kochmod:open': true });
+  const afterOneTick = trashTick(trashInteract(k('burnt_pizza')).state, 10);
+  assert.deepEqual(trashView(afterOneTick), { 'kochmod:open': true }, 'still open after the first station tick');
+  assert.deepEqual(trashView(trashTick(afterOneTick, 10)), { 'kochmod:open': false }, 'closed after the second');
 });
 
 test('trash: nothing is stored, breaking drops nothing', () => {

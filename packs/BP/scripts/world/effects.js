@@ -97,13 +97,19 @@ function give(player, itemId, count) {
 }
 
 /**
- * Spawns one item entity per id at a location.
+ * Spawns one item entity per id at a location. An unknown id is skipped with a warning; the rest still drops.
  * @param {Dimension} dimension
  * @param {Vector3} location
  * @param {string[]} itemIds
  */
 export function dropItems(dimension, location, itemIds) {
-  for (const id of itemIds) dimension.spawnItem(new ItemStack(id, 1), location);
+  for (const id of itemIds) {
+    try {
+      dimension.spawnItem(new ItemStack(id, 1), location);
+    } catch (error) {
+      console.warn(`kochmod: cannot drop ${id}: ${error}`);
+    }
+  }
 }
 
 /**

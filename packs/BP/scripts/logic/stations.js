@@ -144,7 +144,7 @@ export function potStation(def) {
         if (items.length === 0) return { state, hint: def.hints.empty };
         if (ticks < COOKED_AT) return { state, hint: def.hints.cooking };
         const give = cookStage(ticks) === 'burnt' ? FAILED : evaluateFor(def.recipes, items);
-        return { state: initial, take: true, give };
+        return def.consumesTool ? { state: initial, take: true, give } : { state: initial, give };
       }
       if (held === null) return items.length === 0 ? { state } : { state, hint: def.hints.needTool };
       if (!isFood(held)) return { state };
@@ -431,8 +431,8 @@ export function cabinetDrops(state) {
 
 // ---- Trash can
 
-/** Ticks the lid stays up after a throw. The station tick runs every 10 ticks, so it closes on the next one. */
-export const TRASH_LID_TICKS = 10;
+/** Ticks the lid stays up after a throw. The station tick runs every 10 ticks, so it is visible for 10–20 ticks. */
+export const TRASH_LID_TICKS = 20;
 
 /**
  * One held item disappears for good (any id, also unknown ones), with sound, a smoke puff and the lid

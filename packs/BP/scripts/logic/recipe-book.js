@@ -1,9 +1,10 @@
 import { DISHES } from './recipes.js';
 import { stepsFor } from './processes.js';
-import { plateName } from './catalog.js';
+import { ITEMS, plateName } from './catalog.js';
 
 /** @typedef {import('@minecraft/server').RawMessage} RawMessage */
 /** @typedef {{ label: RawMessage, icon: string }} BookButton */
+/** @typedef {import('./processes.js').Step} Step */
 
 const PREFIX = 'kochmod:';
 const BOOK_ICON = 'textures/items/recipe_book';
@@ -26,21 +27,54 @@ export function bookIndex() {
   };
 }
 
+/** @param {string} id @returns {boolean} */
+const isIngredient = (id) => Object.hasOwn(ITEMS, id) && ITEMS[id].kind === 'ingredient';
+
 /**
- * The steps of one dish, one button each, plus a back button. Identical preparation steps appear once.
+ * The picture sequence of one dish: walks the recipe parts in order; an ingredient becomes
+ * "<Zutat> ➜ <Kühlschrank|Vorratsschrank>", a prepared part first its own inputs, then its process step.
+ * Each ingredient and each step appears once; the final step comes last.
+ * @param {string} dishId
+ * @returns {{ item: string, station: string, tool?: string }[]}
+ */
+function sequence(dishId) {
+  const steps = stepsFor(dishId);
+  /** @type {Map<string, Step>} output item -> the step that makes it */
+  const makes = new Map(steps.map((s) => [s.result ?? s.item, s]));
+  /** @type {{ item: string, station: string, tool?: string }[]} */
+  const out = [];
+  const seen = new Set();
+  /** @param {string} key @param {{ item: string, station: string, tool?: string }} entry */
+  const emit = (key, entry) => {
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push(entry);
+  };
+  /** @param {string} item */
+  const walk = (item) => {
+    if (isIngredient(item)) {
+      const source = ITEMS[item].source;
+      if (source) emit(`fetch|${item}`, { item, station: source });
+      return;
+    }
+    const step = makes.get(item);
+    if (!step) return;
+    for (const input of step.parts ?? [step.item]) walk(input);
+    emit(`${step.item}|${step.station}|${step.result ?? ''}`, step);
+  };
+  walk(dishId);
+  return out;
+}
+
+/**
+ * The steps of one dish, one button each, plus a back button: every ingredient with the crate it comes
+ * from, then the station step that uses it; the final step last.
  * @param {string} dishId
  * @returns {{ title: RawMessage, buttons: BookButton[] }}
  */
 export function bookPages(dishId) {
-  const seen = new Set();
-  const steps = stepsFor(dishId).filter((s) => {
-    const key = `${s.item}|${s.station}|${s.result ?? ''}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
   /** @type {BookButton[]} */
-  const buttons = steps.map((s, i) => ({
+  const buttons = sequence(dishId).map((s, i) => ({
     label: {
       rawtext: [
         { text: `${i + 1}. ` }, itemName(s.item), { text: ' ➜ ' }, stationName(s.station),

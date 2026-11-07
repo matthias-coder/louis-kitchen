@@ -25,7 +25,8 @@ export const ARRIVE_DISTANCE = 1.5;
 /** Guest ticks the entity may be missing before the bell gives up on it (entities load after blocks). */
 export const MISSING_GRACE = 3;
 
-const STATION_KINDS = [...new Set(DISHES.flatMap(stationsFor))];
+/** Station kinds the dishes need (registry kinds; each is also a block id). */
+export const STATION_KINDS = [...new Set(DISHES.flatMap(stationsFor))];
 /** Plate states of the table: one per dish plus the failed dish. */
 export const DISH_PLATES = [...DISHES.map(plateName), plateName(FAILED)];
 const PREFIX = 'kochmod:';
@@ -371,7 +372,7 @@ export function ringBell(bellKey, io, rnd) {
 
 /**
  * Spawner first (a seat freed in this step is filled only after a fresh delay),
- * then one step per seated guest; each guest is isolated by its own try/catch.
+ * then one step per seated guest; the spawner and each guest are isolated by their own try/catch.
  * @param {string} bellKey
  * @param {number} dt
  * @param {GuestIo} io
@@ -385,7 +386,16 @@ function tickBell(bellKey, dt, io, rnd) {
     return;
   }
   const loaded = loadBell(bellKey, io) ?? freeBell(rnd);
-  const state = trySpawn(bellKey, loaded, dt, io, rnd);
+  /** @type {BellState} */
+  let state;
+  try {
+    state = trySpawn(bellKey, loaded, dt, io, rnd);
+  } catch (e) {
+    // a failing spawner must not freeze the bell: retry later, the seated guests still step
+    io.warn(`kochmod: spawning failed at bell ${bellKey}: ${e}`);
+    const { pending: _, ...rest } = loaded;
+    state = { ...rest, cooldown: RETRY_TICKS };
+  }
   /** @type {Record<string, SeatEntry>} */
   const guests = { ...state.guests };
   let left = false;

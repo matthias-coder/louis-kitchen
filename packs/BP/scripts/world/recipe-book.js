@@ -35,7 +35,7 @@ async function ask(player, title, buttons, retriesDone) {
   }
 }
 
-/** Index -> dish page -> back to the index, until the player closes a form. @param {Player} player */
+/** Index -> dish page (again after a tapped step) -> back to the index, until the player closes a form. @param {Player} player */
 async function openBook(player) {
   for (;;) {
     const index = bookIndex();
@@ -43,9 +43,13 @@ async function openBook(player) {
     const dish = picked === undefined ? undefined : index.buttons[picked]?.dish;
     if (!dish) return;
     const page = bookPages(dish);
-    const step = await ask(player, page.title, page.buttons, 0);
-    // only the last button ("back") returns to the list; closing the page ends the book
-    if (step !== page.buttons.length - 1) return;
+    // a tapped step shows the same page again; only the last button ("back") returns to the list,
+    // closing the page ends the book
+    for (;;) {
+      const step = await ask(player, page.title, page.buttons, 0);
+      if (step === undefined) return;
+      if (step === page.buttons.length - 1) break;
+    }
   }
 }
 

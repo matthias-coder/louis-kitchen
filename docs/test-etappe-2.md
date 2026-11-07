@@ -45,7 +45,7 @@ Für Papa und Sohn. Hake ab, was klappt. Erst am PC, dann am Tablet.
 
 ### Suppentopf
 
-- [ ] Zutaten in den Topf legen (zum Beispiel Brühe, Nudeln, Ei, Frühlingszwiebel). Der Topf blubbert und Dampf steigt auf.
+- [ ] Zutaten in den Topf legen (zum Beispiel Brühe, Nudeln, Ei, Frühlingszwiebel). Der Topf blubbert. Nach etwa 4 Sekunden steigt Dampf auf.
 - [ ] Mit leerer Hand: Hinweis „Nimm eine Schüssel!".
 - [ ] Antippen, solange es kocht: Hinweis „Das kocht noch.".
 - [ ] Mit der Schüssel antippen, wenn es fertig ist: Man bekommt Ramen.
@@ -55,7 +55,7 @@ Für Papa und Sohn. Hake ab, was klappt. Erst am PC, dann am Tablet.
 
 ### Dönerspieß
 
-- [ ] Hänge rohes Dönerfleisch an den Spieß. Es dreht sich.
+- [ ] Hänge rohes Dönerfleisch an den Spieß. Das Fleisch ist am Spieß zu sehen.
 - [ ] Nach 8 Sekunden mit dem Messer antippen: Jedes Antippen gibt eine Scheibe Dönerfleisch, insgesamt 6 Scheiben.
 - [ ] Zweites Fleisch an den vollen Spieß: Hinweis „Da hängt schon Fleisch.".
 - [ ] Mit dem Messer, bevor es fertig ist: Hinweis „Das Fleisch ist noch nicht fertig.".
@@ -65,7 +65,7 @@ Für Papa und Sohn. Hake ab, was klappt. Erst am PC, dann am Tablet.
 ### Wok
 
 - [ ] Zutaten in den Wok legen (Nudeln, Ei, Karottenscheiben, Frühlingszwiebel, Sojasoße). Er brutzelt.
-- [ ] Mit dem Wokwender antippen, wenn es fertig ist: Bratnudeln.
+- [ ] Mit dem Wokwender antippen, wenn es fertig ist: Bratnudeln. Der Wokwender bleibt in der Hand.
 - [ ] Mit leerer Hand: Hinweis „Nimm den Wokwender!".
 - [ ] Zu viele Zutaten: Hinweis „Der Wok ist voll.".
 
@@ -94,8 +94,9 @@ Für Papa und Sohn. Hake ab, was klappt. Erst am PC, dann am Tablet.
 
 - [ ] Das Rezeptbuch hat einen deutschen Namen und ein Bild.
 - [ ] Tippe mit dem Rezeptbuch in der Hand. Eine Liste mit 9 Bildknöpfen öffnet sich, einer pro Gericht.
-- [ ] Tippe ein Gericht an. Es erscheinen nummerierte Schritte, zum Beispiel „1. Zwiebel ➜ Schneidebrett (Messer)".
-- [ ] Jeder Schritt hat die Form „Zutat ➜ Station (Werkzeug)" und ein Bild.
+- [ ] Tippe ein Gericht an. Es erscheinen nummerierte Schritte mit Bild. Zuerst steht jede Zutat mit ihrem Schrank da, dann das Gerät, zum Beispiel beim Cheeseburger „1. Brötchen ➜ Vorratsschrank", „2. Rohe Frikadelle ➜ Kühlschrank", „3. Rohe Frikadelle ➜ Grill (Pfannenwender)" … „8. Cheeseburger ➜ Anrichte".
+- [ ] Hamburger und Cheeseburger sehen verschieden aus (nur beim Cheeseburger steht Käse). Bei Pizza und Sushi stehen Pizzateig, Tomatensoße, Käse, Reis und Algenblatt dabei.
+- [ ] Tippe einen Schritt an: Dieselbe Seite bleibt offen.
 - [ ] Der Knopf „Zurück" bringt dich zur Liste.
 
 ## Teil 6: Gäste
@@ -125,7 +126,7 @@ Baue jedes Restaurant einmal auf einer freien, ebenen Fläche (im Überlebensmod
 - [ ] In jeder Küche steht genau ein Mülleimer, und er funktioniert gleich nach dem Bauen.
 - [ ] Im Restaurant und im Döner-Imbiss steht der Mülleimer an der linken Wand der Küche, nicht in der Küchenreihe; an die Kochmod-Kiste in der Ecke kommt man direkt heran.
 - [ ] Alles ist begehbar. Man kommt an jedes Gerät, jede Kiste und jeden Stuhl. Im Mega-Restaurant kommt man über die Treppe nach oben.
-- [ ] Tippe die Glocke an. Ein Gast kommt und setzt sich. Im Mega-Restaurant kommen auch oben Gäste (obere Glocke läuten).
+- [ ] Tippe die Glocke an. Auf jeden freien Stuhl setzt sich ein Gast, einer nach dem anderen. Im Mega-Restaurant kommen auch oben Gäste (obere Glocke läuten).
 - [ ] Ein alter „Restaurant-Baukasten" aus Etappe 1 baut weiterhin das Restaurant.
 
 ## Teil 8: Tablet

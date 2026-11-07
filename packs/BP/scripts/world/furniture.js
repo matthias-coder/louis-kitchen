@@ -172,7 +172,13 @@ const bellComponent = {
     // registered first, so the bell's own guests count as seated
     worldStore.registryAdd('bell', key);
     // ringing calls a guest for every free seat right away (staggered)
-    const hint = BELL_HINTS[ringBell(key)];
+    let hint;
+    try {
+      hint = BELL_HINTS[ringBell(key)];
+    } catch (error) {
+      console.warn(`kochmod bell: ring failed: ${error}`);
+      return; // no hint after a failed ring
+    }
     try {
       player?.onScreenDisplay.setActionBar({ translate: hint });
     } catch (error) {

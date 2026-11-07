@@ -73,13 +73,15 @@ export const POT = [
 /**
  * A station that cooks a mix of items by time and is emptied with a tool (pot, wok).
  * hints: lang keys for full, still cooking, empty hand on a filled station, tool on an empty station.
- * @typedef {{ recipes: DishRecipe[], tool: string, max: number,
+ * consumesTool: whether scooping uses up the tool (the pot's bowl becomes the dish container; the wok spatula stays).
+ * @typedef {{ recipes: DishRecipe[], tool: string, consumesTool: boolean, max: number,
  *   hints: { full: string, cooking: string, needTool: string, empty: string }, sound: string }} PotDef
  */
 /** @type {PotDef} */
 export const POT_DEF = {
   recipes: POT,
   tool: 'kochmod:bowl',
+  consumesTool: true,
   max: 6,
   hints: { full: 'kochmod.hint.pot_full', cooking: 'kochmod.hint.pot_cooking', needTool: 'kochmod.hint.need_bowl', empty: 'kochmod.hint.pot_empty' },
   sound: 'kochmod.bubble',
@@ -92,6 +94,7 @@ export const WOK = [
 export const WOK_DEF = {
   recipes: WOK,
   tool: 'kochmod:wok_spatula',
+  consumesTool: false,
   max: 6,
   hints: { full: 'kochmod.hint.wok_full', cooking: 'kochmod.hint.pot_cooking', needTool: 'kochmod.hint.need_wok_spatula', empty: 'kochmod.hint.pot_empty' },
   sound: 'kochmod.sizzle',

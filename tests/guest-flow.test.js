@@ -781,3 +781,24 @@ test('an old world keeps its seated guest after the migration', () => {
   assert.deepEqual(w.bells[BELL_KEY], { guests: { [CHAIR_KEY]: { guestId: id, table: TABLE_KEY } }, cooldown: RETRY_TICKS });
   assert.deepEqual(w.log, [['hold', id]]);
 });
+
+// ---- spawner errors
+
+test('a throwing spawner does not freeze the bell: warn, retry later, seated guests still step', () => {
+  const w = threeSeats({ bells: { [BELL_KEY]: FREE(0) } });
+  const id = w.seatGuest({ phase: 'eating', timer: 400, served: HAM });
+  w.io.spawnGuest = () => { throw new Error('boom'); };
+  tick(w);
+  assert.equal(w.guests[id].data.timer, 380, 'the seated guest keeps eating');
+  assert.deepEqual(w.bells[BELL_KEY], { guests: { [CHAIR_KEY]: { guestId: id, table: TABLE_KEY } }, cooldown: RETRY_TICKS });
+  assert.equal(w.warnings.length, 1);
+  assert.match(w.warnings[0], /boom/);
+});
+
+test('a throwing spawner during a ring drops the pending guests and retries later', () => {
+  const w = threeSeats({ bells: { [BELL_KEY]: { guests: {}, cooldown: 0, pending: 2 } } });
+  w.io.spawnGuest = () => { throw new Error('boom'); };
+  tick(w);
+  assert.deepEqual(w.bells[BELL_KEY], { guests: {}, cooldown: RETRY_TICKS });
+  assert.equal(w.warnings.length, 1);
+});

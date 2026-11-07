@@ -86,10 +86,11 @@ test('pot recipes: ramen, potato soup and cooked rice', () => {
   for (const r of POT) for (const id of [r.dish, ...r.parts]) assert.ok(id in ITEMS, id);
 });
 
-test('pot def: recipes, bowl, six items, hints and the bubble sound', () => {
+test('pot def: recipes, bowl (consumed: it becomes the dish container), six items, hints and the bubble sound', () => {
   assert.deepEqual(POT_DEF, {
     recipes: POT,
     tool: k('bowl'),
+    consumesTool: true,
     max: 6,
     hints: { full: 'kochmod.hint.pot_full', cooking: 'kochmod.hint.pot_cooking', needTool: 'kochmod.hint.need_bowl', empty: 'kochmod.hint.pot_empty' },
     sound: 'kochmod.bubble',
@@ -123,10 +124,11 @@ test('wok recipes: fried noodles', () => {
   for (const r of WOK) for (const id of [r.dish, ...r.parts]) assert.ok(id in ITEMS, id);
 });
 
-test('wok def: recipes, wok spatula, six items, hints and the sizzle sound', () => {
+test('wok def: recipes, wok spatula (kept), six items, hints and the sizzle sound', () => {
   assert.deepEqual(WOK_DEF, {
     recipes: WOK,
     tool: k('wok_spatula'),
+    consumesTool: false,
     max: 6,
     hints: { full: 'kochmod.hint.wok_full', cooking: 'kochmod.hint.pot_cooking', needTool: 'kochmod.hint.need_wok_spatula', empty: 'kochmod.hint.pot_empty' },
     sound: 'kochmod.sizzle',

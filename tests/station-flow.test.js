@@ -1,9 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { interactStation, breakStation, tickGrills } from '../packs/BP/scripts/logic/station-flow.js';
-import { INITIAL, boardInteract, boardView, boardDrops, grillView } from '../packs/BP/scripts/logic/stations.js';
+import { interactStation, breakStation, tickGrills, tickDishwashers } from '../packs/BP/scripts/logic/station-flow.js';
+import { INITIAL, WASH_TICKS, boardInteract, boardView, boardDrops, grillView } from '../packs/BP/scripts/logic/stations.js';
 
 const GRILL = 'kochmod:grill';
+const WASHER = 'kochmod:dishwasher';
 
 test('interactStation sets the view, then saves, then applies', () => {
   /** @type {string[]} */
@@ -112,4 +113,30 @@ test('tickGrills: empty and fully burnt grills are not rewritten', () => {
   tickGrills(['a', 'b'], 10, w.io, GRILL);
   assert.equal(saves, 0);
   assert.equal(grillView(w.states.b), 'burnt');
+});
+
+test('tickDishwashers: washes loaded dishwashers, switches the view once done, skips empty ones', () => {
+  const w = fakeWorld(
+    { a: WASHER, b: WASHER, c: WASHER, d: 'minecraft:air' },
+    { a: { plates: 2, ticks: WASH_TICKS - 10 }, b: { plates: 0, ticks: 0 }, c: { plates: 1, ticks: 0 }, d: { plates: 1, ticks: 0 } },
+  );
+  let saves = 0;
+  const save = w.io.save;
+  w.io.save = (k, s) => { saves++; save(k, s); };
+  tickDishwashers(['a', 'b', 'c', 'd'], 10, w.io, WASHER);
+  assert.deepEqual(w.states.a, { plates: 2, ticks: WASH_TICKS });
+  assert.equal(w.views.a, 'done');
+  assert.deepEqual(w.states.c, { plates: 1, ticks: 10 });
+  assert.equal('c' in w.views, false, 'still running, no permutation update');
+  assert.equal(saves, 2, 'the empty dishwasher is not rewritten');
+  assert.deepEqual(w.forgotten, ['d']);
+  assert.equal(w.warnings.length, 0);
+});
+
+test('tickDishwashers: a loaded dishwasher without saved state is initialised; errors are isolated', () => {
+  const w = fakeWorld({ a: WASHER, b: WASHER }, { b: new Error('corrupt') });
+  tickDishwashers(['b', 'a'], 10, w.io, WASHER);
+  assert.deepEqual(w.states.a, INITIAL.dishwasher);
+  assert.equal(w.warnings.length, 1);
+  assert.match(w.warnings[0], /dishwasher.*b/);
 });

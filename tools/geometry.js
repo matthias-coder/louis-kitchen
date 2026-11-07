@@ -27,10 +27,39 @@ const tallCabinet = [
   { name: 'cabinet', cubes: [{ origin: [-7, 0, -7], size: [14, 30, 14], top: 'top', side: 'side', bottom: 'bottom', front: 'front' }] },
 ];
 
+/** Dish cabinet plates: 4 on the bottom board, 4 on the shelf; plate_n shows when the count is >= n. */
+const PLATE_Y = [1, 2, 3, 4, 8, 9, 10, 11];
+
 /** @type {Record<keyof typeof layouts, BoneDef[]>} */
 export const models = {
   fridge: tallCabinet,
   pantry: tallCabinet,
+  // Front (north, -z) faces the player after the cardinal_direction rotation; the status light sticks out 0.5 px.
+  dishwasher: [
+    { name: 'body', cubes: [{ origin: [-8, 0, -8], size: [16, 16, 16], top: 'top', side: 'side', bottom: 'bottom', front: 'front' }] },
+    ...['off', 'blue', 'green'].map((light) => ({
+      name: `light_${light}`,
+      cubes: [/** @type {CubeDef} */ ({ origin: [4, 13, -8.5], size: [2, 2, 0.5], top: `light_${light}`, side: `light_${light}` })],
+    })),
+  ],
+  // Open towards north (-z): back wall, two side walls, bottom, middle shelf and top board.
+  dish_cabinet: [
+    {
+      name: 'cabinet',
+      cubes: [
+        { origin: [-8, 0, 7], size: [16, 16, 1], top: 'panel_top', side: 'panel', front: 'inside' },
+        { origin: [-8, 0, -8], size: [1, 16, 15], top: 'panel_top', side: 'panel' },
+        { origin: [7, 0, -8], size: [1, 16, 15], top: 'panel_top', side: 'panel' },
+        { origin: [-7, 0, -8], size: [14, 1, 15], top: 'board_top', side: 'board_edge' },
+        { origin: [-7, 7, -8], size: [14, 1, 15], top: 'board_top', side: 'board_edge' },
+        { origin: [-7, 15, -8], size: [14, 1, 15], top: 'panel_top', side: 'board_edge', bottom: 'board_top' },
+      ],
+    },
+    ...PLATE_Y.map((y, i) => ({
+      name: `plate_${i + 1}`,
+      cubes: [/** @type {CubeDef} */ ({ origin: [-4, y, -5], size: [8, 0.75, 8], top: 'plate_top', side: 'plate_side' })],
+    })),
+  ],
   grill: [
     body(11),
     { name: 'grate', cubes: [{ origin: [-7, 11, -7], size: [14, 1, 14], top: 'grate_top', side: 'grate_side', bottom: 'body_bottom' }] },

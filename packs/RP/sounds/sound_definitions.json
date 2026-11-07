@@ -12,6 +12,10 @@
     "kochmod.plate": {
       "category": "block",
       "sounds": ["sounds/random/pop"]
+    },
+    "kochmod.bubble": {
+      "category": "block",
+      "sounds": ["sounds/bubbles/bubble1", "sounds/bubbles/bubble2", "sounds/bubbles/bubble3"]
     }
   }
 }

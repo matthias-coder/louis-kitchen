@@ -119,6 +119,24 @@ const TALL = {
 export const layouts = {
   fridge: TALL,
   pantry: TALL,
+  dishwasher: {
+    front: /** @type {Region} */ ([0, 0, 16, 16]),
+    side: /** @type {Region} */ ([16, 0, 16, 16]),
+    top: /** @type {Region} */ ([32, 0, 16, 16]),
+    bottom: /** @type {Region} */ ([48, 0, 16, 16]),
+    light_off: /** @type {Region} */ ([0, 16, 2, 2]),
+    light_blue: /** @type {Region} */ ([4, 16, 2, 2]),
+    light_green: /** @type {Region} */ ([8, 16, 2, 2]),
+  },
+  dish_cabinet: {
+    panel: /** @type {Region} */ ([0, 0, 16, 16]),
+    panel_top: /** @type {Region} */ ([16, 0, 16, 16]),
+    inside: /** @type {Region} */ ([32, 0, 16, 16]),
+    board_edge: /** @type {Region} */ ([48, 0, 16, 1]),
+    board_top: /** @type {Region} */ ([0, 16, 16, 16]),
+    plate_top: /** @type {Region} */ ([16, 16, 8, 8]),
+    plate_side: /** @type {Region} */ ([32, 16, 8, 1]),
+  },
   grill: {
     body_side: /** @type {Region} */ ([0, 0, 16, 11]),
     body_top: /** @type {Region} */ ([16, 0, 16, 16]),
@@ -792,4 +810,79 @@ export const pantry = {
     O: '#d9b274', P: '#c9a063', K: '#8a5a2b', N: '#b98b4e', Y: '#f3dc9a', Q: '#a8742f',
   },
   rows: drawPantry(),
+};
+
+// ---- Dishwasher: white box, dark control strip with a status light, door line and handle
+
+function drawDishwasher() {
+  const L = layouts.dishwasher;
+  const c = canvas();
+  c.fill(L.front, 'W');
+  for (let y = 0; y < 4; y++) c.row(L.front, y, 'D');
+  c.row(L.front, 3, 'E');
+  for (const x of [9, 11, 13]) c.px(L.front, x, 1, 'B'); // buttons
+  for (let y = 0; y < 4; y++) for (let x = 1; x <= 4; x++) c.px(L.front, x, y, 'E'); // socket behind the light (north face: u = 8 - x)
+  c.row(L.front, 4, 'L'); // door line
+  for (let x = 3; x <= 12; x++) { c.px(L.front, x, 6, 'H'); c.px(L.front, x, 7, 'M'); } // handle
+  for (let y = 4; y < 14; y++) { c.px(L.front, 0, y, 'L'); c.px(L.front, 15, y, 'L'); }
+  for (let y = 14; y < 16; y++) c.row(L.front, y, 'K'); // kick plate
+  c.fill(L.side, 'G');
+  c.border(L.side, 'F');
+  for (let y = 14; y < 16; y++) c.row(L.side, y, 'K');
+  c.fill(L.top, 'W');
+  c.border(L.top, 'L');
+  c.fill(L.bottom, 'K');
+  c.fill(L.light_off, 'o');
+  c.px(L.light_off, 0, 0, 'p');
+  c.fill(L.light_blue, 'b');
+  c.px(L.light_blue, 0, 0, 'c');
+  c.fill(L.light_green, 'g');
+  c.px(L.light_green, 0, 0, 'h');
+  return c.rows();
+}
+
+/** @type {Sprite} */
+export const dishwasher = {
+  name: 'dishwasher',
+  palette: {
+    W: '#f1f4f6', L: '#cfd5da', G: '#d3d9de', F: '#aab2b9', K: '#4a4f55',
+    D: '#2f3439', E: '#1f2327', B: '#9aa3aa', H: '#3b4147', M: '#9aa3aa',
+    o: '#3a3f44', p: '#555b61', b: '#3fa9ff', c: '#bfe6ff', g: '#46d35a', h: '#c8ffc8',
+  },
+  rows: drawDishwasher(),
+};
+
+// ---- Dish cabinet: open wooden cabinet with a middle shelf; the plate stack grows with the count
+
+function drawDishCabinet() {
+  const L = layouts.dish_cabinet;
+  const c = canvas();
+  c.fill(L.panel, 'O');
+  for (let x = 0; x < 16; x += 4) for (let y = 0; y < 16; y++) c.px(L.panel, x, y, 'P');
+  c.border(L.panel, 'K');
+  c.fill(L.panel_top, 'O');
+  for (let y = 0; y < 16; y += 4) c.row(L.panel_top, y, 'P');
+  c.border(L.panel_top, 'K');
+  c.fill(L.inside, 'I');
+  for (let x = 1; x < 16; x += 5) for (let y = 0; y < 16; y++) c.px(L.inside, x, y, 'J');
+  c.fill(L.board_edge, 'K');
+  c.fill(L.board_top, 'N');
+  for (let y = 2; y < 16; y += 5) c.row(L.board_top, y, 'P');
+  c.fill(L.plate_top, 'w');
+  c.border(L.plate_top, 'r');
+  for (const [x, y] of [[0, 0], [7, 0], [0, 7], [7, 7]]) c.px(L.plate_top, x, y, '.');
+  for (let i = 2; i < 6; i++) c.px(L.plate_top, i, 1, 'v'); // light-blue inner ring hint
+  c.fill(L.plate_side, 'r');
+  c.px(L.plate_side, 0, 0, 's'); c.px(L.plate_side, 7, 0, 's');
+  return c.rows();
+}
+
+/** @type {Sprite} */
+export const dish_cabinet = {
+  name: 'dish_cabinet',
+  palette: {
+    O: '#a8763e', P: '#8d5f2f', K: '#6b4423', I: '#6e4524', J: '#5e3a1d', N: '#c08a4c',
+    w: '#ffffff', r: '#9fd3f2', v: '#d6f0ff', s: '#5f8fb0',
+  },
+  rows: drawDishCabinet(),
 };

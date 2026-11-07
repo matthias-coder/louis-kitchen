@@ -1,0 +1,132 @@
+{
+  "format_version": "1.21.90",
+  "minecraft:block": {
+    "description": {
+      "identifier": "kochmod:dish_cabinet",
+      "menu_category": {
+        "category": "construction"
+      },
+      "states": {
+        "kochmod:plates": [
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1,
+          0
+        ]
+      },
+      "traits": {
+        "minecraft:placement_direction": {
+          "enabled_states": [
+            "minecraft:cardinal_direction"
+          ]
+        }
+      }
+    },
+    "components": {
+      "minecraft:geometry": {
+        "identifier": "geometry.kochmod.dish_cabinet",
+        "bone_visibility": {
+          "plate_1": "q.block_state('kochmod:plates') >= 1",
+          "plate_2": "q.block_state('kochmod:plates') >= 2",
+          "plate_3": "q.block_state('kochmod:plates') >= 3",
+          "plate_4": "q.block_state('kochmod:plates') >= 4",
+          "plate_5": "q.block_state('kochmod:plates') >= 5",
+          "plate_6": "q.block_state('kochmod:plates') >= 6",
+          "plate_7": "q.block_state('kochmod:plates') >= 7",
+          "plate_8": "q.block_state('kochmod:plates') >= 8"
+        }
+      },
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "kochmod_dish_cabinet",
+          "render_method": "alpha_test"
+        }
+      },
+      "minecraft:collision_box": {
+        "origin": [
+          -8,
+          0,
+          -8
+        ],
+        "size": [
+          16,
+          16,
+          16
+        ]
+      },
+      "minecraft:selection_box": {
+        "origin": [
+          -8,
+          0,
+          -8
+        ],
+        "size": [
+          16,
+          16,
+          16
+        ]
+      },
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 1
+      },
+      "minecraft:light_dampening": 0,
+      "minecraft:map_color": "#a8763e",
+      "kochmod:dish_cabinet": {}
+    },
+    "permutations": [
+      {
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'north'",
+        "components": {
+          "minecraft:transformation": {
+            "rotation": [
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'west'",
+        "components": {
+          "minecraft:transformation": {
+            "rotation": [
+              0,
+              90,
+              0
+            ]
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'south'",
+        "components": {
+          "minecraft:transformation": {
+            "rotation": [
+              0,
+              180,
+              0
+            ]
+          }
+        }
+      },
+      {
+        "condition": "q.block_state('minecraft:cardinal_direction') == 'east'",
+        "components": {
+          "minecraft:transformation": {
+            "rotation": [
+              0,
+              -90,
+              0
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

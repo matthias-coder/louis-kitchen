@@ -83,12 +83,13 @@ function consumeHeld(player) {
 }
 
 /**
- * Gives one item to the player; drops it at the player's feet if the inventory is full.
+ * Gives `count` of an item as one stack; whatever does not fit drops at the player's feet.
  * @param {Player} player
  * @param {string} itemId
+ * @param {number} count
  */
-function give(player, itemId) {
-  const stack = new ItemStack(itemId, 1);
+function give(player, itemId, count) {
+  const stack = new ItemStack(itemId, count);
   const drop = (/** @type {ItemStack} */ s) => { player.dimension.spawnItem(s, player.location); };
   const container = inventory(player);
   if (container) giveOrDrop(container, stack, drop);
@@ -113,7 +114,7 @@ export function dropItems(dimension, location, itemIds) {
  */
 export function applyResult(result, player, block) {
   if (result.take) consumeHeld(player);
-  if (result.give) give(player, result.give);
+  if (result.give) give(player, result.give, result.count ?? 1);
   if (result.hint) player.onScreenDisplay.setActionBar({ translate: result.hint });
   if (result.sound) block.dimension.playSound(result.sound, block.center());
 }

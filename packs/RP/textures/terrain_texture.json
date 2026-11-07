@@ -52,6 +52,12 @@
     "kochmod_cutting_board": {
       "textures": "textures/blocks/cutting_board"
     },
+    "kochmod_dish_cabinet": {
+      "textures": "textures/blocks/dish_cabinet"
+    },
+    "kochmod_dishwasher": {
+      "textures": "textures/blocks/dishwasher"
+    },
     "kochmod_fridge": {
       "textures": "textures/blocks/fridge"
     },

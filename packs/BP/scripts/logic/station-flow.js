@@ -1,6 +1,7 @@
-import { INITIAL, grillTick, grillView } from './stations.js';
+import { INITIAL, grillTick, grillView, dishwasherTick, dishwasherView } from './stations.js';
 
 /** @typedef {import('./stations.js').GrillState} GrillState */
+/** @typedef {import('./stations.js').DishwasherState} DishwasherState */
 
 /**
  * Runs one interaction. Order matters: the block view is set first, then the
@@ -34,42 +35,85 @@ export function breakStation(drops, state, io) {
 }
 
 /**
- * Advances every registered grill by `dt`. Each key is isolated: an error on
- * one key is reported via `warn` and the remaining grills keep cooking.
- * A loaded grill without saved state is initialised to INITIAL.grill.
+ * A station that changes over time (grill, dishwasher).
+ * @template {{ ticks: number }} S
+ * @template V
+ * @typedef {{ name: string, initial: S, tick: (state: S, dt: number) => S, view: (state: S) => V }} TimedDef
+ */
+/**
+ * blockTypeAt returns undefined while the chunk is not loaded.
+ * @template S, V
+ * @typedef {{
+ *   blockTypeAt(key: string): string | undefined,
+ *   load(key: string): S | undefined,
+ *   save(key: string, state: S): void,
+ *   forget(key: string): void,
+ *   setView(key: string, view: V): void,
+ *   warn(message: string): void,
+ * }} TickIo
+ */
+
+/**
+ * Advances every registered station of one kind by `dt`. Each key is isolated: an
+ * error on one key is reported via `warn` and the remaining stations keep running.
+ * A loaded station without saved state is initialised, a replaced block is forgotten,
+ * unchanged state is not rewritten and the view is only set when it changes.
+ * @template {{ ticks: number }} S
+ * @template V
  * @param {string[]} keys
  * @param {number} dt
- * @param {{
- *   blockTypeAt(key: string): string | undefined,
- *   load(key: string): GrillState | undefined,
- *   save(key: string, state: GrillState): void,
- *   forget(key: string): void,
- *   setView(key: string, view: ReturnType<typeof grillView>): void,
- *   warn(message: string): void,
- * }} io blockTypeAt returns undefined while the chunk is not loaded
- * @param {string} grillTypeId
+ * @param {TickIo<S, V>} io
+ * @param {string} typeId
+ * @param {TimedDef<S, V>} def
  */
-export function tickGrills(keys, dt, io, grillTypeId) {
+export function tickTimed(keys, dt, io, typeId, def) {
   for (const key of keys) {
     try {
-      const typeId = io.blockTypeAt(key);
-      if (typeId === undefined) continue;
-      if (typeId !== grillTypeId) {
+      const blockType = io.blockTypeAt(key);
+      if (blockType === undefined) continue;
+      if (blockType !== typeId) {
         io.forget(key);
         continue;
       }
       const state = io.load(key);
       if (!state) {
-        io.save(key, INITIAL.grill);
+        io.save(key, def.initial);
         continue;
       }
-      const next = grillTick(state, dt);
+      const next = def.tick(state, dt);
       if (next.ticks === state.ticks) continue;
-      const nextView = grillView(next);
-      if (nextView !== grillView(state)) io.setView(key, nextView);
+      const nextView = def.view(next);
+      if (nextView !== def.view(state)) io.setView(key, nextView);
       io.save(key, next);
     } catch (e) {
-      io.warn(`kochmod: grill tick failed for ${key}: ${e}`);
+      io.warn(`kochmod: ${def.name} tick failed for ${key}: ${e}`);
     }
   }
+}
+
+/** @type {TimedDef<GrillState, ReturnType<typeof grillView>>} */
+const GRILL_TIMER = { name: 'grill', initial: INITIAL.grill, tick: grillTick, view: grillView };
+/** @type {TimedDef<DishwasherState, ReturnType<typeof dishwasherView>>} */
+const DISHWASHER_TIMER = { name: 'dishwasher', initial: INITIAL.dishwasher, tick: dishwasherTick, view: dishwasherView };
+
+/**
+ * Advances every registered grill by `dt` (see tickTimed).
+ * @param {string[]} keys
+ * @param {number} dt
+ * @param {TickIo<GrillState, ReturnType<typeof grillView>>} io
+ * @param {string} grillTypeId
+ */
+export function tickGrills(keys, dt, io, grillTypeId) {
+  tickTimed(keys, dt, io, grillTypeId, GRILL_TIMER);
+}
+
+/**
+ * Advances every registered dishwasher by `dt` (see tickTimed).
+ * @param {string[]} keys
+ * @param {number} dt
+ * @param {TickIo<DishwasherState, ReturnType<typeof dishwasherView>>} io
+ * @param {string} dishwasherTypeId
+ */
+export function tickDishwashers(keys, dt, io, dishwasherTypeId) {
+  tickTimed(keys, dt, io, dishwasherTypeId, DISHWASHER_TIMER);
 }

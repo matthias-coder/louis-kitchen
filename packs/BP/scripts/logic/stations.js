@@ -2,16 +2,22 @@ import { BURNT_AT, cookStage } from './cooking.js';
 import { evaluateAssembly } from './recipes.js';
 
 /**
- * take: consume one held item. give: item id handed to the player.
- * hint: lang key for the action bar. sound: sound id to play at the block.
+ * take: consume one held item. give: item id handed to the player, `count` of them
+ * as one stack (default 1). hint: lang key for the action bar. sound: sound id to play at the block.
  * @template S
- * @typedef {{ state: S, take?: boolean, give?: string, hint?: string, sound?: string }} Result
+ * @typedef {{ state: S, take?: boolean, give?: string, count?: number, hint?: string, sound?: string }} Result
  */
 /** @typedef {{ occupied: boolean, ticks: number }} GrillState */
 /** @typedef {{ item: string | null }} BoardState */
 /** @typedef {{ items: string[] }} CounterState */
+/** @typedef {{ plates: number, ticks: number }} DishwasherState */
+/** @typedef {{ plates: number }} CabinetState */
 
 export const COUNTER_MAX = 8;
+/** Ticks a dishwasher needs (10 s). */
+export const WASH_TICKS = 200;
+export const DISHWASHER_MAX = 4;
+export const CABINET_MAX = 8;
 
 const ID = {
   bun: 'kochmod:bun',
@@ -24,6 +30,8 @@ const ID = {
   cheese: 'kochmod:cheese',
   knife: 'kochmod:knife',
   spatula: 'kochmod:spatula',
+  dirtyPlate: 'kochmod:dirty_plate',
+  cleanPlate: 'kochmod:clean_plate',
 };
 
 const INGREDIENTS = [
@@ -31,11 +39,13 @@ const INGREDIENTS = [
   ID.lettuce, ID.tomato, ID.tomatoSlices, ID.cheese,
 ];
 
-/** @type {{ grill: GrillState, board: BoardState, counter: CounterState }} */
+/** @type {{ grill: GrillState, board: BoardState, counter: CounterState, dishwasher: DishwasherState, cabinet: CabinetState }} */
 export const INITIAL = {
   grill: { occupied: false, ticks: 0 },
   board: { item: null },
   counter: { items: [] },
+  dishwasher: { plates: 0, ticks: 0 },
+  cabinet: { plates: CABINET_MAX }, // a placed cabinet comes full of clean plates
 };
 
 // ---- Grill
@@ -166,4 +176,87 @@ export function counterView(state) {
  */
 export function counterDrops(state) {
   return [...state.items];
+}
+
+// ---- Dishwasher
+
+/**
+ * @param {DishwasherState} state
+ * @param {string | null} held
+ * @returns {Result<DishwasherState>}
+ */
+export function dishwasherInteract(state, held) {
+  if (held === ID.dirtyPlate) {
+    if (state.plates >= DISHWASHER_MAX) return { state, hint: 'kochmod.hint.dishwasher_full' };
+    return { state: { plates: state.plates + 1, ticks: 0 }, take: true, sound: 'kochmod.bubble' };
+  }
+  if (held === null && state.plates > 0) {
+    if (state.ticks >= WASH_TICKS) return { state: { plates: 0, ticks: 0 }, give: ID.cleanPlate, count: state.plates };
+    return { state, hint: 'kochmod.hint.washing' };
+  }
+  return { state };
+}
+
+/**
+ * @param {DishwasherState} state
+ * @param {number} dt
+ * @returns {DishwasherState}
+ */
+export function dishwasherTick(state, dt) {
+  if (state.plates === 0) return state;
+  return { plates: state.plates, ticks: Math.min(state.ticks + dt, WASH_TICKS) };
+}
+
+/**
+ * @param {DishwasherState} state
+ * @returns {'empty' | 'running' | 'done'}
+ */
+export function dishwasherView(state) {
+  if (state.plates === 0) return 'empty';
+  return state.ticks >= WASH_TICKS ? 'done' : 'running';
+}
+
+/**
+ * @param {DishwasherState} state
+ * @returns {string[]}
+ */
+export function dishwasherDrops(state) {
+  const id = dishwasherView(state) === 'done' ? ID.cleanPlate : ID.dirtyPlate;
+  return Array(state.plates).fill(id);
+}
+
+// ---- Dish cabinet
+
+/**
+ * @param {CabinetState} state
+ * @param {string | null} held
+ * @returns {Result<CabinetState>}
+ */
+export function cabinetInteract(state, held) {
+  if (held === ID.cleanPlate) {
+    if (state.plates >= CABINET_MAX) return { state, hint: 'kochmod.hint.cabinet_full' };
+    return { state: { plates: state.plates + 1 }, take: true, sound: 'kochmod.plate' };
+  }
+  if (held === null) {
+    if (state.plates === 0) return { state, hint: 'kochmod.hint.cabinet_empty' };
+    return { state: { plates: state.plates - 1 }, give: ID.cleanPlate };
+  }
+  return { state };
+}
+
+/**
+ * Number of plates shown in the cabinet (block state `kochmod:plates`).
+ * @param {CabinetState} state
+ * @returns {number}
+ */
+export function cabinetView(state) {
+  return state.plates;
+}
+
+/**
+ * @param {CabinetState} state
+ * @returns {string[]}
+ */
+export function cabinetDrops(state) {
+  return Array(state.plates).fill(ID.cleanPlate);
 }

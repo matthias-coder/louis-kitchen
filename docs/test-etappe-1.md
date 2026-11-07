@@ -12,7 +12,7 @@ Für Papa und Sohn. Hake ab, was klappt.
 
 ## Teil 2: Kochen
 
-- [ ] Im Kreativ-Inventar gibt es alle 13 Gegenstände, 3 Stationen, 5 Kisten, Tisch, Stuhl und Glocke.
+- [ ] Im Kreativ-Inventar gibt es alle 15 Gegenstände (mit den zwei Tellern), 3 Stationen, die Kisten und Schränke, Spülmaschine, Geschirrschrank, Tisch, Stuhl und Glocke.
 - [ ] Alle haben einen deutschen Namen und ein Bild.
 - [ ] Tippe eine Kiste an. Ein Menü mit Bildknöpfen erscheint.
 - [ ] Wähle etwas im Kistenmenü. Man bekommt 4 Zutaten oder 1 Werkzeug.
@@ -62,6 +62,18 @@ Für Papa und Sohn. Hake ab, was klappt.
 - [ ] Mit sauberem Teller im Inventar (egal in welchem Fach) servieren. Der Gast isst, du hast einen sauberen Teller weniger.
 - [ ] Der Gast geht, ein leerer Teller bleibt. Tippe ihn mit leerer Hand an. Du bekommst einen schmutzigen Teller.
 - [ ] Bleibt der leere Teller stehen und du servierst dem nächsten Gast direkt darauf, bekommst du den schmutzigen Teller zurück und ein sauberer wird verbraucht.
+- [ ] Stelle eine Spülmaschine auf. Das Licht oben ist aus.
+- [ ] Tippe sie 4-mal mit schmutzigen Tellern an. Es blubbert, das Licht wird blau.
+- [ ] Ein fünfter schmutziger Teller: Der Hinweis „Die Spülmaschine ist voll." erscheint.
+- [ ] Tippe sofort mit leerer Hand: Der Hinweis „Die Spülmaschine läuft noch." erscheint.
+- [ ] Nach etwa 10 Sekunden wird das Licht grün. Tippe mit leerer Hand: Du bekommst 4 saubere Teller, das Licht ist aus.
+- [ ] Baue eine laufende Spülmaschine ab: Die schmutzigen Teller fallen heraus. Eine fertige: Die sauberen fallen heraus.
+- [ ] Stelle einen Geschirrschrank auf. Er zeigt gleich einen Stapel von 8 Tellern (4 unten, 4 auf dem Brett).
+- [ ] Tippe ihn mit leerer Hand an. Du bekommst einen sauberen Teller, der Stapel wird kleiner.
+- [ ] Nimm alle Teller heraus und tippe noch einmal: „Keine sauberen Teller mehr. Spül die schmutzigen!"
+- [ ] Lege saubere Teller zurück. Der Stapel wächst. Bei 8 Tellern: „Der Geschirrschrank ist voll."
+- [ ] Spülmaschine und Geschirrschrank drehen ihre Vorderseite zu dir, wenn du sie aufstellst.
+- [ ] Die Kochmod-Kiste enthält Spülmaschine und Geschirrschrank.
 
 ## Teil 4: Aufs Tablet bringen
 

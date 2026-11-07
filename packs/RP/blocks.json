@@ -45,5 +45,11 @@
   },
   "kochmod:bell": {
     "sound": "metal"
+  },
+  "kochmod:dishwasher": {
+    "sound": "metal"
+  },
+  "kochmod:dish_cabinet": {
+    "sound": "wood"
   }
 }

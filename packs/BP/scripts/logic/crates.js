@@ -46,6 +46,7 @@ const ALL_ITEMS = [
 export const ALL_BLOCKS = [
   'grill', 'cutting_board', 'counter',
   'crate_vegetables', 'crate_meat', 'crate_bread', 'crate_dairy', 'crate_tools', 'crate_all', 'fridge', 'pantry',
+  'dishwasher', 'dish_cabinet',
   'table', 'chair', 'bell',
 ];
 

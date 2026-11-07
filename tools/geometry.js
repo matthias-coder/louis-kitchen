@@ -19,7 +19,7 @@ const patties = (y, half) => ['raw', 'cooked', 'burnt'].map((kind) => ({
 }));
 
 /**
- * Tall cabinet (fridge): one 14x30x14 box, front (north, -z) distinct from the sides.
+ * Tall cabinet (fridge, pantry): one 14x30x14 box, front (north, -z) distinct from the sides.
  * Blocks may reach 30 px high; their collision box is capped at 16 in the block JSON.
  * @type {BoneDef[]}
  */
@@ -30,6 +30,7 @@ const tallCabinet = [
 /** @type {Record<keyof typeof layouts, BoneDef[]>} */
 export const models = {
   fridge: tallCabinet,
+  pantry: tallCabinet,
   grill: [
     body(11),
     { name: 'grate', cubes: [{ origin: [-7, 11, -7], size: [14, 1, 14], top: 'grate_top', side: 'grate_side', bottom: 'body_bottom' }] },

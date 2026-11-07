@@ -25,6 +25,8 @@ export const CRATES = {
       { item: 'kochmod:cheese', count: 4 },
     ],
   },
+  // Dry goods; stage 2 adds noodles, rice and so on here.
+  pantry: { title: 'kochmod.crate.pantry', entries: [{ item: 'kochmod:bun', count: 4 }] },
   crate_tools: {
     title: 'kochmod.crate.tools',
     entries: [
@@ -42,7 +44,7 @@ const ALL_ITEMS = [
 /** Every block of the add-on, in menu order (block items are handed out like items). */
 export const ALL_BLOCKS = [
   'grill', 'cutting_board', 'counter',
-  'crate_vegetables', 'crate_meat', 'crate_bread', 'crate_dairy', 'crate_tools', 'crate_all', 'fridge',
+  'crate_vegetables', 'crate_meat', 'crate_bread', 'crate_dairy', 'crate_tools', 'crate_all', 'fridge', 'pantry',
   'table', 'chair', 'bell',
 ];
 

@@ -12,10 +12,10 @@ const NEEDED = ['kochmod:bun', 'kochmod:raw_patty', 'kochmod:lettuce', 'kochmod:
 const { crate_all: ALL, ...SUPPLY } = CRATES;
 const entries = Object.values(SUPPLY).flatMap((c) => c.entries);
 const ALL_ITEM_IDS = ['bun', 'raw_patty', 'cooked_patty', 'burnt_patty', 'lettuce', 'tomato', 'tomato_slices', 'cheese', 'knife', 'spatula', 'hamburger', 'cheeseburger', 'failed_dish'];
-const ALL_BLOCK_IDS = ['grill', 'cutting_board', 'counter', 'crate_vegetables', 'crate_meat', 'crate_bread', 'crate_dairy', 'crate_tools', 'crate_all', 'fridge', 'table', 'chair', 'bell'];
+const ALL_BLOCK_IDS = ['grill', 'cutting_board', 'counter', 'crate_vegetables', 'crate_meat', 'crate_bread', 'crate_dairy', 'crate_tools', 'crate_all', 'fridge', 'pantry', 'table', 'chair', 'bell'];
 
-test('there are exactly the seven crates', () => {
-  assert.deepEqual(Object.keys(CRATES).sort(), ['crate_all', 'crate_bread', 'crate_dairy', 'crate_meat', 'crate_tools', 'crate_vegetables', 'fridge']);
+test('there are exactly the eight crates', () => {
+  assert.deepEqual(Object.keys(CRATES).sort(), ['crate_all', 'crate_bread', 'crate_dairy', 'crate_meat', 'crate_tools', 'crate_vegetables', 'fridge', 'pantry']);
 });
 
 test('crates only hand out the seven supply items, and together all that stage 1 needs', () => {
@@ -31,7 +31,7 @@ test('tools come singly, ingredients in fours, and no crate is empty', () => {
 
 test('crate_all lists every item and every block exactly once, in order', () => {
   assert.deepEqual(ALL.entries.map((e) => e.item), [...ALL_ITEM_IDS, ...ALL_BLOCK_IDS].map((i) => `kochmod:${i}`));
-  assert.equal(ALL.entries.length, 26);
+  assert.equal(ALL.entries.length, 27);
   ALL.entries.forEach((e, i) => assert.equal(e.count, i < 8 ? 4 : 1, e.item));
 });
 
@@ -47,13 +47,14 @@ test('each crate has a block file using the kochmod:crate component', () => {
   }
 });
 
-test('fridge holds the cold ingredients', () => {
+test('fridge holds the cold ingredients, pantry the dry goods', () => {
   assert.deepEqual(CRATES.fridge.entries.map((e) => e.item), ['tomato', 'lettuce', 'raw_patty', 'cheese'].map((i) => `kochmod:${i}`));
+  assert.deepEqual(CRATES.pantry.entries.map((e) => e.item), ['kochmod:bun']);
 });
 
-test('fridge geometry exists, UVs stay inside the texture and the facing state is wired', () => {
+test('fridge and pantry geometry exists, UVs stay inside the texture and the facing state is wired', () => {
   const png = (/** @type {string} */ id) => fs.readFileSync(new URL(`../packs/RP/textures/blocks/${id}.png`, import.meta.url));
-  for (const id of ['fridge']) {
+  for (const id of ['fridge', 'pantry']) {
     const block = JSON.parse(fs.readFileSync(new URL(`../packs/BP/blocks/${id}.json`, import.meta.url), 'utf8'))['minecraft:block'];
     const geo = JSON.parse(fs.readFileSync(new URL(`../packs/RP/models/blocks/${id}.geo.json`, import.meta.url), 'utf8'))['minecraft:geometry'][0];
     assert.equal(block.components['minecraft:geometry'], geo.description.identifier);

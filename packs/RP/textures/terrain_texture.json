@@ -58,6 +58,9 @@
     "kochmod_grill": {
       "textures": "textures/blocks/grill"
     },
+    "kochmod_pantry": {
+      "textures": "textures/blocks/pantry"
+    },
     "kochmod_table": {
       "textures": "textures/blocks/table"
     }

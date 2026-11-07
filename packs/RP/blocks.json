@@ -34,6 +34,9 @@
   "kochmod:fridge": {
     "sound": "metal"
   },
+  "kochmod:pantry": {
+    "sound": "wood"
+  },
   "kochmod:table": {
     "sound": "wood"
   },

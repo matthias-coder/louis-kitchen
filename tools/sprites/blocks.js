@@ -118,6 +118,7 @@ const TALL = {
 
 export const layouts = {
   fridge: TALL,
+  pantry: TALL,
   grill: {
     body_side: /** @type {Region} */ ([0, 0, 16, 11]),
     body_top: /** @type {Region} */ ([16, 0, 16, 16]),
@@ -750,4 +751,45 @@ export const fridge = {
     H: '#3b4147', M: '#6c747b', B: '#5aa9e6', D: '#4a4f55',
   },
   rows: drawFridge(),
+};
+
+/**
+ * Pantry: light oak kitchen cabinet, darker frame, a shelf line, two doors with round knobs.
+ * @returns {string[]}
+ */
+function drawPantry() {
+  const L = TALL;
+  const c = canvas();
+  c.fill(L.front, 'O');
+  for (let y = 0; y < 28; y += 2) for (let x = 1; x < 13; x += 5) c.px(L.front, x + (y % 4 === 0 ? 0 : 2), y, 'P'); // wood grain
+  c.border(L.front, 'K');
+  c.row(L.front, 1, 'K');
+  for (let y = 0; y < 30; y++) { c.px(L.front, 1, y, 'K'); c.px(L.front, 12, y, 'K'); }
+  c.row(L.front, 10, 'K'); // shelf line between the upper and lower door panels
+  c.row(L.front, 11, 'N');
+  for (let y = 0; y < 28; y++) { c.px(L.front, 6, y, 'K'); c.px(L.front, 7, y, 'K'); } // gap between the two doors
+  for (let y = 12; y < 27; y++) { c.px(L.front, 2, y, 'N'); c.px(L.front, 11, y, 'N'); }
+  for (const [kx, ky] of [[4, 17], [8, 17], [4, 5], [8, 5]]) { // round knobs, 2x2 with a highlight
+    c.px(L.front, kx, ky, 'Y'); c.px(L.front, kx + 1, ky, 'Q');
+    c.px(L.front, kx, ky + 1, 'Q'); c.px(L.front, kx + 1, ky + 1, 'K');
+  }
+  for (let y = 28; y < 30; y++) c.row(L.front, y, 'K');
+  c.fill(L.side, 'O');
+  for (let y = 1; y < 28; y += 3) c.row(L.side, y, 'P');
+  c.border(L.side, 'K');
+  c.row(L.side, 10, 'K');
+  for (let y = 28; y < 30; y++) c.row(L.side, y, 'K');
+  c.fill(L.top, 'O');
+  c.border(L.top, 'K');
+  c.fill(L.bottom, 'K');
+  return c.rows();
+}
+
+/** @type {Sprite} */
+export const pantry = {
+  name: 'pantry',
+  palette: {
+    O: '#d9b274', P: '#c9a063', K: '#8a5a2b', N: '#b98b4e', Y: '#f3dc9a', Q: '#a8742f',
+  },
+  rows: drawPantry(),
 };

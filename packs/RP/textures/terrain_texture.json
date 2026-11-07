@@ -52,6 +52,9 @@
     "kochmod_cutting_board": {
       "textures": "textures/blocks/cutting_board"
     },
+    "kochmod_fridge": {
+      "textures": "textures/blocks/fridge"
+    },
     "kochmod_grill": {
       "textures": "textures/blocks/grill"
     },

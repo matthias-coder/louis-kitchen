@@ -3,7 +3,7 @@ import path from 'node:path';
 import { layouts } from './sprites/blocks.js';
 
 /** @typedef {[number, number, number, number]} Region */
-/** @typedef {{ origin: [number, number, number], size: [number, number, number], top: string, side: string, bottom?: string }} CubeDef */
+/** @typedef {{ origin: [number, number, number], size: [number, number, number], top: string, side: string, bottom?: string, front?: string }} CubeDef */
 /** @typedef {{ name: string, cubes: CubeDef[] }} BoneDef */
 
 /** Station body: 16x12x16 worktop. @param {number} [height] @returns {BoneDef} */
@@ -18,8 +18,18 @@ const patties = (y, half) => ['raw', 'cooked', 'burnt'].map((kind) => ({
   cubes: [{ origin: [-half, y, -half], size: [half * 2, 2, half * 2], top: `patty_${kind}_top`, side: `patty_${kind}_side` }],
 }));
 
+/**
+ * Tall cabinet (fridge): one 14x30x14 box, front (north, -z) distinct from the sides.
+ * Blocks may reach 30 px high; their collision box is capped at 16 in the block JSON.
+ * @type {BoneDef[]}
+ */
+const tallCabinet = [
+  { name: 'cabinet', cubes: [{ origin: [-7, 0, -7], size: [14, 30, 14], top: 'top', side: 'side', bottom: 'bottom', front: 'front' }] },
+];
+
 /** @type {Record<keyof typeof layouts, BoneDef[]>} */
 export const models = {
+  fridge: tallCabinet,
   grill: [
     body(11),
     { name: 'grate', cubes: [{ origin: [-7, 11, -7], size: [14, 1, 14], top: 'grate_top', side: 'grate_side', bottom: 'body_bottom' }] },
@@ -185,7 +195,7 @@ export function buildGeometry(id) {
         origin: cube.origin,
         size: cube.size,
         uv: {
-          north: crop(side, sx, sy, what),
+          north: crop(cube.front ? region(cube.front) : side, sx, sy, what),
           south: crop(side, sx, sy, what),
           east: crop(side, sz, sy, what),
           west: crop(side, sz, sy, what),

@@ -12,10 +12,10 @@ const NEEDED = ['kochmod:bun', 'kochmod:raw_patty', 'kochmod:lettuce', 'kochmod:
 const { crate_all: ALL, ...SUPPLY } = CRATES;
 const entries = Object.values(SUPPLY).flatMap((c) => c.entries);
 const ALL_ITEM_IDS = ['bun', 'raw_patty', 'cooked_patty', 'burnt_patty', 'lettuce', 'tomato', 'tomato_slices', 'cheese', 'knife', 'spatula', 'hamburger', 'cheeseburger', 'failed_dish'];
-const ALL_BLOCK_IDS = ['grill', 'cutting_board', 'counter', 'crate_vegetables', 'crate_meat', 'crate_bread', 'crate_dairy', 'crate_tools', 'crate_all', 'table', 'chair', 'bell'];
+const ALL_BLOCK_IDS = ['grill', 'cutting_board', 'counter', 'crate_vegetables', 'crate_meat', 'crate_bread', 'crate_dairy', 'crate_tools', 'crate_all', 'fridge', 'table', 'chair', 'bell'];
 
-test('there are exactly the six crates', () => {
-  assert.deepEqual(Object.keys(CRATES).sort(), ['crate_all', 'crate_bread', 'crate_dairy', 'crate_meat', 'crate_tools', 'crate_vegetables']);
+test('there are exactly the seven crates', () => {
+  assert.deepEqual(Object.keys(CRATES).sort(), ['crate_all', 'crate_bread', 'crate_dairy', 'crate_meat', 'crate_tools', 'crate_vegetables', 'fridge']);
 });
 
 test('crates only hand out the seven supply items, and together all that stage 1 needs', () => {
@@ -31,7 +31,7 @@ test('tools come singly, ingredients in fours, and no crate is empty', () => {
 
 test('crate_all lists every item and every block exactly once, in order', () => {
   assert.deepEqual(ALL.entries.map((e) => e.item), [...ALL_ITEM_IDS, ...ALL_BLOCK_IDS].map((i) => `kochmod:${i}`));
-  assert.equal(ALL.entries.length, 25);
+  assert.equal(ALL.entries.length, 26);
   ALL.entries.forEach((e, i) => assert.equal(e.count, i < 8 ? 4 : 1, e.item));
 });
 
@@ -44,6 +44,34 @@ test('each crate has a block file using the kochmod:crate component', () => {
     const json = JSON.parse(fs.readFileSync(new URL(`../packs/BP/blocks/${id}.json`, import.meta.url), 'utf8'));
     assert.equal(json['minecraft:block'].description.identifier, `kochmod:${id}`);
     assert.ok('kochmod:crate' in json['minecraft:block'].components);
+  }
+});
+
+test('fridge holds the cold ingredients', () => {
+  assert.deepEqual(CRATES.fridge.entries.map((e) => e.item), ['tomato', 'lettuce', 'raw_patty', 'cheese'].map((i) => `kochmod:${i}`));
+});
+
+test('fridge geometry exists, UVs stay inside the texture and the facing state is wired', () => {
+  const png = (/** @type {string} */ id) => fs.readFileSync(new URL(`../packs/RP/textures/blocks/${id}.png`, import.meta.url));
+  for (const id of ['fridge']) {
+    const block = JSON.parse(fs.readFileSync(new URL(`../packs/BP/blocks/${id}.json`, import.meta.url), 'utf8'))['minecraft:block'];
+    const geo = JSON.parse(fs.readFileSync(new URL(`../packs/RP/models/blocks/${id}.geo.json`, import.meta.url), 'utf8'))['minecraft:geometry'][0];
+    assert.equal(block.components['minecraft:geometry'], geo.description.identifier);
+    assert.ok(block.description.traits['minecraft:placement_direction'].enabled_states.includes('minecraft:cardinal_direction'));
+    assert.equal(block.permutations.length, 4);
+    assert.deepEqual(block.components['minecraft:collision_box'].size, [16, 16, 16]);
+    const texture = png(id);
+    assert.equal(texture.readUInt32BE(16), geo.description.texture_width);
+    assert.equal(texture.readUInt32BE(20), geo.description.texture_height);
+    for (const cube of geo.bones.flatMap((/** @type {any} */ b) => b.cubes)) {
+      assert.deepEqual(cube.size, [14, 30, 14]);
+      assert.ok(cube.origin[1] === 0 && cube.origin[1] + cube.size[1] <= 30);
+      assert.ok(Math.abs(cube.origin[0]) + cube.size[0] / 2 <= 15 && cube.origin[0] === -cube.size[0] / 2 && cube.origin[2] === -cube.size[2] / 2);
+      for (const f of Object.values(cube.uv)) {
+        assert.ok(f.uv[0] + f.uv_size[0] <= geo.description.texture_width && f.uv[1] + f.uv_size[1] <= geo.description.texture_height);
+      }
+    }
+    assert.equal(JSON.parse(fs.readFileSync(new URL('../packs/RP/textures/terrain_texture.json', import.meta.url), 'utf8')).texture_data[`kochmod_${id}`].textures, `textures/blocks/${id}`);
   }
 });
 

@@ -31,6 +31,9 @@
   "kochmod:crate_all": {
     "sound": "stone"
   },
+  "kochmod:fridge": {
+    "sound": "metal"
+  },
   "kochmod:table": {
     "sound": "wood"
   },

@@ -108,7 +108,16 @@ function drawPatty(c, top, side, kind, seed) {
 
 // ---- Layouts (source of truth for the geometry UVs)
 
+/** Tall cabinet atlas (fridge, pantry): 14x30 front, side and back, 14x14 top and bottom. */
+const TALL = {
+  front: /** @type {Region} */ ([0, 0, 14, 30]),
+  side: /** @type {Region} */ ([14, 0, 14, 30]),
+  top: /** @type {Region} */ ([28, 0, 14, 14]),
+  bottom: /** @type {Region} */ ([28, 14, 14, 14]),
+};
+
 export const layouts = {
+  fridge: TALL,
   grill: {
     body_side: /** @type {Region} */ ([0, 0, 16, 11]),
     body_top: /** @type {Region} */ ([16, 0, 16, 16]),
@@ -702,4 +711,43 @@ export const bell = {
     s: '#b8bcc4', S: '#eef0f4',
   },
   rows: drawBell(),
+};
+
+// ---- Fridge and pantry: tall cabinets sharing the TALL layout (geometry in tools/geometry.js)
+
+/**
+ * Fridge: white body, seam at 2/3 height (freezer above, fridge door below), dark handles, dark grey base.
+ * @returns {string[]}
+ */
+function drawFridge() {
+  const L = TALL;
+  const c = canvas();
+  c.fill(L.front, 'W');
+  c.border(L.front, 'L');
+  c.row(L.front, 10, 'S');
+  c.row(L.front, 9, 'L');
+  c.row(L.front, 11, 'L');
+  for (let y = 3; y <= 7; y++) c.px(L.front, 11, y, 'H');
+  for (let y = 14; y <= 22; y++) c.px(L.front, 11, y, 'H');
+  c.px(L.front, 10, 3, 'M'); c.px(L.front, 10, 14, 'M');
+  c.px(L.front, 3, 4, 'B'); c.px(L.front, 4, 4, 'B'); // small indicator light on the freezer
+  for (let y = 28; y < 30; y++) c.row(L.front, y, 'D');
+  c.fill(L.side, 'G');
+  c.border(L.side, 'F');
+  c.row(L.side, 10, 'F');
+  for (let y = 28; y < 30; y++) c.row(L.side, y, 'D');
+  c.fill(L.top, 'W');
+  c.border(L.top, 'L');
+  c.fill(L.bottom, 'D');
+  return c.rows();
+}
+
+/** @type {Sprite} */
+export const fridge = {
+  name: 'fridge',
+  palette: {
+    W: '#f1f4f6', L: '#cfd5da', S: '#9aa3aa', G: '#d3d9de', F: '#aab2b9',
+    H: '#3b4147', M: '#6c747b', B: '#5aa9e6', D: '#4a4f55',
+  },
+  rows: drawFridge(),
 };

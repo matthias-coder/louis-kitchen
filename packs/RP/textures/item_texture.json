@@ -38,11 +38,26 @@
     "kochmod_block_table": {
       "textures": "textures/items/block_table"
     },
+    "kochmod_bowl": {
+      "textures": "textures/items/bowl"
+    },
+    "kochmod_broth": {
+      "textures": "textures/items/broth"
+    },
     "kochmod_bun": {
       "textures": "textures/items/bun"
     },
     "kochmod_burnt_patty": {
       "textures": "textures/items/burnt_patty"
+    },
+    "kochmod_burnt_pizza": {
+      "textures": "textures/items/burnt_pizza"
+    },
+    "kochmod_carrot": {
+      "textures": "textures/items/carrot"
+    },
+    "kochmod_carrot_slices": {
+      "textures": "textures/items/carrot_slices"
     },
     "kochmod_cheese": {
       "textures": "textures/items/cheese"
@@ -56,11 +71,38 @@
     "kochmod_cooked_patty": {
       "textures": "textures/items/cooked_patty"
     },
+    "kochmod_cooked_rice": {
+      "textures": "textures/items/cooked_rice"
+    },
+    "kochmod_cream": {
+      "textures": "textures/items/cream"
+    },
     "kochmod_dirty_plate": {
       "textures": "textures/items/dirty_plate"
     },
+    "kochmod_doner": {
+      "textures": "textures/items/doner"
+    },
+    "kochmod_doner_meat": {
+      "textures": "textures/items/doner_meat"
+    },
+    "kochmod_doner_meat_raw": {
+      "textures": "textures/items/doner_meat_raw"
+    },
+    "kochmod_doner_sauce": {
+      "textures": "textures/items/doner_sauce"
+    },
+    "kochmod_dough": {
+      "textures": "textures/items/dough"
+    },
+    "kochmod_egg": {
+      "textures": "textures/items/egg"
+    },
     "kochmod_failed_dish": {
       "textures": "textures/items/failed_dish"
+    },
+    "kochmod_fried_noodles": {
+      "textures": "textures/items/fried_noodles"
     },
     "kochmod_hamburger": {
       "textures": "textures/items/hamburger"
@@ -71,20 +113,89 @@
     "kochmod_lettuce": {
       "textures": "textures/items/lettuce"
     },
+    "kochmod_noodles": {
+      "textures": "textures/items/noodles"
+    },
+    "kochmod_nori": {
+      "textures": "textures/items/nori"
+    },
+    "kochmod_onion": {
+      "textures": "textures/items/onion"
+    },
+    "kochmod_onion_rings": {
+      "textures": "textures/items/onion_rings"
+    },
+    "kochmod_pita": {
+      "textures": "textures/items/pita"
+    },
+    "kochmod_pizza_margherita": {
+      "textures": "textures/items/pizza_margherita"
+    },
+    "kochmod_pizza_peel": {
+      "textures": "textures/items/pizza_peel"
+    },
+    "kochmod_potato": {
+      "textures": "textures/items/potato"
+    },
+    "kochmod_potato_cubes": {
+      "textures": "textures/items/potato_cubes"
+    },
+    "kochmod_potato_soup": {
+      "textures": "textures/items/potato_soup"
+    },
+    "kochmod_ramen": {
+      "textures": "textures/items/ramen"
+    },
     "kochmod_raw_patty": {
       "textures": "textures/items/raw_patty"
+    },
+    "kochmod_raw_pizza_margherita": {
+      "textures": "textures/items/raw_pizza_margherita"
+    },
+    "kochmod_raw_salami_pizza": {
+      "textures": "textures/items/raw_salami_pizza"
     },
     "kochmod_restaurant_kit": {
       "textures": "textures/items/restaurant_kit"
     },
+    "kochmod_rice": {
+      "textures": "textures/items/rice"
+    },
+    "kochmod_salami": {
+      "textures": "textures/items/salami"
+    },
+    "kochmod_salami_pizza": {
+      "textures": "textures/items/salami_pizza"
+    },
+    "kochmod_salmon": {
+      "textures": "textures/items/salmon"
+    },
+    "kochmod_salmon_strips": {
+      "textures": "textures/items/salmon_strips"
+    },
+    "kochmod_soy_sauce": {
+      "textures": "textures/items/soy_sauce"
+    },
     "kochmod_spatula": {
       "textures": "textures/items/spatula"
+    },
+    "kochmod_spring_onion": {
+      "textures": "textures/items/spring_onion"
+    },
+    "kochmod_sushi": {
+      "textures": "textures/items/sushi"
     },
     "kochmod_tomato": {
       "textures": "textures/items/tomato"
     },
+    "kochmod_tomato_sauce": {
+      "textures": "textures/items/tomato_sauce"
+    },
     "kochmod_tomato_slices": {
       "textures": "textures/items/tomato_slices"
+    },
+    "kochmod_wok_spatula": {
+      "textures": "textures/items/wok_spatula"
     }
   }
 }

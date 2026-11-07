@@ -1,17 +1,21 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import { ITEMS } from '../packs/BP/scripts/logic/catalog.js';
 import { CRATES, ALL_BLOCKS, BUSY_RETRIES, entryLook, shouldRetryBusy } from '../packs/BP/scripts/logic/crates.js';
 
 const lang = fs.readFileSync(new URL('../packs/RP/texts/de_DE.lang', import.meta.url), 'utf8');
-const SUPPLIED = ['raw_patty', 'bun', 'lettuce', 'tomato', 'cheese', 'knife', 'spatula', 'clean_plate'].map((i) => `kochmod:${i}`);
-const TOOLS = ['kochmod:knife', 'kochmod:spatula'];
+const SUPPLIED = ['raw_patty', 'bun', 'lettuce', 'tomato', 'cheese', 'knife', 'spatula', 'clean_plate',
+  'salami', 'egg', 'salmon', 'cream', 'onion', 'carrot', 'potato', 'spring_onion', 'doner_meat_raw',
+  'dough', 'tomato_sauce', 'noodles', 'rice', 'broth', 'nori', 'pita', 'doner_sauce', 'soy_sauce',
+  'bowl', 'pizza_peel', 'wok_spatula'].map((i) => `kochmod:${i}`);
+const TOOLS = ['kochmod:knife', 'kochmod:spatula', 'kochmod:bowl', 'kochmod:pizza_peel', 'kochmod:wok_spatula'];
 // Stage 1 recipes need these; cooked patty and tomato slices are produced at stations.
 const NEEDED = ['kochmod:bun', 'kochmod:raw_patty', 'kochmod:lettuce', 'kochmod:tomato', 'kochmod:cheese', ...TOOLS];
 
 const { crate_all: ALL, ...SUPPLY } = CRATES;
 const entries = Object.values(SUPPLY).flatMap((c) => c.entries);
-const ALL_ITEM_IDS = ['bun', 'tomato', 'lettuce', 'raw_patty', 'cheese', 'cooked_patty', 'burnt_patty', 'tomato_slices', 'knife', 'spatula', 'hamburger', 'cheeseburger', 'failed_dish', 'clean_plate', 'restaurant_kit'];
+const ALL_ITEM_IDS = Object.keys(ITEMS).filter((id) => ITEMS[id].menu !== false).map((id) => id.replace('kochmod:', ''));
 const ALL_BLOCK_IDS = ['grill', 'cutting_board', 'counter', 'crate_tools', 'crate_all', 'fridge', 'pantry', 'dishwasher', 'dish_cabinet', 'table', 'chair', 'bell'];
 
 test('there are exactly the four crates', () => {
@@ -26,13 +30,16 @@ test('crates only hand out the supply items, and together all that stage 1 needs
 
 test('tools come singly, ingredients in fours, and no crate is empty', () => {
   for (const c of Object.values(CRATES)) assert.ok(c.entries.length > 0);
-  for (const e of entries) assert.equal(e.count, ['kochmod:knife', 'kochmod:spatula'].includes(e.item) ? 1 : 4, e.item);
+  for (const e of entries) assert.equal(e.count, TOOLS.includes(e.item) ? 1 : 4, e.item);
 });
 
 test('crate_all lists every item and every block exactly once, in order', () => {
   assert.deepEqual(ALL.entries.map((e) => e.item), [...ALL_ITEM_IDS, ...ALL_BLOCK_IDS].map((i) => `kochmod:${i}`));
-  assert.equal(ALL.entries.length, 27);
-  ALL.entries.forEach((e, i) => assert.equal(e.count, i < 8 || e.item === 'kochmod:clean_plate' ? 4 : 1, e.item));
+  assert.equal(ALL.entries.length, 52 + ALL_BLOCK_IDS.length);
+  for (const e of ALL.entries) {
+    const kind = ITEMS[e.item]?.kind;
+    assert.equal(e.count, ['ingredient', 'prepared', 'plate'].includes(kind) ? 4 : 1, e.item);
+  }
 });
 
 test('every crate title exists in de_DE.lang', () => {
@@ -48,8 +55,10 @@ test('each crate has a block file using the kochmod:crate component', () => {
 });
 
 test('fridge holds the cold ingredients, pantry the dry goods', () => {
-  assert.deepEqual(CRATES.fridge.entries.map((e) => e.item), ['tomato', 'lettuce', 'raw_patty', 'cheese'].map((i) => `kochmod:${i}`));
-  assert.deepEqual(CRATES.pantry.entries.map((e) => e.item), ['kochmod:bun']);
+  assert.deepEqual(CRATES.fridge.entries.map((e) => e.item), ['tomato', 'lettuce', 'raw_patty', 'cheese',
+    'salami', 'egg', 'salmon', 'cream', 'onion', 'carrot', 'potato', 'spring_onion', 'doner_meat_raw'].map((i) => `kochmod:${i}`));
+  assert.deepEqual(CRATES.pantry.entries.map((e) => e.item), ['bun',
+    'dough', 'tomato_sauce', 'noodles', 'rice', 'broth', 'nori', 'pita', 'doner_sauce', 'soy_sauce'].map((i) => `kochmod:${i}`));
 });
 
 test('fridge and pantry geometry exists, UVs stay inside the texture and the facing state is wired', () => {
@@ -109,6 +118,7 @@ test('items keep their item texture as menu icon', () => {
 
 test('crate_tools also hands out four clean plates', () => {
   assert.deepEqual(CRATES.crate_tools.entries, [
-    { item: 'kochmod:knife', count: 1 }, { item: 'kochmod:spatula', count: 1 }, { item: 'kochmod:clean_plate', count: 4 },
+    { item: 'kochmod:knife', count: 1 }, { item: 'kochmod:spatula', count: 1 }, { item: 'kochmod:bowl', count: 1 },
+    { item: 'kochmod:pizza_peel', count: 1 }, { item: 'kochmod:wok_spatula', count: 1 }, { item: 'kochmod:clean_plate', count: 4 },
   ]);
 });

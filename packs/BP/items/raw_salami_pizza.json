@@ -1,0 +1,19 @@
+{
+  "format_version": "1.21.90",
+  "minecraft:item": {
+    "description": {
+      "identifier": "kochmod:raw_salami_pizza",
+      "menu_category": {
+        "category": "items"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "kochmod_raw_salami_pizza"
+        }
+      },
+      "minecraft:max_stack_size": 64
+    }
+  }
+}

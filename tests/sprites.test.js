@@ -1,12 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import * as items from '../tools/sprites/items.js';
+import { ITEMS } from '../packs/BP/scripts/logic/catalog.js';
 import { recolor, spriteToRgba } from '../tools/sprites/util.js';
 
-const ITEM_IDS = [
-  'bun', 'raw_patty', 'cooked_patty', 'burnt_patty', 'lettuce', 'tomato', 'tomato_slices',
-  'cheese', 'knife', 'spatula', 'hamburger', 'cheeseburger', 'failed_dish', 'clean_plate', 'dirty_plate', 'restaurant_kit',
-];
+const ITEM_IDS = Object.keys(ITEMS).map((id) => id.replace('kochmod:', ''));
 
 /** @type {import('../tools/sprites/util.js').Sprite[]} */
 const sprites = Object.values(items).filter((v) => v && typeof v === 'object' && Array.isArray(v.rows));

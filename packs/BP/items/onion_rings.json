@@ -1,0 +1,19 @@
+{
+  "format_version": "1.21.90",
+  "minecraft:item": {
+    "description": {
+      "identifier": "kochmod:onion_rings",
+      "menu_category": {
+        "category": "items"
+      }
+    },
+    "components": {
+      "minecraft:icon": {
+        "textures": {
+          "default": "kochmod_onion_rings"
+        }
+      },
+      "minecraft:max_stack_size": 64
+    }
+  }
+}

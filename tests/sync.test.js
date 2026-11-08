@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { bookIndex, bookPages } from '../packs/BP/scripts/logic/recipe-book.js';
 import { DISHES } from '../packs/BP/scripts/logic/recipes.js';
+import { cabinetMenu } from '../packs/BP/scripts/logic/stations.js';
 import { CRATES, ALL_BLOCKS, entryLook } from '../packs/BP/scripts/logic/crates.js';
 import { STATION_KINDS } from '../packs/BP/scripts/logic/guest-flow.js';
 
@@ -51,6 +52,7 @@ test('every icon of the recipe book and the crate menus exists as a texture', ()
   const icons = [
     ...bookIndex().buttons.map((b) => b.icon),
     ...DISHES.flatMap((d) => bookPages(d).buttons.map((b) => b.icon)),
+    ...cabinetMenu({ plates: 1, bowls: 1 }).buttons.map((b) => b.icon),
     ...Object.values(CRATES).flatMap((c) => c.entries.map((e) => entryLook(e).icon)),
   ];
   for (const icon of new Set(icons)) assert.ok(fs.existsSync(path.join(ROOT, 'packs/RP', `${icon}.png`)), icon);

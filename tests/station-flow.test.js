@@ -119,15 +119,15 @@ test('tickGrills: empty and fully burnt grills are not rewritten', () => {
 test('tickDishwashers: washes loaded dishwashers, switches the view once done, skips empty ones', () => {
   const w = fakeWorld(
     { a: WASHER, b: WASHER, c: WASHER, d: 'minecraft:air' },
-    { a: { plates: 2, ticks: WASH_TICKS - 10 }, b: { plates: 0, ticks: 0 }, c: { plates: 1, ticks: 0 }, d: { plates: 1, ticks: 0 } },
+    { a: { plates: 2, bowls: 0, ticks: WASH_TICKS - 10 }, b: { plates: 0, bowls: 0, ticks: 0 }, c: { plates: 1, bowls: 0, ticks: 0 }, d: { plates: 1, bowls: 0, ticks: 0 } },
   );
   let saves = 0;
   const save = w.io.save;
   w.io.save = (k, s) => { saves++; save(k, s); };
   tickDishwashers(['a', 'b', 'c', 'd'], 10, w.io, WASHER);
-  assert.deepEqual(w.states.a, { plates: 2, ticks: WASH_TICKS });
+  assert.deepEqual(w.states.a, { plates: 2, bowls: 0, ticks: WASH_TICKS });
   assert.equal(w.views.a, 'done');
-  assert.deepEqual(w.states.c, { plates: 1, ticks: 10 });
+  assert.deepEqual(w.states.c, { plates: 1, bowls: 0, ticks: 10 });
   assert.equal('c' in w.views, false, 'still running, no permutation update');
   assert.equal(saves, 2, 'the empty dishwasher is not rewritten');
   assert.deepEqual(w.forgotten, ['d']);

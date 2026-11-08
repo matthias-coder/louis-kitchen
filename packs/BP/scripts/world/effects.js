@@ -122,6 +122,7 @@ export function applyResult(result, player, block) {
   if (result.take) consumeHeld(player);
   if (result.consume) removeOneItem(player, result.consume);
   if (result.give) give(player, result.give, result.count ?? 1);
+  for (const stack of result.gives ?? []) give(player, stack.item, stack.count);
   if (result.hint) player.onScreenDisplay.setActionBar({ translate: result.hint });
   if (result.sound) block.dimension.playSound(result.sound, block.center());
   if (result.particle) {

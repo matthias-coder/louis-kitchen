@@ -1,14 +1,16 @@
 import { BlockPermutation, system } from '@minecraft/server';
+import { ActionFormData } from '@minecraft/server-ui';
 import {
   migrateStationState, grill as grillStation, oven as ovenStation, pot as potStation, wok as wokStation,
   spit as spitStation,
   boardInteract, boardView, boardDrops,
   counterInteract, counterView, counterDrops,
   dishwasherInteract, dishwasherView, dishwasherDrops,
-  cabinetInteract, cabinetView, cabinetDrops, INITIAL,
+  cabinetInteract, cabinetView, cabinetDrops, cabinetMenu, cabinetTake, CABINET_CHOICES, INITIAL,
   trash as trashStation,
 } from '../logic/stations.js';
 import { locKey } from '../logic/store.js';
+import { BUSY_RETRY_TICKS, shouldRetryBusy } from '../logic/crates.js';
 import { interactStation, breakStation, tickTimedStation, tickDishwashers } from '../logic/station-flow.js';
 import { worldStore, applyResult, heldItemId, playerHasItem, dropItems, loadedBlock } from './effects.js';
 
@@ -236,6 +238,30 @@ function registerAs(kind, def, block) {
 }
 
 /**
+ * Loads the state, runs one interaction and applies it.
+ * @template S
+ * @param {string} kind
+ * @param {StationDef<S>} def
+ * @param {Block} block
+ * @param {import('@minecraft/server').Player} player
+ * @param {(state: S, held: string | null, carried: import('../logic/stations.js').Carried) => import('../logic/stations.js').Result<S>} interact
+ * @returns {import('../logic/stations.js').Result<S>}
+ */
+function runInteraction(kind, def, block, player, interact) {
+  const key = keyOf(block);
+  // a migrated state needs no extra view refresh: interactStation sets the view anyway
+  const state = loadState(def, key).state ?? def.initial;
+  return interactStation(interact, def.states, state, heldItemId(player), (id) => playerHasItem(player, id), {
+    setView: (states) => setStates(block, def.typeId, states),
+    save: (next) => {
+      worldStore.save(key, next);
+      worldStore.registryAdd(kind, key);
+    },
+    apply: (result) => applyResult(result, player, block),
+  });
+}
+
+/**
  * One custom component per station kind; `kind` is also the registry name.
  * @template S
  * @param {string} kind
@@ -251,20 +277,78 @@ function stationComponent(kind, def) {
     },
     onPlayerInteract({ block, player }) {
       if (!player) return;
-      const key = keyOf(block);
-      // a migrated state needs no extra view refresh: interactStation sets the view anyway
-      const state = loadState(def, key).state ?? def.initial;
-      interactStation(def.interact, def.states, state, heldItemId(player), (id) => playerHasItem(player, id), {
-        setView: (states) => setStates(block, def.typeId, states),
-        save: (next) => {
-          worldStore.save(key, next);
-          worldStore.registryAdd(kind, key);
-        },
-        apply: (result) => applyResult(result, player, block),
-      });
+      runInteraction(kind, def, block, player, def.interact);
     },
     onPlayerBreak({ block, dimension }) {
       breakAt(kind, def, dimension, block);
+    },
+  };
+}
+
+/** @param {import('@minecraft/server').Player} player */
+function cabinetFailedHint(player) {
+  try {
+    player.onScreenDisplay.setActionBar({ translate: 'kochmod.hint.crate_failed' });
+  } catch (error) {
+    console.warn(`kochmod cabinet: hint failed: ${error}`);
+  }
+}
+
+/**
+ * Opens the cabinet menu and hands out the chosen item from freshly loaded state; never throws.
+ * A busy player (chat or another screen open) gets the menu again a few times.
+ * @param {import('@minecraft/server').Player} player
+ * @param {import('@minecraft/server').Dimension} dimension
+ * @param {import('@minecraft/server').Vector3} location
+ * @param {number} retriesDone
+ * @returns {Promise<void>}
+ */
+async function openCabinet(player, dimension, location, retriesDone) {
+  /** @type {import('@minecraft/server-ui').ActionFormResponse} */
+  let response;
+  try {
+    const block = dimension.getBlock(location);
+    if (block?.typeId !== dishCabinet.typeId) return;
+    const menu = cabinetMenu(loadState(dishCabinet, keyOf(block)).state ?? dishCabinet.initial);
+    const form = new ActionFormData().title({ translate: menu.title });
+    for (const button of menu.buttons) form.button(button.label, button.icon);
+    response = await form.show(player);
+  } catch (error) {
+    console.warn(`kochmod cabinet: form failed: ${error}`);
+    return;
+  }
+  if (response.canceled) {
+    if (shouldRetryBusy(response.cancelationReason, retriesDone)) {
+      system.runTimeout(() => { void openCabinet(player, dimension, location, retriesDone + 1); }, BUSY_RETRY_TICKS);
+    } else if (response.cancelationReason === 'UserBusy') {
+      cabinetFailedHint(player);
+    }
+    return;
+  }
+  const choice = response.selection === undefined ? undefined : CABINET_CHOICES[response.selection];
+  if (!choice) return;
+  try {
+    const block = dimension.getBlock(location);
+    if (block?.typeId !== dishCabinet.typeId) return;
+    runInteraction('dish_cabinet', dishCabinet, block, player, (s) => cabinetTake(s, choice));
+  } catch (error) {
+    console.warn(`kochmod cabinet: taking ${choice} failed: ${error}`);
+    cabinetFailedHint(player);
+  }
+}
+
+/** The dish cabinet: putting dishes in works like any station, an empty hand opens the menu. @returns {BlockCustomComponent} */
+function cabinetComponent() {
+  const base = stationComponent('dish_cabinet', dishCabinet);
+  return {
+    ...base,
+    onPlayerInteract({ block, player }) {
+      if (!player) return;
+      const result = runInteraction('dish_cabinet', dishCabinet, block, player, cabinetInteract);
+      if (!result.menu) return;
+      const { dimension, location } = block;
+      // Forms cannot be shown from inside the (read-only) event callback.
+      system.run(() => { void openCabinet(player, dimension, location, 0); });
     },
   };
 }
@@ -299,7 +383,7 @@ export function registerStationBlock(block) {
 /** @param {BlockComponentRegistry} blockComponentRegistry */
 export function registerStations(blockComponentRegistry) {
   for (const [typeId, [kind, def]] of Object.entries(BY_TYPE)) {
-    blockComponentRegistry.registerCustomComponent(typeId, stationComponent(kind, def));
+    blockComponentRegistry.registerCustomComponent(typeId, def === dishCabinet ? cabinetComponent() : stationComponent(kind, def));
   }
 }
 

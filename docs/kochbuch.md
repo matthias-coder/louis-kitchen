@@ -8,15 +8,17 @@ Für Louis und Papa. Alles passiert durch **Antippen**: Zutat in der Hand → St
 |---|---|---|
 | Kühlschrank | gibt gekühlte Zutaten (Tomate, Salat, Frikadelle, Käse, Salami, Ei, Lachs, Sahne, Frühlingszwiebel, Dönerfleisch, Pizzateig, Dönersoße) | – |
 | Vorratsschrank | gibt trockene Zutaten (Brötchen, Kartoffel, Zwiebel, Karotte, Tomatensoße, Nudeln, gekochter Reis, Brühe, Algenblatt, Dönertasche, Sojasoße) | – |
-| Werkzeugkiste | Küchen-Multitool, Schüssel, Rezeptbuch, saubere Teller | – |
+| Werkzeugkiste | Küchen-Multitool, Rezeptbuch, saubere Teller | – |
 | Schneidebrett | schneidet Tomate, Zwiebel, Karotte, Kartoffel, Lachs | Küchen-Multitool (im Rucksack) |
 | Grill | brät die Frikadelle: roh → braun (8 Sekunden) → schwarz (nach weiteren 30 Sekunden) | Küchen-Multitool (im Rucksack) |
 | Pizzaofen | backt die rohe Pizza: 8 Sekunden bis fertig, dann wird sie schwarz | Küchen-Multitool (im Rucksack) |
 | Fritteuse | frittiert Kartoffelstifte: 8 Sekunden bis fertig, dann werden sie schwarz | Küchen-Multitool (im Rucksack) |
-| Suppentopf | kocht Suppen (bis zu 6 Zutaten); nach 8 Sekunden fertig, zu lange = misslungen | Schüssel (wird mit der Suppe verbraucht) |
+| Suppentopf | kocht Suppen (bis zu 6 Zutaten); nach 8 Sekunden fertig, zu lange = misslungen | Suppenschüssel aus dem Geschirrschrank (im Rucksack, wird mit der Suppe verbraucht) |
 | Dönerspieß | grillt das Dönerfleisch; nach 8 Sekunden kannst du 6 Scheiben abschneiden. Brennt nie an. | Küchen-Multitool (im Rucksack) |
 | Wok | brät die Bratnudeln (bis zu 6 Zutaten) | Küchen-Multitool (im Rucksack) |
 | Anrichte | legt Zutaten zusammen; leere Hand macht das Gericht fertig. Reihenfolge egal! | leere Hand |
+| Geschirrschrank | Tipp mit leerer Hand öffnet das Menü: Teller, Suppenschüssel, Pizzakarton | leere Hand |
+| Spülmaschine | schmutzige Teller und Schüsseln rein; nach 10 Sekunden kommen sie sauber wieder heraus | Teller oder Schüssel in der Hand |
 | Mülleimer | ein Tipp wirft ein Stück aus der Hand weg (Werkzeuge nie) | – |
 
 **Faustregeln**
@@ -68,7 +70,7 @@ Wie der Hamburger, plus:
 2. Nudeln aus dem Vorratsschrank.
 3. Ei aus dem Kühlschrank.
 4. Frühlingszwiebel aus dem Kühlschrank.
-5. Alle vier in den Suppentopf. Es blubbert und dampft. Nach 8 Sekunden mit der Schüssel antippen: **Ramen**!
+5. Alle vier in den Suppentopf. Es blubbert und dampft. Nach 8 Sekunden mit leerer Hand antippen (Suppenschüssel im Rucksack): **Ramen**!
 
 ## Kartoffelsuppe
 
@@ -77,7 +79,7 @@ Wie der Hamburger, plus:
 3. Karotte aus dem Vorratsschrank.
 4. Karotte aufs Schneidebrett legen, mit leerer Hand antippen (Multitool im Rucksack): schneidet. Das gibt Karottenscheiben.
 5. Sahne aus dem Kühlschrank.
-6. Kartoffelstifte, Karottenscheiben und Sahne in den Suppentopf. Nach 8 Sekunden mit der Schüssel antippen: **Kartoffelsuppe**!
+6. Kartoffelstifte, Karottenscheiben und Sahne in den Suppentopf. Nach 8 Sekunden mit leerer Hand antippen (Suppenschüssel im Rucksack): **Kartoffelsuppe**!
 
 ## Pommes
 

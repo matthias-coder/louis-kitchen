@@ -9,19 +9,19 @@ Für Papa und Sohn. Hake ab, was klappt. Erst am PC, dann am Tablet.
 - [ ] Schalte das Inhaltsprotokoll ein: „Einstellungen → Ersteller → Inhaltsprotokoll-GUI aktivieren".
 - [ ] Nach dem Laden der Welt kommt keine Fehlermeldung im Inhaltsprotokoll.
 
-## Teil 1: Das Multitool
+## Teil 1: Das Küchen-Multitool
 
-- [ ] Hol das Multitool aus der Werkzeugkiste und lege es in den Rucksack (nicht in die Hand).
+- [ ] Hol das Küchen-Multitool aus der Werkzeugkiste und lege es in den Rucksack (nicht in die Hand).
 - [ ] Schneidebrett: Zutat aufs Brett legen, mit leerer Hand antippen. Es wird geschnitten.
 - [ ] Grill: Frikadelle mit leerer Hand holen.
 - [ ] Pizzaofen: Pizza mit leerer Hand aus dem Ofen holen.
 - [ ] Dönerspieß: Mit leerer Hand Scheiben abschneiden.
 - [ ] Wok: Bratnudeln mit leerer Hand holen.
 - [ ] Fritteuse: Pommes mit leerer Hand holen.
-- [ ] Ohne Multitool im Rucksack kommt an jeder Station ein Hinweis, dass man das Multitool braucht.
+- [ ] Ohne Küchen-Multitool im Rucksack kommt an jeder Station ein Hinweis, dass man das Küchen-Multitool braucht (auch am Dönerspieß mit Fleisch und am Schneidebrett mit einer ganzen Zutat; die Zutat kommt dann trotzdem zurück in die Hand).
 - [ ] Alte Werkzeuge aus einer alten Welt (Messer, Pfannenwender, Pizzaschieber, Wokwender) funktionieren weiterhin an ihrer Station.
 
-## Teil 2: Sushi ohne Reis kochen
+## Teil 2: Sushi mit gekochtem Reis
 
 - [ ] Der Vorratsschrank enthält Gekochten Reis.
 - [ ] Sushi: Gekochter Reis, Algenblatt und Lachsstreifen auf die Anrichte. Es wird Sushi, ohne dass ein Topf nötig ist.
@@ -35,7 +35,7 @@ Für Papa und Sohn. Hake ab, was klappt. Erst am PC, dann am Tablet.
 ## Teil 4: Geschirrschrank
 
 - [ ] Tippe den Geschirrschrank an. Ein Menü öffnet sich mit Teller, Suppenschüssel und Pizzakarton.
-- [ ] Bei jedem Eintrag steht die Anzahl, die man bekommt.
+- [ ] Bei Teller und Schüssel steht die Anzahl, die man bekommt.
 - [ ] Jeder Eintrag gibt genau das, was dasteht, in den Rucksack.
 
 ## Teil 5: Suppe mit Suppenschüssel
@@ -44,6 +44,8 @@ Für Papa und Sohn. Hake ab, was klappt. Erst am PC, dann am Tablet.
 - [ ] Kartoffelsuppe geht genauso.
 - [ ] Die Suppe wird ohne Teller am Tisch serviert. Der Gast isst sie aus der Schüssel.
 - [ ] Die schmutzige Schüssel gehört in die Spülmaschine. Nach dem Spülen kommt sie sauber wieder heraus.
+- [ ] Ohne Suppenschüssel im Rucksack kommt der Hinweis „Hol eine Suppenschüssel aus dem Geschirrschrank."
+- [ ] Sind im Geschirrschrank keine sauberen Schüsseln mehr, kommt der Hinweis „Keine sauberen Schüsseln mehr. Spül die schmutzigen!"
 
 ## Teil 6: Großzügige Gäste
 
@@ -69,6 +71,8 @@ Voraussetzung: ein Restaurant mit Pizzaofen.
 - [ ] Pizza ohne Pizzakarton: Hinweis, dass ein Pizzakarton gebraucht wird.
 - [ ] Mit leerer Hand: nur ein Hinweis, der Gast schüttelt nicht den Kopf.
 - [ ] Mit Pommes in der Hand: Der Gast schüttelt den Kopf und es kommt ein Hinweis.
+- [ ] Auf dem Tablet auch testen: den Gast antippen, mit der Pizza in der Hand (Antippen zählt dort als Schlag, es muss trotzdem servieren).
+- [ ] Eine andere Pizza als die gewünschte (zum Beispiel Margherita statt Salami) bringt 1 Smaragd, der Gast schaut zufrieden, aber nicht strahlend.
 - [ ] Baue die Glocke ab, solange der Mitnahme-Gast wartet. Der Gast verschwindet.
 
 ## Teil 9: Die alte Welt lädt
@@ -80,5 +84,5 @@ Voraussetzung: ein Restaurant mit Pizzaofen.
 
 ## Teil 10: Rezeptbuch und Inhaltsprotokoll
 
-- [ ] Das Rezeptbuch zeigt das Multitool und die Suppenschüssel in den Schritten.
+- [ ] Das Rezeptbuch zeigt das Küchen-Multitool und die Suppenschüssel in den Schritten.
 - [ ] Im Inhaltsprotokoll stehen keine Fehler.

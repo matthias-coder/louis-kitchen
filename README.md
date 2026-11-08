@@ -3,6 +3,13 @@
 Louis Kitchen (technischer Name im Code: Kochmod) ist ein Minecraft-Bedrock-Add-on (1.26) zum Kochen und für ein kleines Restaurant.
 Es ist für ein 7-jähriges Kind gemacht und komplett auf Deutsch.
 
+## Etappe 3: Einfacher spielen
+
+- Das Multitool im Rucksack ersetzt Messer, Pfannenwender, Pizzaschieber, Dönermesser und Wokwender
+- Pommes aus der Fritteuse (Kartoffel, Kartoffelstifte, Fritteuse), auch in Burger-Laden, Döner-Imbiss und den Restaurants
+- Suppen kommen in die Suppenschüssel, Pizza zum Mitnehmen in den Pizzakarton (Mitnahme-Gäste an der Glocke)
+- Geschirrschrank mit Teller, Suppenschüssel und Pizzakarton; Sushi braucht Gekochten Reis aus dem Vorratsschrank
+
 ## Etappe 2: Alle Gerichte
 
 - 9 Gerichte: Hamburger, Cheeseburger, Döner, Sushi, Pizza Margherita, Salamipizza, Ramen, Kartoffelsuppe, Bratnudeln
@@ -21,7 +28,7 @@ Es ist für ein 7-jähriges Kind gemacht und komplett auf Deutsch.
 ## Neue Version veröffentlichen
 
 1. Version in `packs/BP/manifest.json` und `packs/RP/manifest.json` (Header, Module, Abhängigkeit) sowie in beiden `.lang`-Dateien erhöhen, Tests laufen lassen, committen.
-2. Tag setzen und pushen: `git tag v2.0.0 && git push origin main v2.0.0`.
+2. Tag setzen und pushen: `git tag v2.1.0 && git push origin main v2.1.0`.
 3. GitHub Actions baut die `.mcaddon` und legt sie als Release ab (der Tag muss zur Manifest-Version passen, sonst bricht der Workflow ab).
 
 ## Befehle
@@ -39,4 +46,4 @@ npm run deploy    # kopiert beide Pakete in den Minecraft-Ordner (Minecraft muss
 - Konzept: `docs/superpowers/specs/2026-11-05-kochmod-design.md`
 - Plan: `docs/superpowers/plans/2026-11-05-kochmod-etappe-1-burger.md`
 - Plan Etappe 2: `docs/superpowers/plans/2026-11-07-kochmod-etappe-2-gerichte.md`
-- Testbogen zum Ausprobieren: `docs/test-etappe-1.md` (Etappe 1), `docs/test-etappe-2.md` (Etappe 2)
+- Testbogen zum Ausprobieren: `docs/test-etappe-1.md` (Etappe 1), `docs/test-etappe-2.md` (Etappe 2), `docs/test-etappe-3.md` (Etappe 3)

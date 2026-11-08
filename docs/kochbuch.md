@@ -1,6 +1,6 @@
 # Kochbuch – So kochst du jedes Gericht
 
-Für Louis und Papa. Alles passiert durch **Antippen**: Zutat in der Hand → Station antippen legt sie hin. Werkzeug in der Hand → Station antippen arbeitet. Leere Hand → Station antippen nimmt zurück oder macht fertig.
+Für Louis und Papa. Alles passiert durch **Antippen**: Zutat in der Hand → Station antippen legt sie hin. Das **Küchen-Multitool** muss nur irgendwo im Inventar (Rucksack) liegen, nicht in der Hand. Leere Hand → Station antippen: wenden, herunternehmen oder schneiden.
 
 ## Die Küche
 
@@ -8,13 +8,13 @@ Für Louis und Papa. Alles passiert durch **Antippen**: Zutat in der Hand → St
 |---|---|---|
 | Kühlschrank | gibt frische Zutaten (Tomate, Salat, Frikadelle, Käse, Salami, Ei, Lachs, Sahne, Zwiebel, Karotte, Kartoffel, Frühlingszwiebel, Dönerfleisch) | – |
 | Vorratsschrank | gibt trockene Zutaten (Brötchen, Pizzateig, Tomatensoße, Nudeln, Reis, Brühe, Algenblatt, Dönertasche, Dönersoße, Sojasoße) | – |
-| Werkzeugkiste | Messer, Pfannenwender, Schüssel, Pizzaschieber, Wokwender, Rezeptbuch, saubere Teller | – |
-| Schneidebrett | schneidet Tomate, Zwiebel, Karotte, Kartoffel, Lachs | Messer |
-| Grill | brät die Frikadelle: roh → braun (8 Sekunden) → schwarz (nach weiteren 30 Sekunden) | Pfannenwender |
-| Pizzaofen | backt die rohe Pizza: 8 Sekunden bis fertig, dann wird sie schwarz | Pizzaschieber |
+| Werkzeugkiste | Küchen-Multitool, Schüssel, Rezeptbuch, saubere Teller | – |
+| Schneidebrett | schneidet Tomate, Zwiebel, Karotte, Kartoffel, Lachs | Küchen-Multitool (im Rucksack) |
+| Grill | brät die Frikadelle: roh → braun (8 Sekunden) → schwarz (nach weiteren 30 Sekunden) | Küchen-Multitool (im Rucksack) |
+| Pizzaofen | backt die rohe Pizza: 8 Sekunden bis fertig, dann wird sie schwarz | Küchen-Multitool (im Rucksack) |
 | Suppentopf | kocht Suppen und Reis (bis zu 6 Zutaten); nach 8 Sekunden fertig, zu lange = misslungen | Schüssel (wird mit der Suppe verbraucht) |
-| Dönerspieß | grillt das Dönerfleisch; nach 8 Sekunden kannst du 6 Scheiben abschneiden. Brennt nie an. | Messer |
-| Wok | brät die Bratnudeln (bis zu 6 Zutaten) | Wokwender (bleibt in der Hand) |
+| Dönerspieß | grillt das Dönerfleisch; nach 8 Sekunden kannst du 6 Scheiben abschneiden. Brennt nie an. | Küchen-Multitool (im Rucksack) |
+| Wok | brät die Bratnudeln (bis zu 6 Zutaten) | Küchen-Multitool (im Rucksack) |
 | Anrichte | legt Zutaten zusammen; leere Hand macht das Gericht fertig. Reihenfolge egal! | leere Hand |
 | Mülleimer | ein Tipp wirft ein Stück aus der Hand weg (Werkzeuge nie) | – |
 
@@ -22,6 +22,7 @@ Für Louis und Papa. Alles passiert durch **Antippen**: Zutat in der Hand → St
 - Fehlt etwas, ist etwas zu viel, noch roh oder verbrannt, entsteht ein **Misslungenes Gericht**. Einfach noch mal probieren.
 - Zu früh vom Grill oder aus dem Ofen genommen? Du bekommst die rohe Zutat zurück und legst sie wieder hin.
 - Servieren: fertiges Gericht in die Hand, **sauberen Teller** im Inventar, Tisch vor dem Gast antippen.
+- Das **Küchen-Multitool** ersetzt Messer, Pfannenwender, Pizzaschieber und Wokwender. Es bleibt im Rucksack: Station mit leerer Hand antippen reicht.
 - Das **Rezeptbuch** (Werkzeugkiste) zeigt dir dieselben Schritte als Bilder im Spiel.
 
 ---
@@ -30,10 +31,10 @@ Für Louis und Papa. Alles passiert durch **Antippen**: Zutat in der Hand → St
 
 1. Brötchen aus dem Vorratsschrank.
 2. Rohe Frikadelle aus dem Kühlschrank.
-3. Frikadelle auf den Grill. Warte, bis sie braun ist, dann mit dem Pfannenwender herunternehmen.
+3. Frikadelle auf den Grill. Warte, bis sie braun ist, dann mit leerer Hand herunternehmen (Multitool im Rucksack).
 4. Salat aus dem Kühlschrank.
 5. Tomate aus dem Kühlschrank.
-6. Tomate aufs Schneidebrett, mit dem Messer schneiden, Tomatenscheiben mit leerer Hand nehmen.
+6. Tomate aufs Schneidebrett, mit leerer Hand antippen (Multitool im Rucksack) schneidet, danach die Tomatenscheiben mit leerer Hand nehmen.
 7. Brötchen, gebratene Frikadelle, Salat und Tomatenscheiben auf die Anrichte legen. Mit leerer Hand antippen: **Hamburger**!
 
 ## Cheeseburger
@@ -49,7 +50,7 @@ Wie der Hamburger, plus:
 2. Tomatensoße aus dem Vorratsschrank.
 3. Käse aus dem Kühlschrank.
 4. Teig, Soße und Käse auf die Anrichte. Leere Hand: **Pizza Margherita (roh)**.
-5. Rohe Pizza in den Pizzaofen. Nach 8 Sekunden mit dem Pizzaschieber herausholen: **Pizza Margherita**! (Zu lange drin = Verbrannte Pizza, ab in den Mülleimer.)
+5. Rohe Pizza in den Pizzaofen. Nach 8 Sekunden mit leerer Hand herausholen (Multitool im Rucksack): **Pizza Margherita**! (Zu lange drin = Verbrannte Pizza, ab in den Mülleimer.)
 
 ## Salamipizza
 
@@ -58,7 +59,7 @@ Wie der Hamburger, plus:
 3. Käse aus dem Kühlschrank.
 4. Salami aus dem Kühlschrank.
 5. Teig, Soße, Käse und Salami auf die Anrichte. Leere Hand: **Salamipizza (roh)**.
-6. In den Pizzaofen, nach 8 Sekunden mit dem Pizzaschieber herausholen: **Salamipizza**!
+6. In den Pizzaofen, nach 8 Sekunden mit leerer Hand herausholen (Multitool im Rucksack): **Salamipizza**!
 
 ## Ramen
 
@@ -71,7 +72,7 @@ Wie der Hamburger, plus:
 ## Kartoffelsuppe
 
 1. Kartoffel aus dem Kühlschrank.
-2. Kartoffel aufs Schneidebrett, mit dem Messer schneiden: Kartoffelwürfel.
+2. Kartoffel aufs Schneidebrett, mit leerer Hand antippen (Multitool im Rucksack): Kartoffelwürfel.
 3. Karotte aus dem Kühlschrank.
 4. Karotte aufs Schneidebrett, schneiden: Karottenscheiben.
 5. Sahne aus dem Kühlschrank.
@@ -81,7 +82,7 @@ Wie der Hamburger, plus:
 
 1. Dönertasche aus dem Vorratsschrank.
 2. Dönerfleisch (roh) aus dem Kühlschrank.
-3. Rohes Dönerfleisch an den Dönerspieß hängen. Nach 8 Sekunden mit dem Messer antippen: eine Scheibe Dönerfleisch (bis zu 6 Scheiben pro Spieß).
+3. Rohes Dönerfleisch an den Dönerspieß hängen. Nach 8 Sekunden mit leerer Hand antippen (Multitool im Rucksack): eine Scheibe Dönerfleisch (bis zu 6 Scheiben pro Spieß).
 4. Salat aus dem Kühlschrank.
 5. Tomate aus dem Kühlschrank.
 6. Tomate aufs Schneidebrett, schneiden: Tomatenscheiben.
@@ -107,7 +108,7 @@ Wie der Hamburger, plus:
 4. Karotte aufs Schneidebrett, schneiden: Karottenscheiben.
 5. Frühlingszwiebel aus dem Kühlschrank.
 6. Sojasoße aus dem Vorratsschrank.
-7. Nudeln, Ei, Karottenscheiben, Frühlingszwiebel und Sojasoße in den Wok. Nach 8 Sekunden mit dem Wokwender antippen: **Bratnudeln**!
+7. Nudeln, Ei, Karottenscheiben, Frühlingszwiebel und Sojasoße in den Wok. Nach 8 Sekunden mit leerer Hand antippen (Multitool im Rucksack): **Bratnudeln**!
 
 ---
 

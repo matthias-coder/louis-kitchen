@@ -225,7 +225,7 @@ export const SPIT_SLICES = 6;
 const SPIT_EMPTY = { meat: false, ticks: 0, slices: 0 };
 
 /**
- * Raw meat goes on an empty spit; the knife cuts cooked meat off, one slice at a time.
+ * Raw meat goes on an empty spit; the multitool cuts cooked meat off, one slice at a time.
  * @param {SpitState} state
  * @param {string | null} held
  * @param {Carried} [carried]

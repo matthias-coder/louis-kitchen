@@ -32,6 +32,9 @@
     "kochmod_block_fridge": {
       "textures": "textures/items/block_fridge"
     },
+    "kochmod_block_fryer": {
+      "textures": "textures/items/block_fryer"
+    },
     "kochmod_block_grill": {
       "textures": "textures/items/block_grill"
     },
@@ -65,6 +68,9 @@
     "kochmod_bun": {
       "textures": "textures/items/bun"
     },
+    "kochmod_burnt_fries": {
+      "textures": "textures/items/burnt_fries"
+    },
     "kochmod_burnt_patty": {
       "textures": "textures/items/burnt_patty"
     },
@@ -95,6 +101,9 @@
     "kochmod_cream": {
       "textures": "textures/items/cream"
     },
+    "kochmod_dirty_bowl": {
+      "textures": "textures/items/dirty_bowl"
+    },
     "kochmod_dirty_plate": {
       "textures": "textures/items/dirty_plate"
     },
@@ -121,6 +130,9 @@
     },
     "kochmod_fried_noodles": {
       "textures": "textures/items/fried_noodles"
+    },
+    "kochmod_fries": {
+      "textures": "textures/items/fries"
     },
     "kochmod_hamburger": {
       "textures": "textures/items/hamburger"
@@ -149,6 +161,9 @@
     "kochmod_lettuce": {
       "textures": "textures/items/lettuce"
     },
+    "kochmod_multitool": {
+      "textures": "textures/items/multitool"
+    },
     "kochmod_noodles": {
       "textures": "textures/items/noodles"
     },
@@ -164,6 +179,9 @@
     "kochmod_pita": {
       "textures": "textures/items/pita"
     },
+    "kochmod_pizza_box": {
+      "textures": "textures/items/pizza_box"
+    },
     "kochmod_pizza_margherita": {
       "textures": "textures/items/pizza_margherita"
     },
@@ -178,6 +196,9 @@
     },
     "kochmod_potato_soup": {
       "textures": "textures/items/potato_soup"
+    },
+    "kochmod_potato_sticks": {
+      "textures": "textures/items/potato_sticks"
     },
     "kochmod_ramen": {
       "textures": "textures/items/ramen"
@@ -211,6 +232,9 @@
     },
     "kochmod_salmon_strips": {
       "textures": "textures/items/salmon_strips"
+    },
+    "kochmod_soup_bowl": {
+      "textures": "textures/items/soup_bowl"
     },
     "kochmod_soy_sauce": {
       "textures": "textures/items/soy_sauce"

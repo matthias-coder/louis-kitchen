@@ -15,7 +15,7 @@ import { ALL_BLOCKS } from '../packs/BP/scripts/logic/crates.js';
 /** @type {Direction[]} */
 const FACINGS = ['north', 'east', 'south', 'west'];
 const { blocks, width, depth, height } = RESTAURANT;
-const STATIONS = ['grill', 'cutting_board', 'counter', 'oven', 'pot', 'spit', 'wok', 'dishwasher', 'dish_cabinet', 'trash_can'];
+const STATIONS = ['grill', 'cutting_board', 'counter', 'oven', 'pot', 'spit', 'wok', 'fryer', 'dishwasher', 'dish_cabinet', 'trash_can'];
 const CABINETS = ['fridge', 'pantry'];
 const CRATES = ['crate_tools', 'crate_all', 'crate_kits'];
 
@@ -73,6 +73,13 @@ test('the doner spit stands on the back row at x=1, the wok at x=11; x=12 stays 
   assert.deepEqual([at('wok').x, at('wok').y, at('wok').z], [11, 1, z]);
   assert.ok(!blocks.some((b) => b.x === 12 && b.y === 1 && b.z === z));
   assert.deepEqual([at('trash_can').x, at('trash_can').y, at('trash_can').z], [1, 1, 6]);
+  assert.deepEqual([at('fryer').x, at('fryer').y, at('fryer').z], [1, 1, 7]);
+});
+
+test('the doner fryer stands on the kitchen floor beside the trash can, not in front of the row (the fridge must stay reachable)', () => {
+  const at = (/** @type {string} */ id) => THEMES.doner.layout.blocks.find((b) => b.id === `kochmod:${id}`);
+  assert.deepEqual([at('trash_can')?.x, at('trash_can')?.z], [1, 6]);
+  assert.deepEqual([at('fryer')?.x, at('fryer')?.y, at('fryer')?.z], [2, 1, 6]);
 });
 
 test('the dish cabinet starts with 8 plates', () => {
@@ -266,13 +273,13 @@ test('floorOffsets covers the whole footprint at y = 0', () => {
 
 // ---- Stage 2: themed restaurants, one Baukasten per theme ----
 
-const ALL_DEVICES = ['grill', 'cutting_board', 'counter', 'oven', 'pot', 'spit', 'wok'];
+const ALL_DEVICES = ['grill', 'cutting_board', 'counter', 'oven', 'pot', 'spit', 'wok', 'fryer'];
 /** The theme table of the task brief, verbatim: kitchen devices and number of tables. */
 const THEME_TABLE = {
-  burger: { devices: ['grill', 'cutting_board', 'counter'], tables: 4 },
+  burger: { devices: ['grill', 'fryer', 'cutting_board', 'counter'], tables: 4 },
   italian: { devices: ['oven', 'pot', 'cutting_board', 'counter'], tables: 4 },
   japanese: { devices: ['pot', 'wok', 'cutting_board', 'counter'], tables: 4 },
-  doner: { devices: ['spit', 'cutting_board', 'counter'], tables: 3 },
+  doner: { devices: ['spit', 'fryer', 'cutting_board', 'counter'], tables: 3 },
   classic: { devices: ALL_DEVICES, tables: 4 },
   mega: { devices: ALL_DEVICES, tables: 8 },
 };
@@ -281,11 +288,10 @@ const EVERY_THEME = ['fridge', 'pantry', 'crate_tools', 'crate_all', 'crate_kits
 const dishIds = (/** @type {string[]} */ ...ids) => ids.map((i) => `kochmod:${i}`);
 /** What guests may wish for at each theme (RECIPES order). */
 const MENUS = {
-  burger: dishIds('hamburger', 'cheeseburger'),
-  // pot + cutting board + counter is also the sushi kitchen (RECIPES: sushi needs pot, cutting_board, counter)
-  italian: dishIds('sushi', 'pizza_margherita', 'salami_pizza', 'ramen', 'potato_soup'),
+  burger: dishIds('hamburger', 'cheeseburger', 'fries'),
+  italian: dishIds('pizza_margherita', 'salami_pizza', 'potato_soup'),
   japanese: dishIds('sushi', 'ramen', 'potato_soup', 'fried_noodles'),
-  doner: dishIds('doner'),
+  doner: dishIds('doner', 'fries'),
   classic: DISHES,
   mega: DISHES,
 };
@@ -386,7 +392,7 @@ test('themeForKit: each kit builds its theme, the old restaurant_kit builds the 
 test('the expected menus follow from RECIPES and the theme table', () => {
   for (const id of THEME_IDS) {
     const devices = THEME_TABLE[id].devices;
-    assert.deepEqual(RECIPES.filter((r) => r.stations.every((s) => devices.includes(s))).map((r) => r.dish), MENUS[id], id);
+    assert.deepEqual(availableDishes(new Set(devices)), MENUS[id], id);
   }
 });
 

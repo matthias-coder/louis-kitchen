@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { ITEMS, itemsOf, itemsFrom, isDish, plateName } from '../packs/BP/scripts/logic/catalog.js';
+import { ITEMS, MULTITOOL, SOUP_BOWL, DIRTY_BOWL, PIZZA_BOX, itemsOf, itemsFrom, isDish, plateName } from '../packs/BP/scripts/logic/catalog.js';
 import { RECIPES, DISHES, FAILED } from '../packs/BP/scripts/logic/recipes.js';
 import { CRATES, ALL_BLOCKS } from '../packs/BP/scripts/logic/crates.js';
 import { CUTTABLE, TIMED, ASSEMBLY, POT, WOK } from '../packs/BP/scripts/logic/processes.js';
@@ -21,24 +21,32 @@ test('every id used by recipes, crates and processes exists in ITEMS', () => {
 
 test('DISHES equals the dishes of RECIPES in order and excludes the failed dish', () => {
   assert.deepEqual(DISHES, RECIPES.map((r) => r.dish));
-  assert.deepEqual(DISHES, k('hamburger', 'cheeseburger', 'doner', 'sushi', 'pizza_margherita', 'salami_pizza', 'ramen', 'potato_soup', 'fried_noodles'));
+  assert.deepEqual(DISHES, k('hamburger', 'cheeseburger', 'doner', 'sushi', 'pizza_margherita', 'salami_pizza', 'fries', 'ramen', 'potato_soup', 'fried_noodles'));
   assert.ok(isDish(FAILED));
   assert.ok(!DISHES.includes(FAILED));
 });
 
 test('itemsFrom lists what each crate supplies, in catalog order', () => {
   assert.deepEqual(itemsFrom('fridge'), k('tomato', 'lettuce', 'raw_patty', 'cheese',
-    'salami', 'egg', 'salmon', 'cream', 'onion', 'carrot', 'potato', 'spring_onion', 'doner_meat_raw'));
-  assert.deepEqual(itemsFrom('pantry'), k('bun',
-    'dough', 'tomato_sauce', 'noodles', 'rice', 'broth', 'nori', 'pita', 'doner_sauce', 'soy_sauce'));
-  assert.deepEqual(itemsFrom('tools'), k('knife', 'spatula', 'bowl', 'pizza_peel', 'wok_spatula', 'recipe_book', 'clean_plate'));
+    'salami', 'egg', 'salmon', 'cream', 'spring_onion', 'doner_meat_raw', 'dough', 'doner_sauce'));
+  assert.deepEqual(itemsFrom('pantry'), k('bun', 'potato', 'onion', 'carrot',
+    'tomato_sauce', 'noodles', 'cooked_rice', 'broth', 'nori', 'pita', 'soy_sauce'));
+  assert.deepEqual(ITEMS[k('rice')], { kind: 'ingredient', stack: 64, menu: false });
+  assert.deepEqual(itemsFrom('tools'), [MULTITOOL, ...k('recipe_book', 'clean_plate')]);
+});
+
+test('soup bowl, dirty bowl and pizza box are plate items; the old bowl is a tool that leaves the crates', () => {
+  assert.deepEqual(ITEMS[SOUP_BOWL], { kind: 'plate', stack: 64 });
+  assert.deepEqual(ITEMS[DIRTY_BOWL], { kind: 'plate', stack: 64, menu: false });
+  assert.deepEqual(ITEMS[PIZZA_BOX], { kind: 'plate', stack: 64 });
+  assert.deepEqual(ITEMS[k('bowl')], { kind: 'tool', stack: 1, menu: false });
 });
 
 test('itemsOf, isDish and plateName', () => {
   assert.deepEqual(itemsOf('dish'), k('hamburger', 'cheeseburger', 'failed_dish',
-    'pizza_margherita', 'salami_pizza', 'ramen', 'potato_soup', 'doner', 'sushi', 'fried_noodles'));
+    'pizza_margherita', 'salami_pizza', 'fries', 'ramen', 'potato_soup', 'doner', 'sushi', 'fried_noodles'));
   assert.deepEqual(itemsOf('prepared'), k('cooked_patty', 'burnt_patty', 'tomato_slices',
-    'onion_rings', 'carrot_slices', 'potato_cubes', 'salmon_strips', 'doner_meat', 'cooked_rice',
+    'onion_rings', 'carrot_slices', 'potato_sticks', 'potato_cubes', 'burnt_fries', 'salmon_strips', 'doner_meat',
     'raw_pizza_margherita', 'raw_salami_pizza', 'burnt_pizza'));
   assert.equal(isDish('kochmod:hamburger'), true);
   assert.equal(isDish('kochmod:bun'), false);
@@ -82,4 +90,14 @@ test('six Baukasten items: misc, stack 1, in the menu; the old restaurant_kit st
     assert.deepEqual(ITEMS[`kochmod:kit_${id}`], { kind: 'misc', stack: 1 }, id);
   }
   assert.deepEqual(ITEMS['kochmod:restaurant_kit'], { kind: 'misc', stack: 1, menu: false });
+});
+
+test('multitool: tool from the tools crate, stack 1; the four old tools stay as items but leave the crates', () => {
+  assert.deepEqual(ITEMS[MULTITOOL], { kind: 'tool', source: 'tools', stack: 1 });
+  for (const old of ['knife', 'spatula', 'pizza_peel', 'wok_spatula'].flatMap((i) => k(i))) {
+    assert.equal(ITEMS[old].kind, 'tool');
+    assert.equal(ITEMS[old].source, undefined);
+    assert.equal(ITEMS[old].menu, false);
+  }
+  assert.deepEqual(itemsFrom('tools'), [MULTITOOL, ...k('recipe_book', 'clean_plate')]);
 });

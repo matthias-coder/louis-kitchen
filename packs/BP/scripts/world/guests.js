@@ -2,9 +2,9 @@ import { BlockPermutation, ItemStack, world } from '@minecraft/server';
 import { DIRECTIONS, offset, tableView } from '../logic/restaurant.js';
 import { parseLocKey } from '../logic/store.js';
 import {
-  TABLE, tickBells, guestAvailability, serveTable, findWaitingGuest, releaseBell, sweepOrphans, ringBell as ringBellFlow,
+  TABLE, tickBells, guestAvailability, serveTable, findWaitingGuest, releaseBell, serveTakeaway, sweepOrphans, ringBell as ringBellFlow,
 } from '../logic/guest-flow.js';
-import { worldStore, loadedBlock } from './effects.js';
+import { worldStore, loadedBlock, heldItemId, playerHasItem, applyResult } from './effects.js';
 
 /** @typedef {import('@minecraft/server').Entity} Entity */
 /** @typedef {import('@minecraft/server').Vector3} Vector3 */
@@ -78,6 +78,12 @@ function guestHandle(entity) {
     },
     look(patch) {
       for (const [k, v] of Object.entries(patch)) entity.setProperty(`kochmod:${k}`, v);
+    },
+    stay() {
+      entity.triggerEvent('kochmod:stay');
+    },
+    pay(emeralds) {
+      entity.dimension.spawnItem(new ItemStack('minecraft:emerald', emeralds), entity.location);
     },
     distanceTo(seatKey) {
       return distance(entity.location, seatPos(seatKey));
@@ -230,4 +236,15 @@ export function bellAvailability(bellKey) {
  */
 export function ringBell(bellKey) {
   return ringBellFlow(bellKey, io, Math.random).status;
+}
+
+/**
+ * A player tapped an entity: hand a boxed pizza to a takeaway guest.
+ * @param {import('@minecraft/server').Player} player
+ * @param {Entity} entity
+ */
+export function onGuestInteract(player, entity) {
+  if (!entity.isValid || entity.typeId !== GUEST_ID) return;
+  const result = serveTakeaway(entity.id, heldItemId(player), (id) => playerHasItem(player, id), io);
+  if (result) applyResult(result, player, { dimension: entity.dimension, center: () => entity.location });
 }

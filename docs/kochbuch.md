@@ -1,27 +1,31 @@
 # Kochbuch – So kochst du jedes Gericht
 
-Für Louis und Papa. Alles passiert durch **Antippen**: Zutat in der Hand → Station antippen legt sie hin. Werkzeug in der Hand → Station antippen arbeitet. Leere Hand → Station antippen nimmt zurück oder macht fertig.
+Für Louis und Papa. Alles passiert durch **Antippen**: Zutat in der Hand → Station antippen legt sie hin. Das **Küchen-Multitool** muss nur irgendwo im Inventar (Rucksack) liegen, nicht in der Hand. Leere Hand → Station antippen: wenden, herunternehmen oder schneiden.
 
 ## Die Küche
 
 | Station | Was sie macht | Werkzeug |
 |---|---|---|
-| Kühlschrank | gibt frische Zutaten (Tomate, Salat, Frikadelle, Käse, Salami, Ei, Lachs, Sahne, Zwiebel, Karotte, Kartoffel, Frühlingszwiebel, Dönerfleisch) | – |
-| Vorratsschrank | gibt trockene Zutaten (Brötchen, Pizzateig, Tomatensoße, Nudeln, Reis, Brühe, Algenblatt, Dönertasche, Dönersoße, Sojasoße) | – |
-| Werkzeugkiste | Messer, Pfannenwender, Schüssel, Pizzaschieber, Wokwender, Rezeptbuch, saubere Teller | – |
-| Schneidebrett | schneidet Tomate, Zwiebel, Karotte, Kartoffel, Lachs | Messer |
-| Grill | brät die Frikadelle: roh → braun (8 Sekunden) → schwarz (nach weiteren 30 Sekunden) | Pfannenwender |
-| Pizzaofen | backt die rohe Pizza: 8 Sekunden bis fertig, dann wird sie schwarz | Pizzaschieber |
-| Suppentopf | kocht Suppen und Reis (bis zu 6 Zutaten); nach 8 Sekunden fertig, zu lange = misslungen | Schüssel (wird mit der Suppe verbraucht) |
-| Dönerspieß | grillt das Dönerfleisch; nach 8 Sekunden kannst du 6 Scheiben abschneiden. Brennt nie an. | Messer |
-| Wok | brät die Bratnudeln (bis zu 6 Zutaten) | Wokwender (bleibt in der Hand) |
+| Kühlschrank | gibt gekühlte Zutaten (Tomate, Salat, Frikadelle, Käse, Salami, Ei, Lachs, Sahne, Frühlingszwiebel, Dönerfleisch, Pizzateig, Dönersoße) | – |
+| Vorratsschrank | gibt trockene Zutaten (Brötchen, Kartoffel, Zwiebel, Karotte, Tomatensoße, Nudeln, gekochter Reis, Brühe, Algenblatt, Dönertasche, Sojasoße) | – |
+| Werkzeugkiste | Küchen-Multitool, Rezeptbuch, saubere Teller | – |
+| Schneidebrett | schneidet Tomate, Zwiebel, Karotte, Kartoffel, Lachs | Küchen-Multitool (im Rucksack) |
+| Grill | brät die Frikadelle: roh → braun (8 Sekunden) → schwarz (nach weiteren 30 Sekunden) | Küchen-Multitool (im Rucksack) |
+| Pizzaofen | backt die rohe Pizza: 8 Sekunden bis fertig, dann wird sie schwarz | Küchen-Multitool (im Rucksack) |
+| Fritteuse | frittiert Kartoffelstifte: 8 Sekunden bis fertig, dann werden sie schwarz | Küchen-Multitool (im Rucksack) |
+| Suppentopf | kocht Suppen (bis zu 6 Zutaten); nach 8 Sekunden fertig, zu lange = misslungen | Suppenschüssel aus dem Geschirrschrank (im Rucksack, wird mit der Suppe verbraucht) |
+| Dönerspieß | grillt das Dönerfleisch; nach 8 Sekunden kannst du 6 Scheiben abschneiden. Brennt nie an. | Küchen-Multitool (im Rucksack) |
+| Wok | brät die Bratnudeln (bis zu 6 Zutaten) | Küchen-Multitool (im Rucksack) |
 | Anrichte | legt Zutaten zusammen; leere Hand macht das Gericht fertig. Reihenfolge egal! | leere Hand |
+| Geschirrschrank | Tipp mit leerer Hand öffnet das Menü: Teller, Suppenschüssel, Pizzakarton | leere Hand |
+| Spülmaschine | schmutzige Teller und Schüsseln rein; nach 10 Sekunden kommen sie sauber wieder heraus | Teller oder Schüssel in der Hand |
 | Mülleimer | ein Tipp wirft ein Stück aus der Hand weg (Werkzeuge nie) | – |
 
 **Faustregeln**
 - Fehlt etwas, ist etwas zu viel, noch roh oder verbrannt, entsteht ein **Misslungenes Gericht**. Einfach noch mal probieren.
 - Zu früh vom Grill oder aus dem Ofen genommen? Du bekommst die rohe Zutat zurück und legst sie wieder hin.
-- Servieren: fertiges Gericht in die Hand, **sauberen Teller** im Inventar, Tisch vor dem Gast antippen.
+- Servieren: fertiges Gericht in die Hand, **sauberen Teller** im Inventar, Tisch vor dem Gast antippen. Suppen (Ramen, Kartoffelsuppe) kommen in der Suppenschüssel, dafür ist kein Teller nötig; nach dem Essen bleibt eine schmutzige Schüssel am Tisch, die in die Spülmaschine kommt.
+- Das **Küchen-Multitool** ersetzt Messer, Pfannenwender, Pizzaschieber und Wokwender. Es bleibt im Rucksack: Station mit leerer Hand antippen reicht.
 - Das **Rezeptbuch** (Werkzeugkiste) zeigt dir dieselben Schritte als Bilder im Spiel.
 
 ---
@@ -30,10 +34,10 @@ Für Louis und Papa. Alles passiert durch **Antippen**: Zutat in der Hand → St
 
 1. Brötchen aus dem Vorratsschrank.
 2. Rohe Frikadelle aus dem Kühlschrank.
-3. Frikadelle auf den Grill. Warte, bis sie braun ist, dann mit dem Pfannenwender herunternehmen.
+3. Frikadelle auf den Grill. Warte, bis sie braun ist, dann mit leerer Hand herunternehmen (Multitool im Rucksack).
 4. Salat aus dem Kühlschrank.
 5. Tomate aus dem Kühlschrank.
-6. Tomate aufs Schneidebrett, mit dem Messer schneiden, Tomatenscheiben mit leerer Hand nehmen.
+6. Tomate aufs Schneidebrett legen, mit leerer Hand antippen (Multitool im Rucksack): schneidet. Danach die Tomatenscheiben mit leerer Hand nehmen.
 7. Brötchen, gebratene Frikadelle, Salat und Tomatenscheiben auf die Anrichte legen. Mit leerer Hand antippen: **Hamburger**!
 
 ## Cheeseburger
@@ -45,20 +49,20 @@ Wie der Hamburger, plus:
 
 ## Pizza Margherita
 
-1. Pizzateig aus dem Vorratsschrank.
+1. Pizzateig aus dem Kühlschrank.
 2. Tomatensoße aus dem Vorratsschrank.
 3. Käse aus dem Kühlschrank.
 4. Teig, Soße und Käse auf die Anrichte. Leere Hand: **Pizza Margherita (roh)**.
-5. Rohe Pizza in den Pizzaofen. Nach 8 Sekunden mit dem Pizzaschieber herausholen: **Pizza Margherita**! (Zu lange drin = Verbrannte Pizza, ab in den Mülleimer.)
+5. Rohe Pizza in den Pizzaofen. Nach 8 Sekunden mit leerer Hand herausholen (Multitool im Rucksack): **Pizza Margherita**! (Zu lange drin = Verbrannte Pizza, ab in den Mülleimer.)
 
 ## Salamipizza
 
-1. Pizzateig aus dem Vorratsschrank.
+1. Pizzateig aus dem Kühlschrank.
 2. Tomatensoße aus dem Vorratsschrank.
 3. Käse aus dem Kühlschrank.
 4. Salami aus dem Kühlschrank.
 5. Teig, Soße, Käse und Salami auf die Anrichte. Leere Hand: **Salamipizza (roh)**.
-6. In den Pizzaofen, nach 8 Sekunden mit dem Pizzaschieber herausholen: **Salamipizza**!
+6. In den Pizzaofen, nach 8 Sekunden mit leerer Hand herausholen (Multitool im Rucksack): **Salamipizza**!
 
 ## Ramen
 
@@ -66,59 +70,79 @@ Wie der Hamburger, plus:
 2. Nudeln aus dem Vorratsschrank.
 3. Ei aus dem Kühlschrank.
 4. Frühlingszwiebel aus dem Kühlschrank.
-5. Alle vier in den Suppentopf. Es blubbert und dampft. Nach 8 Sekunden mit der Schüssel antippen: **Ramen**!
+5. Alle vier in den Suppentopf. Es blubbert und dampft. Nach 8 Sekunden mit leerer Hand antippen (Suppenschüssel im Rucksack): **Ramen**!
 
 ## Kartoffelsuppe
 
-1. Kartoffel aus dem Kühlschrank.
-2. Kartoffel aufs Schneidebrett, mit dem Messer schneiden: Kartoffelwürfel.
-3. Karotte aus dem Kühlschrank.
-4. Karotte aufs Schneidebrett, schneiden: Karottenscheiben.
+1. Kartoffel aus dem Vorratsschrank.
+2. Kartoffel aufs Schneidebrett legen, mit leerer Hand antippen (Multitool im Rucksack): schneidet. Das gibt Kartoffelstifte.
+3. Karotte aus dem Vorratsschrank.
+4. Karotte aufs Schneidebrett legen, mit leerer Hand antippen (Multitool im Rucksack): schneidet. Das gibt Karottenscheiben.
 5. Sahne aus dem Kühlschrank.
-6. Kartoffelwürfel, Karottenscheiben und Sahne in den Suppentopf. Nach 8 Sekunden mit der Schüssel antippen: **Kartoffelsuppe**!
+6. Kartoffelstifte, Karottenscheiben und Sahne in den Suppentopf. Nach 8 Sekunden mit leerer Hand antippen (Suppenschüssel im Rucksack): **Kartoffelsuppe**!
+
+## Pommes
+
+1. Kartoffel aus dem Vorratsschrank.
+2. Kartoffel aufs Schneidebrett legen, mit leerer Hand antippen (Multitool im Rucksack): schneidet. Das gibt Kartoffelstifte.
+3. Kartoffelstifte in die Fritteuse. Nach 8 Sekunden mit leerer Hand herausholen (Multitool im Rucksack): **Pommes**! (Zu lange drin = Verbrannte Pommes, ab in den Mülleimer.)
+4. Pommes auf einem sauberen Teller servieren.
 
 ## Döner
 
 1. Dönertasche aus dem Vorratsschrank.
 2. Dönerfleisch (roh) aus dem Kühlschrank.
-3. Rohes Dönerfleisch an den Dönerspieß hängen. Nach 8 Sekunden mit dem Messer antippen: eine Scheibe Dönerfleisch (bis zu 6 Scheiben pro Spieß).
+3. Rohes Dönerfleisch an den Dönerspieß hängen. Nach 8 Sekunden mit leerer Hand antippen (Multitool im Rucksack): eine Scheibe Dönerfleisch (bis zu 6 Scheiben pro Spieß).
 4. Salat aus dem Kühlschrank.
 5. Tomate aus dem Kühlschrank.
-6. Tomate aufs Schneidebrett, schneiden: Tomatenscheiben.
-7. Zwiebel aus dem Kühlschrank.
-8. Zwiebel aufs Schneidebrett, schneiden: Zwiebelringe.
-9. Dönersoße aus dem Vorratsschrank.
+6. Tomate aufs Schneidebrett legen, mit leerer Hand antippen (Multitool im Rucksack): schneidet. Das gibt Tomatenscheiben.
+7. Zwiebel aus dem Vorratsschrank.
+8. Zwiebel aufs Schneidebrett legen, mit leerer Hand antippen (Multitool im Rucksack): schneidet. Das gibt Zwiebelringe.
+9. Dönersoße aus dem Kühlschrank.
 10. Dönertasche, Dönerfleisch, Salat, Tomatenscheiben, Zwiebelringe und Dönersoße auf die Anrichte. Leere Hand: **Döner**!
 
 ## Sushi
 
 1. Algenblatt aus dem Vorratsschrank.
-2. Reis aus dem Vorratsschrank.
-3. Reis in den Suppentopf. Nach 8 Sekunden mit der Schüssel antippen: Gekochter Reis.
-4. Lachs aus dem Kühlschrank.
-5. Lachs aufs Schneidebrett, schneiden: Lachsstreifen.
-6. Algenblatt, gekochten Reis und Lachsstreifen auf die Anrichte. Leere Hand: **Sushi**!
+2. Gekochter Reis aus dem Vorratsschrank.
+3. Lachs aus dem Kühlschrank.
+4. Lachs aufs Schneidebrett legen, mit leerer Hand antippen (Multitool im Rucksack): schneidet. Das gibt Lachsstreifen.
+5. Algenblatt, gekochten Reis und Lachsstreifen auf die Anrichte. Leere Hand: **Sushi**!
 
 ## Bratnudeln
 
 1. Nudeln aus dem Vorratsschrank.
 2. Ei aus dem Kühlschrank.
-3. Karotte aus dem Kühlschrank.
-4. Karotte aufs Schneidebrett, schneiden: Karottenscheiben.
+3. Karotte aus dem Vorratsschrank.
+4. Karotte aufs Schneidebrett legen, mit leerer Hand antippen (Multitool im Rucksack): schneidet. Das gibt Karottenscheiben.
 5. Frühlingszwiebel aus dem Kühlschrank.
 6. Sojasoße aus dem Vorratsschrank.
-7. Nudeln, Ei, Karottenscheiben, Frühlingszwiebel und Sojasoße in den Wok. Nach 8 Sekunden mit dem Wokwender antippen: **Bratnudeln**!
+7. Nudeln, Ei, Karottenscheiben, Frühlingszwiebel und Sojasoße in den Wok. Nach 8 Sekunden mit leerer Hand antippen (Multitool im Rucksack): **Bratnudeln**!
+
+---
+
+## Pizza zum Mitnehmen
+
+Manchmal steht ein Gast mit einem Läufer-Zeichen und einer Pizza in der Denkblase neben der Klingel. Er setzt sich nicht hin, er will die Pizza mitnehmen.
+
+1. Back die Pizza, die er sich wünscht.
+2. Nimm einen Pizzakarton aus dem Geschirrschrank in deinen Rucksack.
+3. Halte die Pizza in der Hand und tippe den Gast an: er bezahlt und geht.
+
+Hast du keinen Karton, erinnert dich der Gast daran. Er nimmt nur Pizza mit, andere Gerichte mag er nicht. Solche Gäste kommen nur, wenn das Restaurant einen Pizzaofen hat.
 
 ---
 
 ## Welches Restaurant kann was?
 
-Gäste wünschen sich nur, was die Küche kochen kann.
+Jede Küche hat ein Kennzeichen-Gerät: Burger = Grill (Pommes gehören dazu), Pizzeria = Pizzaofen, Japanisch = Wok, Döner = Dönerspieß (auch mit Pommes), Klassisch = Suppentopf. Steht das Gerät in der Nähe der Klingel, bietet das Restaurant diese Küche an. Gäste wünschen sich nur Gerichte angebotener Küchen, die die Küche auch kochen kann.
+
+Der Gast nimmt jedes Gericht, das zu einer angebotenen Küche passt: das Wunschgericht bringt 1 bis 3 Smaragde, ein anderes passendes Gericht 1 Smaragd, ein Gericht einer fremden Küche oder ein misslungenes Gericht 0.
 
 | Restaurant (Baukasten aus der Restaurant-Kiste) | Geräte | Gerichte |
 |---|---|---|
-| Burger-Laden | Grill, Schneidebrett, Anrichte | Hamburger, Cheeseburger |
-| Pizzeria | Pizzaofen, Suppentopf, Schneidebrett, Anrichte | Pizza Margherita, Salamipizza, Ramen, Kartoffelsuppe, Sushi |
+| Burger-Laden | Grill, Fritteuse, Schneidebrett, Anrichte | Hamburger, Cheeseburger, Pommes |
+| Pizzeria | Pizzaofen, Suppentopf, Schneidebrett, Anrichte | Pizza Margherita, Salamipizza, Kartoffelsuppe |
 | Sushi-Bar | Suppentopf, Wok, Schneidebrett, Anrichte | Sushi, Ramen, Kartoffelsuppe, Bratnudeln |
-| Döner-Imbiss | Dönerspieß, Schneidebrett, Anrichte | Döner |
-| Restaurant und Mega-Restaurant | alle Geräte | alle neun Gerichte |
+| Döner-Imbiss | Dönerspieß, Fritteuse, Schneidebrett, Anrichte | Döner, Pommes |
+| Restaurant und Mega-Restaurant | alle Geräte | alle zehn Gerichte |

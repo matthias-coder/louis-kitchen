@@ -1,15 +1,17 @@
 import { BURNT_AT, COOKED_AT, cookStage } from './cooking.js';
 import { evaluateAssembly, evaluateFor, FAILED } from './recipes.js';
-import { ITEMS } from './catalog.js';
-import { CUTTABLE, TIMED, POT_DEF, WOK_DEF, SPIT } from './processes.js';
+import { ITEMS, SOUP_BOWL, DIRTY_BOWL, PIZZA_BOX } from './catalog.js';
+import { CUTTABLE, CUT_TOOLS, TIMED, POT_DEF, WOK_DEF, SPIT } from './processes.js';
 
 /**
  * take: consume one held item. give: item id handed to the player, `count` of them
  * as one stack (default 1). hint: lang key for the action bar. sound: sound id to play at the block.
- * particle: particle id spawned just above the block.
+ * particle: particle id spawned just above the block. consume: remove one of this item from any inventory slot.
+ * gives: several stacks handed over at once. menu: open the station's menu (only the dish cabinet).
  * @template S
- * @typedef {{ state: S, take?: boolean, give?: string, count?: number, hint?: string, sound?: string, particle?: string }} Result
+ * @typedef {{ state: S, take?: boolean, consume?: string, give?: string, count?: number, gives?: { item: string, count: number }[], menu?: boolean, hint?: string, sound?: string, particle?: string }} Result
  */
+/** Whether the player carries the item in any inventory slot. @typedef {(id: string) => boolean} Carried */
 /** item: what lies on the station (null when empty); ticks: cooking time so far. @typedef {{ item: string | null, ticks: number }} TimedState */
 /** @typedef {TimedState} GrillState */
 /** items: what is in the pot, in order; ticks: cooking time so far. @typedef {{ items: string[], ticks: number }} PotState */
@@ -18,8 +20,9 @@ import { CUTTABLE, TIMED, POT_DEF, WOK_DEF, SPIT } from './processes.js';
 /** @typedef {typeof TIMED[string]} TimedDef */
 /** @typedef {{ item: string | null }} BoardState */
 /** @typedef {{ items: string[] }} CounterState */
-/** @typedef {{ plates: number, ticks: number }} DishwasherState */
-/** @typedef {{ plates: number }} CabinetState */
+/** @typedef {{ plates: number, bowls: number, ticks: number }} DishwasherState */
+/** @typedef {{ plates: number, bowls: number }} CabinetState */
+/** @typedef {'plate' | 'bowl' | 'box'} CabinetChoice */
 /** open: ticks the lid stays up (the trash can stores nothing else). @typedef {{ open: number }} TrashState */
 
 export const COUNTER_MAX = 8;
@@ -39,10 +42,27 @@ const FAMILY_BASES = /** @type {Record<string, CounterFamily>} */ ({
 export const WASH_TICKS = 200;
 export const DISHWASHER_MAX = 4;
 export const CABINET_MAX = 8;
+export const CABINET_CHOICES = /** @type {const} */ (['plate', 'bowl', 'box']);
+
+/** A player who carries nothing: only the held item counts. */
+export const NO_CARRY = (/** @type {string} */ _id) => false;
+
+/**
+ * The first of `tools` that is in hand, else the first the inventory carries.
+ * @param {string | null} held
+ * @param {Carried} carried
+ * @param {string[]} tools
+ * @returns {{ id: string, inHand: boolean } | null}
+ */
+export function findTool(held, carried, tools) {
+  const inHand = tools.find((t) => t === held);
+  if (inHand !== undefined) return { id: inHand, inHand: true };
+  const inBag = tools.find((t) => carried(t));
+  return inBag === undefined ? null : { id: inBag, inHand: false };
+}
 
 const ID = {
   rawPatty: 'kochmod:raw_patty', // what a stage 1 grill was cooking
-  knife: 'kochmod:knife',
   dirtyPlate: 'kochmod:dirty_plate',
   cleanPlate: 'kochmod:clean_plate',
 };
@@ -75,15 +95,16 @@ export function timedStation(def) {
     /**
      * @param {TimedState} state
      * @param {string | null} held
+     * @param {Carried} [carried]
      * @returns {Result<TimedState>}
      */
-    interact(state, held) {
+    interact(state, held, carried = NO_CARRY) {
       if (state.item === null) {
         if (accepted(held)) return { state: { item: /** @type {string} */ (held), ticks: 0 }, take: true, sound: def.sound };
         return { state };
       }
-      if (held === def.tool) return { state: { item: null, ticks: 0 }, give: resultOf(state.item, state.ticks) };
       if (accepted(held)) return { state, hint: def.hintFull };
+      if (findTool(held, carried, def.tools)) return { state: { item: null, ticks: 0 }, give: resultOf(state.item, state.ticks) };
       return { state, hint: def.hintTool };
     },
     /**
@@ -120,6 +141,7 @@ export const grillView = grill.view;
 export const grillDrops = grill.drops;
 
 export const oven = timedStation(TIMED.oven);
+export const fryer = timedStation(TIMED.fryer);
 
 // ---- Pot stations (soup pot, wok)
 
@@ -136,15 +158,18 @@ export function potStation(def) {
     /**
      * @param {PotState} state
      * @param {string | null} held
+     * @param {Carried} [carried]
      * @returns {Result<PotState>}
      */
-    interact(state, held) {
+    interact(state, held, carried = NO_CARRY) {
       const { items, ticks } = state;
-      if (held === def.tool) {
+      const tool = isFood(held ?? '') ? null : findTool(held, carried, def.tools);
+      if (tool) {
         if (items.length === 0) return { state, hint: def.hints.empty };
         if (ticks < COOKED_AT) return { state, hint: def.hints.cooking };
         const give = cookStage(ticks) === 'burnt' ? FAILED : evaluateFor(def.recipes, items);
-        return def.consumesTool ? { state: initial, take: true, give } : { state: initial, give };
+        if (!def.consumesTool) return { state: initial, give };
+        return tool.inHand ? { state: initial, take: true, give } : { state: initial, consume: tool.id, give };
       }
       if (held === null) return items.length === 0 ? { state } : { state, hint: def.hints.needTool };
       if (!isFood(held)) return { state };
@@ -204,17 +229,18 @@ export const SPIT_SLICES = 6;
 const SPIT_EMPTY = { meat: false, ticks: 0, slices: 0 };
 
 /**
- * Raw meat goes on an empty spit; the knife cuts cooked meat off, one slice at a time.
+ * Raw meat goes on an empty spit; the multitool cuts cooked meat off, one slice at a time.
  * @param {SpitState} state
  * @param {string | null} held
+ * @param {Carried} [carried]
  * @returns {Result<SpitState>}
  */
-export function spitInteract(state, held) {
+export function spitInteract(state, held, carried = NO_CARRY) {
   if (held === SPIT.raw) {
     if (state.meat) return { state, hint: 'kochmod.hint.spit_busy' };
     return { state: { meat: true, ticks: 0, slices: SPIT_SLICES }, take: true };
   }
-  if (held !== SPIT.tool) return { state };
+  if (!findTool(held, carried, SPIT.tools)) return state.meat ? { state, hint: 'kochmod.hint.need_multitool' } : { state };
   if (!state.meat) return { state, hint: 'kochmod.hint.spit_empty' };
   if (state.ticks < COOKED_AT) return { state, hint: 'kochmod.hint.spit_raw' };
   const slices = state.slices - 1;
@@ -254,17 +280,18 @@ export function spitDrops(state) {
 /** The spit's rules as one station (for the tick loop). */
 export const spit = { INITIAL: SPIT_EMPTY, interact: spitInteract, tick: spitTick, view: spitView, drops: spitDrops };
 
-/** @type {{ grill: GrillState, oven: TimedState, pot: PotState, wok: PotState, spit: SpitState, board: BoardState, counter: CounterState, dishwasher: DishwasherState, cabinet: CabinetState, trash: TrashState }} */
+/** @type {{ grill: GrillState, oven: TimedState, fryer: TimedState, pot: PotState, wok: PotState, spit: SpitState, board: BoardState, counter: CounterState, dishwasher: DishwasherState, cabinet: CabinetState, trash: TrashState }} */
 export const INITIAL = {
   grill: grill.INITIAL,
   oven: oven.INITIAL,
+  fryer: fryer.INITIAL,
   pot: pot.INITIAL,
   wok: wok.INITIAL,
   spit: SPIT_EMPTY,
   board: { item: null },
   counter: { items: [] },
-  dishwasher: { plates: 0, ticks: 0 },
-  cabinet: { plates: CABINET_MAX }, // a placed cabinet comes full of clean plates
+  dishwasher: { plates: 0, bowls: 0, ticks: 0 },
+  cabinet: { plates: CABINET_MAX, bowls: CABINET_MAX }, // a placed cabinet comes full of clean plates and bowls
   trash: { open: 0 },
 };
 
@@ -273,17 +300,22 @@ export const INITIAL = {
 /**
  * @param {BoardState} state
  * @param {string | null} held
+ * @param {Carried} [carried]
  * @returns {Result<BoardState>}
  */
-export function boardInteract(state, held) {
+export function boardInteract(state, held, carried = NO_CARRY) {
   const cuttable = held !== null && Object.hasOwn(CUTTABLE, held);
   if (state.item === null) {
     if (cuttable) return { state: { item: held }, take: true };
     return { state };
   }
-  if (held === null) return { state: { item: null }, give: state.item };
-  if (held === ID.knife && Object.hasOwn(CUTTABLE, state.item)) {
+  if (Object.hasOwn(CUTTABLE, state.item) && findTool(held, carried, CUT_TOOLS)) {
     return { state: { item: CUTTABLE[state.item] }, sound: 'kochmod.chop' };
+  }
+  if (held === null) {
+    // a whole item comes back too (child-friendly), but the hint says what cuts it
+    if (Object.hasOwn(CUTTABLE, state.item)) return { state: { item: null }, give: state.item, hint: 'kochmod.hint.need_multitool' };
+    return { state: { item: null }, give: state.item };
   }
   if (cuttable) return { state, hint: 'kochmod.hint.board_full' };
   return { state };
@@ -313,9 +345,10 @@ export function boardDrops(state) {
 /**
  * @param {CounterState} state
  * @param {string | null} held
+ * @param {Carried} [_carried] ignored: same signature as every station
  * @returns {Result<CounterState>}
  */
-export function counterInteract(state, held) {
+export function counterInteract(state, held, _carried = NO_CARRY) {
   if (held === null) {
     if (state.items.length === 0) return { state };
     return { state: { items: [] }, give: evaluateAssembly(state.items), sound: 'kochmod.plate' };
@@ -351,15 +384,24 @@ export function counterDrops(state) {
 /**
  * @param {DishwasherState} state
  * @param {string | null} held
+ * @param {Carried} [_carried] ignored: same signature as every station
  * @returns {Result<DishwasherState>}
  */
-export function dishwasherInteract(state, held) {
-  if (held === ID.dirtyPlate) {
-    if (state.plates >= DISHWASHER_MAX) return { state, hint: 'kochmod.hint.dishwasher_full' };
-    return { state: { plates: state.plates + 1, ticks: 0 }, take: true, sound: 'kochmod.bubble' };
+export function dishwasherInteract(state, held, _carried = NO_CARRY) {
+  if (held === ID.dirtyPlate || held === DIRTY_BOWL) {
+    if (state.plates + state.bowls >= DISHWASHER_MAX) return { state, hint: 'kochmod.hint.dishwasher_full' };
+    const next = held === DIRTY_BOWL
+      ? { plates: state.plates, bowls: state.bowls + 1, ticks: 0 }
+      : { plates: state.plates + 1, bowls: state.bowls, ticks: 0 };
+    return { state: next, take: true, sound: 'kochmod.bubble' };
   }
-  if (held === null && state.plates > 0) {
-    if (state.ticks >= WASH_TICKS) return { state: { plates: 0, ticks: 0 }, give: ID.cleanPlate, count: state.plates };
+  if (held === null && state.plates + state.bowls > 0) {
+    if (state.ticks >= WASH_TICKS) {
+      const gives = [];
+      if (state.plates > 0) gives.push({ item: ID.cleanPlate, count: state.plates });
+      if (state.bowls > 0) gives.push({ item: SOUP_BOWL, count: state.bowls });
+      return { state: INITIAL.dishwasher, gives };
+    }
     return { state, hint: 'kochmod.hint.washing' };
   }
   return { state };
@@ -371,8 +413,8 @@ export function dishwasherInteract(state, held) {
  * @returns {DishwasherState}
  */
 export function dishwasherTick(state, dt) {
-  if (state.plates === 0) return state;
-  return { plates: state.plates, ticks: Math.min(state.ticks + dt, WASH_TICKS) };
+  if (state.plates + state.bowls === 0) return state;
+  return { plates: state.plates, bowls: state.bowls, ticks: Math.min(state.ticks + dt, WASH_TICKS) };
 }
 
 /**
@@ -380,7 +422,7 @@ export function dishwasherTick(state, dt) {
  * @returns {'empty' | 'running' | 'done'}
  */
 export function dishwasherView(state) {
-  if (state.plates === 0) return 'empty';
+  if (state.plates + state.bowls === 0) return 'empty';
   return state.ticks >= WASH_TICKS ? 'done' : 'running';
 }
 
@@ -389,27 +431,75 @@ export function dishwasherView(state) {
  * @returns {string[]}
  */
 export function dishwasherDrops(state) {
-  const id = dishwasherView(state) === 'done' ? ID.cleanPlate : ID.dirtyPlate;
-  return Array(state.plates).fill(id);
+  const done = dishwasherView(state) === 'done';
+  return [
+    ...Array(state.plates).fill(done ? ID.cleanPlate : ID.dirtyPlate),
+    ...Array(state.bowls).fill(done ? SOUP_BOWL : DIRTY_BOWL),
+  ];
 }
 
 // ---- Dish cabinet
 
 /**
+ * Putting a plate or bowl in; an empty hand asks for the menu (see cabinetTake).
  * @param {CabinetState} state
  * @param {string | null} held
+ * @param {Carried} [_carried] ignored: same signature as every station
  * @returns {Result<CabinetState>}
  */
-export function cabinetInteract(state, held) {
+export function cabinetInteract(state, held, _carried = NO_CARRY) {
   if (held === ID.cleanPlate) {
     if (state.plates >= CABINET_MAX) return { state, hint: 'kochmod.hint.cabinet_full' };
-    return { state: { plates: state.plates + 1 }, take: true, sound: 'kochmod.plate' };
+    return { state: { ...state, plates: state.plates + 1 }, take: true, sound: 'kochmod.plate' };
   }
-  if (held === null) {
-    if (state.plates === 0) return { state, hint: 'kochmod.hint.cabinet_empty' };
-    return { state: { plates: state.plates - 1 }, give: ID.cleanPlate };
+  if (held === SOUP_BOWL) {
+    if (state.bowls >= CABINET_MAX) return { state, hint: 'kochmod.hint.cabinet_full' };
+    return { state: { ...state, bowls: state.bowls + 1 }, take: true, sound: 'kochmod.plate' };
   }
+  if (held === null) return { state, menu: true };
   return { state };
+}
+
+/**
+ * The picture menu of the cabinet: plate and bowl with their counts, the pizza box without.
+ * @param {CabinetState} state
+ * @returns {{ title: string, buttons: { choice: CabinetChoice, label: import('@minecraft/server').RawMessage, icon: string }[] }}
+ */
+export function cabinetMenu(state) {
+  /** @type {Record<CabinetChoice, { item: string, count?: number }>} */
+  const look = {
+    plate: { item: ID.cleanPlate, count: state.plates },
+    bowl: { item: SOUP_BOWL, count: state.bowls },
+    box: { item: PIZZA_BOX },
+  };
+  return {
+    title: 'kochmod.crate.cabinet',
+    buttons: CABINET_CHOICES.map((choice) => {
+      const { item, count } = look[choice];
+      const name = { translate: `item.${item}` };
+      return {
+        choice,
+        label: count === undefined ? name : { rawtext: [name, { text: ` (${count})` }] },
+        icon: `textures/items/${item.replace('kochmod:', '')}`,
+      };
+    }),
+  };
+}
+
+/**
+ * Takes the chosen item out of the cabinet (boxes are unlimited).
+ * @param {CabinetState} state
+ * @param {CabinetChoice} choice
+ * @returns {Result<CabinetState>}
+ */
+export function cabinetTake(state, choice) {
+  if (choice === 'box') return { state, give: PIZZA_BOX };
+  if (choice === 'bowl') {
+    if (state.bowls === 0) return { state, hint: 'kochmod.hint.cabinet_no_bowls' };
+    return { state: { ...state, bowls: state.bowls - 1 }, give: SOUP_BOWL };
+  }
+  if (state.plates === 0) return { state, hint: 'kochmod.hint.cabinet_empty' };
+  return { state: { ...state, plates: state.plates - 1 }, give: ID.cleanPlate };
 }
 
 /**
@@ -426,7 +516,7 @@ export function cabinetView(state) {
  * @returns {string[]}
  */
 export function cabinetDrops(state) {
-  return Array(state.plates).fill(ID.cleanPlate);
+  return [...Array(state.plates).fill(ID.cleanPlate), ...Array(state.bowls).fill(SOUP_BOWL)];
 }
 
 // ---- Trash can
@@ -481,8 +571,8 @@ export function trashDrops(_state) {
 /** The trash can's rules as one station (for the station glue and the tick loop). */
 export const trash = {
   INITIAL: INITIAL.trash,
-  /** @param {TrashState} state @param {string | null} held @returns {Result<TrashState>} */
-  interact: (state, held) => trashInteract(held, state),
+  /** @param {TrashState} state @param {string | null} held @param {Carried} [_carried] @returns {Result<TrashState>} */
+  interact: (state, held, _carried) => trashInteract(held, state),
   tick: trashTick,
   view: trashView,
   drops: trashDrops,
@@ -505,14 +595,15 @@ const validPot = (/** @type {Record<string, unknown>} */ s) => Array.isArray(s.i
 const VALID = {
   grill: validTimed,
   oven: validTimed,
+  fryer: validTimed,
   pot: validPot,
   wok: validPot,
   spit: (s) => typeof s.meat === 'boolean' && isCount(s.ticks) && isCount(s.slices) && Number.isInteger(s.slices)
     && /** @type {number} */ (s.slices) <= SPIT_SLICES && s.meat === /** @type {number} */ (s.slices) > 0,
   board: (s) => s.item === null || typeof s.item === 'string',
   counter: (s) => Array.isArray(s.items) && s.items.every((i) => typeof i === 'string'),
-  dishwasher: (s) => isCount(s.plates) && isCount(s.ticks),
-  cabinet: (s) => isCount(s.plates),
+  dishwasher: (s) => isCount(s.plates) && isCount(s.bowls) && isCount(s.ticks),
+  cabinet: (s) => isCount(s.plates) && isCount(s.bowls),
   trash: (s) => isCount(s.open),
 };
 
@@ -530,6 +621,12 @@ export function migrateStationState(kind, saved) {
   if (kind === 'grill' && typeof saved.occupied === 'boolean') {
     if (!saved.occupied) return INITIAL[kind];
     return /** @type {typeof INITIAL[K]} */ ({ item: ID.rawPatty, ticks: isCount(saved.ticks) ? Math.min(saved.ticks, BURNT_AT) : 0 });
+  }
+  if (kind === 'cabinet' && isCount(saved.plates)) {
+    return /** @type {typeof INITIAL[K]} */ (/** @type {unknown} */ ({ plates: saved.plates, bowls: CABINET_MAX }));
+  }
+  if (kind === 'dishwasher' && isCount(saved.plates) && isCount(saved.ticks)) {
+    return /** @type {typeof INITIAL[K]} */ (/** @type {unknown} */ ({ plates: saved.plates, bowls: 0, ticks: saved.ticks }));
   }
   return INITIAL[kind];
 }

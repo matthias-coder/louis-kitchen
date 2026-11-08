@@ -8,7 +8,7 @@
       "properties": {
         "kochmod:wish": {
           "type": "enum",
-          "values": ["none", "hamburger", "cheeseburger", "doner", "sushi", "pizza_margherita", "salami_pizza", "ramen", "potato_soup", "fried_noodles"],
+          "values": ["none", "hamburger", "cheeseburger", "doner", "sushi", "pizza_margherita", "salami_pizza", "fries", "ramen", "potato_soup", "fried_noodles"],
           "default": "none",
           "client_sync": true
         },
@@ -22,6 +22,11 @@
           "type": "enum",
           "values": ["neutral", "happy", "grumpy"],
           "default": "neutral",
+          "client_sync": true
+        },
+        "kochmod:takeaway": {
+          "type": "bool",
+          "default": false,
           "client_sync": true
         }
       }
@@ -67,6 +72,10 @@
         "add": { "component_groups": ["kochmod:walking"] }
       },
       "kochmod:sit": {
+        "remove": { "component_groups": ["kochmod:walking"] },
+        "add": { "component_groups": ["kochmod:seated"] }
+      },
+      "kochmod:stay": {
         "remove": { "component_groups": ["kochmod:walking"] },
         "add": { "component_groups": ["kochmod:seated"] }
       }

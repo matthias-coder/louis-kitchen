@@ -196,6 +196,32 @@ export const knife = {
 };
 
 /** @type {Sprite} */
+export const multitool = {
+  name: 'multitool',
+  palette: {
+    k: '#2a2f38', s: '#e8edf2', m: '#aab4c0', d: '#76808e', h: '#40464f', b: '#6b3d17', B: '#a0622a',
+  },
+  rows: [
+    '................',
+    '.kk......kkkkkk.',
+    '.ksk....ksssssmk',
+    '.kssk...kshsshmk',
+    '..kssk..kshsshdk',
+    '..kssmk.kssssddk',
+    '...ksmdk.kddddk.',
+    '...kmmdk..kmmk..',
+    '....kdkk..kmk...',
+    '.....kkkkkkk....',
+    '.......kBk......',
+    '......kBBbk.....',
+    '......kBBbk.....',
+    '......kBBbk.....',
+    '......kBbbk.....',
+    '.......kkk......',
+  ],
+};
+
+/** @type {Sprite} */
 export const spatula = {
   name: 'spatula',
   palette: {
@@ -522,6 +548,12 @@ export const potato_cubes = paint('potato_cubes', { y: '#f0d682', d: '#c9a850', 
   }
 });
 
+export const potato_sticks = paint('potato_sticks', { y: '#f0d682', d: '#c9a850', l: '#fff0b0' }, (c) => {
+  for (const [x, y, h] of [[3, 3, 10], [6, 2, 11], [9, 4, 9], [12, 3, 10]]) {
+    c.rect(x, y, 2, h, 'y').rect(x + 1, y, 1, h, 'd').set(x, y, 'l').set(x, y + 1, 'l');
+  }
+});
+
 export const salmon_strips = paint('salmon_strips', { o: '#f0713e', w: '#fde0cc', d: '#d4562a' }, (c) => {
   for (const [x, y, w] of [[2, 3, 12], [3, 7, 11], [2, 11, 12]]) {
     c.rect(x, y, w, 3, 'o').rect(x, y + 2, w, 1, 'd');
@@ -545,6 +577,25 @@ const BOWL = { b: '#4a78c2', r: '#a8c4ee', s: '#2f5290', h: '#d6e4fa', e: '#e8f0
 export const bowl = paint('bowl', BOWL, (c) => {
   bowlBody(c);
   c.ellipse(8, 6, 6, 1.6, 'e').rect(2, 6, 12, 1, 'r');
+});
+
+const SOUP = { b: '#eef2f6', r: '#ffffff', s: '#b4bfcc', h: '#ffffff', e: '#f6e7b0' };
+export const soup_bowl = paint('soup_bowl', SOUP, (c) => {
+  bowlBody(c);
+  c.ellipse(8, 6, 6, 1.6, 'e').rect(2, 6, 12, 1, 'r');
+});
+
+export const dirty_bowl = paint('dirty_bowl', { ...SOUP, e: '#7a5a34', m: '#8a5a2b' }, (c) => {
+  bowlBody(c);
+  c.ellipse(8, 6, 6, 1.6, 'e').rect(2, 6, 12, 1, 'r');
+  for (const [x, y] of [[5, 9], [6, 10], [10, 8], [9, 11], [7, 12], [11, 10]]) c.dot(x, y, 'm');
+  c.dot(4, 6, 'm').dot(11, 6, 'm');
+});
+
+export const pizza_box = paint('pizza_box', { b: '#c89a5a', d: '#8f6a35', l: '#e2bd84', r: '#d6452b', y: '#f0c040' }, (c) => {
+  c.rect(1, 4, 14, 9, 'b').rect(1, 12, 14, 1, 'd').rect(1, 4, 14, 1, 'l').rect(1, 4, 1, 9, 'd').rect(14, 4, 1, 9, 'd');
+  c.ellipse(8, 8.5, 3.6, 3.2, 'y').ellipse(8, 8.5, 2.6, 2.2, 'r');
+  for (const [x, y] of [[7, 8], [9, 9], [8, 10]]) c.dot(x, y, 'y');
 });
 
 export const cooked_rice = paint('cooked_rice', { ...BOWL, w: '#fbfaf2', g: '#aeb0a4' }, (c) => {
@@ -572,6 +623,15 @@ export const raw_salami_pizza = paint('raw_salami_pizza', PIZZA_RAW, pizzaDraw(t
 export const burnt_pizza = recolor(paint('x', PIZZA_COOKED, pizzaDraw(false, true)), 'burnt_pizza', {
   d: '#2b1a10', c: '#4a3524', u: '#18100a', g: '#1f2a18', k: '#120a06',
 });
+
+const FRIES_DRAW = (/** @type {ReturnType<typeof canvas>} */ c) => {
+  // paper bag with sticks poking out
+  for (const [x, y, h] of [[4, 2, 6], [6, 1, 7], [8, 3, 5], [10, 2, 6], [7, 4, 4]]) c.rect(x, y, 2, h, 'y').set(x, y, 'l');
+  c.rect(3, 8, 10, 6, 'r').rect(3, 8, 10, 1, 'R').rect(6, 10, 4, 2, 'w');
+};
+const FRIES_PALETTE = { y: '#f2c94c', l: '#fff0a8', r: '#c73a2b', R: '#e0584a', w: '#f8f4e8' };
+export const fries = paint('fries', FRIES_PALETTE, FRIES_DRAW);
+export const burnt_fries = recolor(paint('x', FRIES_PALETTE, FRIES_DRAW), 'burnt_fries', { y: '#4a3320', l: '#6a4a30' });
 
 // -- tools --
 

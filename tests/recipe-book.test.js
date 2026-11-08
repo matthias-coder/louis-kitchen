@@ -38,7 +38,7 @@ const labels = (dish) => bookPages(dish).buttons.slice(0, -1).map((b) => render(
 test('bookIndex: one button per dish in DISHES order with name and picture', () => {
   const index = bookIndex();
   assert.deepEqual(index.title, { translate: 'kochmod.book.title' });
-  assert.equal(index.buttons.length, 9);
+  assert.equal(index.buttons.length, 10);
   assert.deepEqual(index.buttons.map((b) => b.dish), DISHES);
   for (const b of index.buttons) {
     assert.deepEqual(b.label, { translate: `item.${b.dish}` });
@@ -50,10 +50,10 @@ test('bookPages: cheeseburger shows every ingredient with its crate before the s
   assert.deepEqual(labels('kochmod:cheeseburger'), [
     '1. Brötchen ➜ Vorratsschrank',
     '2. Rohe Frikadelle ➜ Kühlschrank',
-    '3. Rohe Frikadelle ➜ Grill (Pfannenwender)',
+    '3. Rohe Frikadelle ➜ Grill (Küchen-Multitool)',
     '4. Salat ➜ Kühlschrank',
     '5. Tomate ➜ Kühlschrank',
-    '6. Tomate ➜ Schneidebrett (Messer)',
+    '6. Tomate ➜ Schneidebrett (Küchen-Multitool)',
     '7. Käse ➜ Kühlschrank',
     '8. Cheeseburger ➜ Anrichte',
   ]);
@@ -74,7 +74,7 @@ test('bookPages: ramen lists its four ingredients, then the pot with the bowl', 
     '2. Nudeln ➜ Vorratsschrank',
     '3. Ei ➜ Kühlschrank',
     '4. Frühlingszwiebel ➜ Kühlschrank',
-    '5. Ramen ➜ Suppentopf (Schüssel)',
+    '5. Ramen ➜ Suppentopf (Suppenschüssel)',
   ]);
   assert.equal(bookPages('kochmod:ramen').buttons[4].icon, 'textures/items/ramen');
 });
@@ -149,4 +149,10 @@ test('bookPages: labels stay unique per page', () => {
     const all = bookPages(dish).buttons.map(labelOf);
     assert.equal(new Set(all).size, all.length, dish);
   }
+});
+
+test('bookPages: sushi fetches the cooked rice from the pantry instead of cooking it', () => {
+  const l = labels('kochmod:sushi');
+  assert.ok(l.includes('2. Gekochter Reis ➜ Vorratsschrank'), l.join(' | '));
+  assert.ok(!l.some((x) => x.includes('Suppentopf')));
 });

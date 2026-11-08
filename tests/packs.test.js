@@ -191,9 +191,9 @@ test('findComMojang prefers env, then APPDATA, then LOCALAPPDATA, else null', ()
 
 test('BP and RP manifest versions are equal', () => {
   assert.deepEqual(bp().header.version, rp().header.version);
-  assert.deepEqual(bp().header.version, [2, 0, 0]);
+  assert.deepEqual(bp().header.version, [2, 1, 0]);
   for (const m of [bp(), rp()]) {
-    for (const mod of m.modules) assert.deepEqual(mod.version, [2, 0, 0]);
+    for (const mod of m.modules) assert.deepEqual(mod.version, [2, 1, 0]);
   }
   const bpDep = bp().dependencies.find((/** @type {any} */ d) => d.uuid);
   const rpDep = rp().dependencies.find((/** @type {any} */ d) => d.uuid);
@@ -301,6 +301,40 @@ test('oven: name, hints and sound exist', () => {
   }
   const sounds = JSON.parse(fs.readFileSync(path.join(root, 'packs/RP/sounds/sound_definitions.json'), 'utf8')).sound_definitions;
   assert.ok(sounds['kochmod.oven']?.sounds?.length > 0);
+});
+
+test('fryer: content states, one basket bone per stage, nothing above 23 px, collision within the block', () => {
+  const { block, geo, vis } = blockWithGeometry('fryer');
+  assert.equal(block.description.identifier, 'kochmod:fryer');
+  assert.deepEqual(block.description.states, { 'kochmod:content': ['empty', 'raw', 'cooked', 'burnt'] });
+  assert.deepEqual(vis, {
+    basket_raw: "q.block_state('kochmod:content') == 'raw'",
+    basket_cooked: "q.block_state('kochmod:content') == 'cooked'",
+    basket_burnt: "q.block_state('kochmod:content') == 'burnt'",
+  });
+  assert.equal(block.components['minecraft:geometry'].identifier, 'geometry.kochmod.fryer');
+  assert.deepEqual(block.components['minecraft:material_instances']['*'], { texture: 'kochmod_fryer', render_method: 'alpha_test' });
+  assert.ok('kochmod:fryer' in block.components);
+  for (const bone of ['basket_raw', 'basket_cooked', 'basket_burnt', 'oil']) assert.ok(geo.bones.some((b) => b.name === bone), bone);
+  for (const box of ['minecraft:collision_box', 'minecraft:selection_box']) {
+    const { origin, size } = block.components[box];
+    assert.ok(origin[1] + size[1] <= 16, box);
+  }
+  for (const bone of geo.bones) {
+    for (const cube of bone.cubes) assert.ok(cube.origin[1] + cube.size[1] <= 23, `${bone.name} reaches above 23 px`);
+  }
+});
+
+test('fryer: name, hints and sound exist', () => {
+  for (const lang of ['de_DE', 'en_US']) {
+    const text = fs.readFileSync(path.join(root, 'packs/RP/texts', `${lang}.lang`), 'utf8');
+    const lines = text.split(/\r?\n/);
+    assert.ok(lines.some((l) => l.startsWith('tile.kochmod:fryer.name=')), `${lang}: name`);
+    assert.ok(lines.some((l) => l.startsWith('kochmod.hint.fryer_full=')), `${lang}: fryer_full`);
+    assert.ok(lines.some((l) => l.startsWith('kochmod.hint.need_multitool=')), `${lang}: need_multitool`);
+  }
+  const sounds = JSON.parse(fs.readFileSync(path.join(root, 'packs/RP/sounds/sound_definitions.json'), 'utf8')).sound_definitions;
+  assert.ok(sounds['kochmod.sizzle']?.sounds?.length > 0);
 });
 
 test('pot: state enum, contents per state, steam while cooking or done, nothing above 23 px, collision within the block', () => {
@@ -451,4 +485,14 @@ test('trash can: name, hints, sound and block sound exist', () => {
   for (const s of sounds['kochmod.trash'].sounds) assert.match(s, /^sounds\//);
   const rpBlocks = JSON.parse(fs.readFileSync(path.join(RP, 'blocks.json'), 'utf8'));
   assert.equal(rpBlocks['kochmod:trash_can']?.sound, 'metal');
+});
+
+test('guest: takeaway property, run bone and render line', () => {
+  const guest = JSON.parse(fs.readFileSync(path.join(BP, 'entities', 'guest.json'), 'utf8'))['minecraft:entity'];
+  assert.deepEqual(guest.description.properties['kochmod:takeaway'], { type: 'bool', default: false, client_sync: true });
+  assert.ok(guest.events['kochmod:stay']);
+  const geo = JSON.parse(fs.readFileSync(path.join(root, 'packs/RP/models/entity/guest.geo.json'), 'utf8'))['minecraft:geometry'][0];
+  assert.ok(geo.bones.some((b) => b.name === 'run'));
+  const rc = JSON.parse(fs.readFileSync(path.join(root, 'packs/RP/render_controllers/guest.render_controllers.json'), 'utf8'));
+  assert.ok(rc.render_controllers['controller.render.kochmod.guest'].part_visibility.some((p) => p.run === "q.property('kochmod:takeaway')"));
 });

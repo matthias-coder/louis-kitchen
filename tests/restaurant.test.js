@@ -3,10 +3,14 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   RADIUS, SPAWN_MIN, SPAWN_MAX, DIRECTIONS,
-  withinRadius, offset, seatDirection, availableDishes, pickWish,
+  withinRadius, offset, seatDirection, availableDishes, cuisinesOf, pickWish, offeredCuisines, CUISINES,
   spawnDelay, rate, seatStillValid, tableInteract, tableView,
+  servedIn, leftover, EMPTY_BOWL, DIRTY_PLATE,
 } from '../packs/BP/scripts/logic/restaurant.js';
 
+import { DIRTY_BOWL } from '../packs/BP/scripts/logic/catalog.js';
+
+const k = (name) => `kochmod:${name}`;
 const HAM = 'kochmod:hamburger';
 const CHEESE = 'kochmod:cheeseburger';
 const FAILED = 'kochmod:failed_dish';
@@ -56,17 +60,19 @@ test('availableDishes: pizzas need the oven (and the counter)', () => {
 });
 
 test('availableDishes: ramen needs only the pot, potato soup also the cutting board', () => {
-  assert.deepEqual(availableDishes(new Set(['pot'])), ['kochmod:ramen']);
-  assert.deepEqual(availableDishes(new Set(['pot', 'cutting_board'])), ['kochmod:ramen', 'kochmod:potato_soup']);
+  assert.deepEqual(availableDishes(new Set(['pot'])), []);
+  assert.deepEqual(availableDishes(new Set(['pot', 'wok'])), ['kochmod:ramen']);
+  assert.deepEqual(availableDishes(new Set(['pot', 'cutting_board'])), ['kochmod:potato_soup']);
 });
 
 test('availableDishes: with every station all dishes, and each recipe needs exactly its derived stations', () => {
   const all = new Set(RECIPES.flatMap((r) => r.stations));
   assert.deepEqual(availableDishes(all), RECIPES.map((r) => r.dish));
   for (const r of RECIPES) {
-    assert.ok(availableDishes(new Set(r.stations)).includes(r.dish), r.dish);
+    const signature = Object.values(CUISINES).filter((c) => c.dishes.includes(r.dish)).map((c) => c.station);
+    assert.ok(availableDishes(new Set([...r.stations, ...signature])).includes(r.dish), r.dish);
     for (const missing of r.stations) {
-      const rest = new Set(r.stations.filter((s) => s !== missing));
+      const rest = new Set([...r.stations, ...signature].filter((s) => s !== missing));
       assert.ok(!availableDishes(rest).includes(r.dish), `${r.dish} without ${missing}`);
     }
   }
@@ -87,10 +93,13 @@ test('spawnDelay', () => {
 });
 
 test('rate', () => {
-  assert.deepEqual(rate(HAM, HAM, () => 0), { happy: true, emeralds: 1 });
-  assert.deepEqual(rate(HAM, HAM, () => 0.999), { happy: true, emeralds: 3 });
-  assert.deepEqual(rate(HAM, CHEESE, () => 0.5), { happy: false, emeralds: 0 });
-  assert.deepEqual(rate(HAM, FAILED, () => 0.5), { happy: false, emeralds: 0 });
+  assert.deepEqual(rate(HAM, HAM, new Set(['burger']), () => 0), { happy: true, emeralds: 1, exact: true });
+  assert.deepEqual(rate(HAM, HAM, new Set(['burger']), () => 0.999), { happy: true, emeralds: 3, exact: true });
+  assert.deepEqual(rate(HAM, CHEESE, new Set(['burger']), () => 0.5), { happy: true, emeralds: 1, exact: false });
+  assert.deepEqual(rate(HAM, k('sushi'), new Set(['burger']), () => 0.5), { happy: false, emeralds: 0, exact: false });
+  assert.deepEqual(rate(HAM, CHEESE, new Set(), () => 0.5), { happy: false, emeralds: 0, exact: false });
+  assert.deepEqual(rate(HAM, FAILED, new Set(['burger']), () => 0.5), { happy: false, emeralds: 0, exact: false });
+  assert.equal(rate(FAILED, FAILED, new Set(['burger']), () => 0.5).exact, false);
 });
 
 test('seatStillValid only when all three exist', () => {
@@ -167,10 +176,38 @@ test('tableView: any served dish shows as food, the failed dish as failed', () =
   assert.equal(tableView('no_such_dish'), 'none', 'unknown stored values show no plate');
 });
 
-test('availableDishes: doner needs spit, cutting board and counter; sushi pot, cutting board and counter; fried noodles the wok', () => {
+test('availableDishes: doner needs spit, cutting board and counter; sushi cutting board and counter; fried noodles the wok', () => {
   assert.deepEqual(availableDishes(new Set(['spit', 'cutting_board', 'counter'])), ['kochmod:doner']);
   assert.deepEqual(availableDishes(new Set(['spit', 'counter'])), []);
-  assert.deepEqual(availableDishes(new Set(['pot', 'cutting_board', 'counter'])), ['kochmod:sushi', 'kochmod:ramen', 'kochmod:potato_soup']);
+  assert.deepEqual(availableDishes(new Set(['wok', 'cutting_board', 'counter'])), ['kochmod:sushi', 'kochmod:fried_noodles']);
   assert.deepEqual(availableDishes(new Set(['wok', 'cutting_board'])), ['kochmod:fried_noodles']);
   assert.deepEqual(availableDishes(new Set(['wok'])), []);
 });
+
+test('servedIn / leftover: soups come in the bowl, everything else on the plate', () => {
+  assert.equal(servedIn(k('ramen')), 'bowl');
+  assert.equal(servedIn(k('potato_soup')), 'bowl');
+  assert.equal(servedIn(k('hamburger')), 'plate');
+  assert.equal(leftover(k('ramen')), EMPTY_BOWL);
+  assert.equal(leftover(k('hamburger')), 'empty');
+  assert.equal(tableView(EMPTY_BOWL), 'empty');
+});
+
+test('tableInteract: a soup is served without a plate; the empty bowl comes back dirty', () => {
+  assert.deepEqual(tableInteract({ plate: 'none' }, k('ramen'), true, false), { state: { plate: 'ramen' }, take: true, serve: k('ramen'), sound: 'kochmod.plate', consumePlate: false });
+  assert.deepEqual(tableInteract({ plate: EMPTY_BOWL }, null, false, false), { state: { plate: 'none' }, give: DIRTY_BOWL });
+  assert.deepEqual(tableInteract({ plate: 'empty' }, null, false, false), { state: { plate: 'none' }, give: DIRTY_PLATE });
+});
+
+test('offeredCuisines follows the signature stations', () => {
+  assert.deepEqual([...offeredCuisines(new Set(['grill', 'cutting_board', 'counter']))], ['burger']);
+  assert.deepEqual([...offeredCuisines(new Set(['oven', 'pot', 'cutting_board', 'counter']))], ['italian', 'classic']);
+  assert.deepEqual([...offeredCuisines(new Set(['cutting_board', 'counter']))], []);
+});
+
+test('availableDishes: cookable and of an offered cuisine (sushi needs the wok nearby to be wished)', () => {
+  assert.deepEqual(availableDishes(new Set(['grill', 'cutting_board', 'counter'])), [HAM, CHEESE]);
+  assert.deepEqual(availableDishes(new Set(['pot', 'wok', 'cutting_board', 'counter'])), [k('sushi'), k('ramen'), k('potato_soup'), k('fried_noodles')]);
+});
+
+test('fries belong to the burger and the doner cuisine', () => { assert.deepEqual(cuisinesOf(k('fries')), ['burger', 'doner']); });

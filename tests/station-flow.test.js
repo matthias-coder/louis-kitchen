@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { interactStation, breakStation, tickGrills, tickDishwashers, tickTimedStation } from '../packs/BP/scripts/logic/station-flow.js';
-import { INITIAL, WASH_TICKS, boardInteract, boardView, boardDrops, grillView } from '../packs/BP/scripts/logic/stations.js';
+import { INITIAL, NO_CARRY, WASH_TICKS, boardInteract, boardView, boardDrops, grillView } from '../packs/BP/scripts/logic/stations.js';
 
 const GRILL = 'kochmod:grill';
 const WASHER = 'kochmod:dishwasher';
@@ -10,7 +10,7 @@ const RAW = 'kochmod:raw_patty';
 test('interactStation sets the view, then saves, then applies', () => {
   /** @type {string[]} */
   const calls = [];
-  const r = interactStation(boardInteract, boardView, INITIAL.board, 'kochmod:tomato', {
+  const r = interactStation(boardInteract, boardView, INITIAL.board, 'kochmod:tomato', NO_CARRY, {
     setView: (v) => calls.push(`view:${v}`),
     save: (s) => calls.push(`save:${s.item}`),
     apply: (res) => calls.push(`apply:${res.take}`),
@@ -22,7 +22,7 @@ test('interactStation sets the view, then saves, then applies', () => {
 test('interactStation saves nothing and takes nothing when setting the view throws', () => {
   /** @type {string[]} */
   const calls = [];
-  assert.throws(() => interactStation(boardInteract, boardView, INITIAL.board, 'kochmod:tomato', {
+  assert.throws(() => interactStation(boardInteract, boardView, INITIAL.board, 'kochmod:tomato', NO_CARRY, {
     setView: () => { throw new Error('boom'); },
     save: () => calls.push('save'),
     apply: () => calls.push('apply'),
@@ -119,15 +119,15 @@ test('tickGrills: empty and fully burnt grills are not rewritten', () => {
 test('tickDishwashers: washes loaded dishwashers, switches the view once done, skips empty ones', () => {
   const w = fakeWorld(
     { a: WASHER, b: WASHER, c: WASHER, d: 'minecraft:air' },
-    { a: { plates: 2, ticks: WASH_TICKS - 10 }, b: { plates: 0, ticks: 0 }, c: { plates: 1, ticks: 0 }, d: { plates: 1, ticks: 0 } },
+    { a: { plates: 2, bowls: 0, ticks: WASH_TICKS - 10 }, b: { plates: 0, bowls: 0, ticks: 0 }, c: { plates: 1, bowls: 0, ticks: 0 }, d: { plates: 1, bowls: 0, ticks: 0 } },
   );
   let saves = 0;
   const save = w.io.save;
   w.io.save = (k, s) => { saves++; save(k, s); };
   tickDishwashers(['a', 'b', 'c', 'd'], 10, w.io, WASHER);
-  assert.deepEqual(w.states.a, { plates: 2, ticks: WASH_TICKS });
+  assert.deepEqual(w.states.a, { plates: 2, bowls: 0, ticks: WASH_TICKS });
   assert.equal(w.views.a, 'done');
-  assert.deepEqual(w.states.c, { plates: 1, ticks: 10 });
+  assert.deepEqual(w.states.c, { plates: 1, bowls: 0, ticks: 10 });
   assert.equal('c' in w.views, false, 'still running, no permutation update');
   assert.equal(saves, 2, 'the empty dishwasher is not rewritten');
   assert.deepEqual(w.forgotten, ['d']);
@@ -211,4 +211,12 @@ test('tickTimedStation: an open trash-can lid closes on the next station tick, a
   assert.equal(saves, 1);
   assert.deepEqual(w.views, { a: { 'kochmod:open': false } });
   assert.deepEqual(w.warnings, []);
+});
+
+test('interactStation passes carried on to interact', () => {
+  /** @type {unknown} */
+  let seen;
+  const carried = (/** @type {string} */ id) => id === 'x';
+  interactStation((s, _held, c) => { seen = c; return { state: s }; }, () => 0, { item: null }, null, carried, { setView() {}, save() {}, apply() {} });
+  assert.equal(seen, carried);
 });

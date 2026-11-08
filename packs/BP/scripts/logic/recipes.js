@@ -5,9 +5,19 @@ export const FAILED = 'kochmod:failed_dish';
 
 /** @typedef {{ dish: string, parts: string[], stations: string[] }} Recipe */
 
+/**
+ * Keeps only the first entry per dish, so a dish with a legacy recipe is listed once.
+ * @template {{ dish: string }} T
+ * @param {T[]} list
+ * @returns {T[]}
+ */
+function dedupeByDish(list) {
+  return list.filter((r, i) => list.findIndex((o) => o.dish === r.dish) === i);
+}
+
 /** @type {Recipe[]} every assembly / timed-station / pot / wok entry whose result is a real dish */
-export const RECIPES = [...ASSEMBLY, ...TIMED_RECIPES, ...POT, ...WOK]
-  .filter((r) => isDish(r.dish) && r.dish !== FAILED)
+export const RECIPES = dedupeByDish([...ASSEMBLY, ...TIMED_RECIPES, ...POT, ...WOK]
+  .filter((r) => isDish(r.dish) && r.dish !== FAILED))
   .map((r) => ({ dish: r.dish, parts: r.parts, stations: stationsFor(r.dish) }));
 
 /** Dish ids in recipe order (the failed dish is not one of them). */

@@ -1,4 +1,4 @@
-import { ITEMS } from './catalog.js';
+import { ITEMS, MULTITOOL, SOUP_BOWL } from './catalog.js';
 
 /**
  * @typedef {{ item: string, station: string, tool?: string, result?: string, parts?: string[] }} Step
@@ -13,19 +13,20 @@ export const CUTTABLE = {
   'kochmod:tomato': 'kochmod:tomato_slices',
   'kochmod:onion': 'kochmod:onion_rings',
   'kochmod:carrot': 'kochmod:carrot_slices',
-  'kochmod:potato': 'kochmod:potato_cubes',
+  'kochmod:potato': 'kochmod:potato_sticks',
   'kochmod:salmon': 'kochmod:salmon_strips',
 };
 
 /**
  * Stations that cook by time. `accepts`: raw item -> cooked / burnt result.
- * @type {Record<string, { accepts: Record<string, { cooked: string, burnt: string }>, tool: string, hintTool: string, hintFull: string, sound: string }>}
+ * @type {Record<string, { accepts: Record<string, { cooked: string, burnt: string }>, tools: string[], tool: string, hintTool: string, hintFull: string, sound: string }>}
  */
 export const TIMED = {
   grill: {
     accepts: { 'kochmod:raw_patty': { cooked: 'kochmod:cooked_patty', burnt: 'kochmod:burnt_patty' } },
-    tool: 'kochmod:spatula',
-    hintTool: 'kochmod.hint.need_spatula',
+    tools: [MULTITOOL, 'kochmod:spatula'],
+    tool: MULTITOOL,
+    hintTool: 'kochmod.hint.need_multitool',
     hintFull: 'kochmod.hint.grill_full',
     sound: 'kochmod.sizzle',
   },
@@ -34,18 +35,30 @@ export const TIMED = {
       'kochmod:raw_pizza_margherita': { cooked: 'kochmod:pizza_margherita', burnt: 'kochmod:burnt_pizza' },
       'kochmod:raw_salami_pizza': { cooked: 'kochmod:salami_pizza', burnt: 'kochmod:burnt_pizza' },
     },
-    tool: 'kochmod:pizza_peel',
-    hintTool: 'kochmod.hint.need_peel',
+    tools: [MULTITOOL, 'kochmod:pizza_peel'],
+    tool: MULTITOOL,
+    hintTool: 'kochmod.hint.need_multitool',
     hintFull: 'kochmod.hint.oven_full',
     sound: 'kochmod.oven',
+  },
+  fryer: {
+    accepts: { 'kochmod:potato_sticks': { cooked: 'kochmod:fries', burnt: 'kochmod:burnt_fries' } },
+    tools: [MULTITOOL],
+    tool: MULTITOOL,
+    hintTool: 'kochmod.hint.need_multitool',
+    hintFull: 'kochmod.hint.fryer_full',
+    sound: 'kochmod.sizzle',
   },
 };
 
 /**
  * The doner spit roasts one cone of raw meat; the knife cuts the cooked meat off it.
- * @type {{ raw: string, cooked: string, tool: string, station: string }}
+ * @type {{ raw: string, cooked: string, tools: string[], tool: string, station: string }}
  */
-export const SPIT = { raw: 'kochmod:doner_meat_raw', cooked: 'kochmod:doner_meat', tool: 'kochmod:knife', station: 'spit' };
+export const SPIT = { raw: 'kochmod:doner_meat_raw', cooked: 'kochmod:doner_meat', tools: [MULTITOOL, 'kochmod:knife'], tool: MULTITOOL, station: 'spit' };
+
+/** Tools that cut on the cutting board: the multitool, or the old knife. */
+export const CUT_TOOLS = [MULTITOOL, 'kochmod:knife'];
 
 const BASE = ['kochmod:bun', 'kochmod:cooked_patty', 'kochmod:lettuce', 'kochmod:tomato_slices'];
 
@@ -66,6 +79,8 @@ export const ASSEMBLY = [
 /** @type {DishRecipe[]} pot recipes; a result need not be a dish (cooked rice is a prepared item) */
 export const POT = [
   { dish: 'kochmod:ramen', parts: ['kochmod:broth', 'kochmod:noodles', 'kochmod:egg', 'kochmod:spring_onion'] },
+  { dish: 'kochmod:potato_soup', parts: ['kochmod:potato_sticks', 'kochmod:carrot_slices', 'kochmod:cream'] },
+  // legacy: soups cooked from the old cubes still count (RECIPES keeps the first entry per dish)
   { dish: 'kochmod:potato_soup', parts: ['kochmod:potato_cubes', 'kochmod:carrot_slices', 'kochmod:cream'] },
   { dish: 'kochmod:cooked_rice', parts: ['kochmod:rice'] },
 ];
@@ -74,16 +89,17 @@ export const POT = [
  * A station that cooks a mix of items by time and is emptied with a tool (pot, wok).
  * hints: lang keys for full, still cooking, empty hand on a filled station, tool on an empty station.
  * consumesTool: whether scooping uses up the tool (the pot's bowl becomes the dish container; the wok spatula stays).
- * @typedef {{ recipes: DishRecipe[], tool: string, consumesTool: boolean, max: number,
+ * @typedef {{ recipes: DishRecipe[], tools: string[], tool: string, consumesTool: boolean, max: number,
  *   hints: { full: string, cooking: string, needTool: string, empty: string }, sound: string }} PotDef
  */
 /** @type {PotDef} */
 export const POT_DEF = {
   recipes: POT,
-  tool: 'kochmod:bowl',
+  tools: [SOUP_BOWL, 'kochmod:bowl'],
+  tool: SOUP_BOWL,
   consumesTool: true,
   max: 6,
-  hints: { full: 'kochmod.hint.pot_full', cooking: 'kochmod.hint.pot_cooking', needTool: 'kochmod.hint.need_bowl', empty: 'kochmod.hint.pot_empty' },
+  hints: { full: 'kochmod.hint.pot_full', cooking: 'kochmod.hint.pot_cooking', needTool: 'kochmod.hint.need_soup_bowl', empty: 'kochmod.hint.pot_empty' },
   sound: 'kochmod.bubble',
 };
 /** @type {DishRecipe[]} wok recipes */
@@ -93,10 +109,11 @@ export const WOK = [
 /** @type {PotDef} */
 export const WOK_DEF = {
   recipes: WOK,
-  tool: 'kochmod:wok_spatula',
+  tools: [MULTITOOL, 'kochmod:wok_spatula'],
+  tool: MULTITOOL,
   consumesTool: false,
   max: 6,
-  hints: { full: 'kochmod.hint.wok_full', cooking: 'kochmod.hint.pot_cooking', needTool: 'kochmod.hint.need_wok_spatula', empty: 'kochmod.hint.pot_empty' },
+  hints: { full: 'kochmod.hint.wok_full', cooking: 'kochmod.hint.pot_cooking', needTool: 'kochmod.hint.need_multitool', empty: 'kochmod.hint.pot_empty' },
   sound: 'kochmod.sizzle',
 };
 
@@ -114,7 +131,7 @@ export const TIMED_RECIPES = Object.values(TIMED).flatMap((def) => (
  */
 function processStep(item) {
   for (const [raw, cut] of Object.entries(CUTTABLE)) {
-    if (cut === item) return { item: raw, station: 'cutting_board', tool: 'kochmod:knife', result: cut };
+    if (cut === item) return { item: raw, station: 'cutting_board', tool: MULTITOOL, result: cut };
   }
   if (item === SPIT.cooked) return { item: SPIT.raw, station: SPIT.station, tool: SPIT.tool, result: item };
   for (const [station, def] of Object.entries(TIMED)) {

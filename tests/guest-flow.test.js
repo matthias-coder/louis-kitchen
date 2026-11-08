@@ -895,6 +895,15 @@ test('serveTakeaway: fries are refused, a pizza without a box asks for the box, 
   assert.equal(w.bells[BELL_KEY].takeaway, undefined);
 });
 
+test('serveTakeaway: an empty hand only hints, without a head shake', () => {
+  const w = fakeWorld({ registries: OVEN });
+  ringBell(BELL_KEY, w.io, () => 0.1);
+  const id = w.bells[BELL_KEY].takeaway.guestId;
+  assert.deepEqual(serveTakeaway(id, null, NO_CARRY, w.io), { hint: 'kochmod.hint.takeaway_pizza_only' });
+  assert.ok(!w.log.some((e) => e[0] === 'react' && e[1] === id));
+  assert.equal(w.guests[id].data.phase, 'takeaway_waiting');
+});
+
 test('serveTakeaway: an unknown guest id gets null', () => {
   const w = fakeWorld({ registries: OVEN });
   assert.equal(serveTakeaway('nobody', PIZZA, carry(PIZZA_BOX), w.io), null);

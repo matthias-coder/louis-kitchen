@@ -609,7 +609,8 @@ export function serveTakeaway(guestId, held, carried, io, rnd = Math.random) {
   if (!guest) return null;
   const d = guest.data();
   if (d.phase !== 'takeaway_waiting') return null;
-  if (held === null || !PIZZA_DISHES.includes(held)) {
+  if (held === null) return { hint: 'kochmod.hint.takeaway_pizza_only' };
+  if (!PIZZA_DISHES.includes(held)) {
     guest.react(false);
     return { hint: 'kochmod.hint.takeaway_pizza_only' };
   }

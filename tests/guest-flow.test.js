@@ -802,3 +802,12 @@ test('a throwing spawner during a ring drops the pending guests and retries late
   assert.deepEqual(w.bells[BELL_KEY], { guests: {}, cooldown: RETRY_TICKS });
   assert.equal(w.warnings.length, 1);
 });
+
+test('after a soup the table keeps an empty bowl, after a burger an empty plate', () => {
+  for (const [served, left] of [['kochmod:ramen', 'empty_bowl'], [HAM, 'empty']]) {
+    const w = fakeWorld({ plates: { [TABLE_KEY]: served.slice('kochmod:'.length) } });
+    w.seatGuest({ phase: 'eating', timer: 20, wish: served, served });
+    tick(w);
+    assert.equal(w.plates[TABLE_KEY], left, served);
+  }
+});

@@ -5,8 +5,12 @@ import {
   RADIUS, SPAWN_MIN, SPAWN_MAX, DIRECTIONS,
   withinRadius, offset, seatDirection, availableDishes, pickWish,
   spawnDelay, rate, seatStillValid, tableInteract, tableView,
+  servedIn, leftover, EMPTY_BOWL, DIRTY_PLATE,
 } from '../packs/BP/scripts/logic/restaurant.js';
 
+import { DIRTY_BOWL } from '../packs/BP/scripts/logic/catalog.js';
+
+const k = (name) => `kochmod:${name}`;
 const HAM = 'kochmod:hamburger';
 const CHEESE = 'kochmod:cheeseburger';
 const SUSHI = 'kochmod:sushi';
@@ -174,4 +178,19 @@ test('availableDishes: doner needs spit, cutting board and counter; sushi cuttin
   assert.deepEqual(availableDishes(new Set(['pot', 'cutting_board', 'counter'])), ['kochmod:sushi', 'kochmod:ramen', 'kochmod:potato_soup']);
   assert.deepEqual(availableDishes(new Set(['wok', 'cutting_board'])), ['kochmod:fried_noodles']);
   assert.deepEqual(availableDishes(new Set(['wok'])), []);
+});
+
+test('servedIn / leftover: soups come in the bowl, everything else on the plate', () => {
+  assert.equal(servedIn(k('ramen')), 'bowl');
+  assert.equal(servedIn(k('potato_soup')), 'bowl');
+  assert.equal(servedIn(k('hamburger')), 'plate');
+  assert.equal(leftover(k('ramen')), EMPTY_BOWL);
+  assert.equal(leftover(k('hamburger')), 'empty');
+  assert.equal(tableView(EMPTY_BOWL), 'empty');
+});
+
+test('tableInteract: a soup is served without a plate; the empty bowl comes back dirty', () => {
+  assert.deepEqual(tableInteract({ plate: 'none' }, k('ramen'), true, false), { state: { plate: 'ramen' }, take: true, serve: k('ramen'), sound: 'kochmod.plate', consumePlate: false });
+  assert.deepEqual(tableInteract({ plate: EMPTY_BOWL }, null, false, false), { state: { plate: 'none' }, give: DIRTY_BOWL });
+  assert.deepEqual(tableInteract({ plate: 'empty' }, null, false, false), { state: { plate: 'none' }, give: DIRTY_PLATE });
 });

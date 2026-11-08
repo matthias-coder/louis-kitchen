@@ -21,7 +21,7 @@ Für Louis und Papa. Alles passiert durch **Antippen**: Zutat in der Hand → St
 **Faustregeln**
 - Fehlt etwas, ist etwas zu viel, noch roh oder verbrannt, entsteht ein **Misslungenes Gericht**. Einfach noch mal probieren.
 - Zu früh vom Grill oder aus dem Ofen genommen? Du bekommst die rohe Zutat zurück und legst sie wieder hin.
-- Servieren: fertiges Gericht in die Hand, **sauberen Teller** im Inventar, Tisch vor dem Gast antippen.
+- Servieren: fertiges Gericht in die Hand, **sauberen Teller** im Inventar, Tisch vor dem Gast antippen. Suppen (Ramen, Kartoffelsuppe) kommen in der Suppenschüssel, dafür ist kein Teller nötig; nach dem Essen bleibt eine schmutzige Schüssel am Tisch, die in die Spülmaschine kommt.
 - Das **Küchen-Multitool** ersetzt Messer, Pfannenwender, Pizzaschieber und Wokwender. Es bleibt im Rucksack: Station mit leerer Hand antippen reicht.
 - Das **Rezeptbuch** (Werkzeugkiste) zeigt dir dieselben Schritte als Bilder im Spiel.
 

@@ -1,9 +1,10 @@
 import { RECIPES, FAILED } from './recipes.js';
-import { isDish, plateName } from './catalog.js';
+import { isDish, plateName, DIRTY_BOWL } from './catalog.js';
+import { POT } from './processes.js';
 
 /** @typedef {{ x: number, y: number, z: number }} Loc */
 /** @typedef {'north' | 'east' | 'south' | 'west'} Direction */
-/** plate: 'none', 'empty' (eaten, dirty plate left) or the plateName of the served dish. @typedef {{ plate: string }} TableState */
+/** plate: 'none', 'empty' (eaten, dirty plate left), 'empty_bowl' (soup eaten, dirty bowl left) or the plateName of the served dish. @typedef {{ plate: string }} TableState */
 /**
  * serve: dish id handed to the waiting guest. consumePlate: remove one clean plate from the player's inventory.
  * @typedef {import('./stations.js').Result<TableState> & { serve?: string, consumePlate?: boolean }} TableResult
@@ -21,6 +22,26 @@ export const DIRECTIONS = ['north', 'east', 'south', 'west'];
 
 export const CLEAN_PLATE = 'kochmod:clean_plate';
 export const DIRTY_PLATE = 'kochmod:dirty_plate';
+/** Table state after a soup. */
+export const EMPTY_BOWL = 'empty_bowl';
+
+/**
+ * Soups (the dishes of the pot) come in the soup bowl, everything else on a plate.
+ * @param {string} dishId
+ * @returns {'plate' | 'bowl'}
+ */
+export function servedIn(dishId) {
+  return POT.some((r) => r.dish === dishId && isDish(r.dish)) ? 'bowl' : 'plate';
+}
+
+/**
+ * Table state once the guest has eaten the dish.
+ * @param {string} dishId
+ * @returns {'empty' | 'empty_bowl'}
+ */
+export function leftover(dishId) {
+  return servedIn(dishId) === 'bowl' ? EMPTY_BOWL : 'empty';
+}
 
 /**
  * @param {Loc} a
@@ -106,7 +127,7 @@ export function seatStillValid(s) {
  * @returns {'none' | 'food' | 'failed' | 'empty'}
  */
 export function tableView(plate) {
-  if (plate === 'empty') return 'empty';
+  if (plate === 'empty' || plate === EMPTY_BOWL) return 'empty';
   if (plate === plateName(FAILED)) return 'failed';
   return isDish(`kochmod:${plate}`) ? 'food' : 'none';
 }
@@ -122,18 +143,21 @@ export function tableView(plate) {
  */
 export function tableInteract(state, held, guestWaiting, hasPlate) {
   const holdsDish = isDish(held);
-  if (state.plate === 'empty' && !(holdsDish && guestWaiting)) return { state: { plate: 'none' }, give: DIRTY_PLATE };
-  if (state.plate === 'none' || state.plate === 'empty') {
+  const dirty = state.plate === EMPTY_BOWL ? DIRTY_BOWL : DIRTY_PLATE;
+  const eaten = state.plate === 'empty' || state.plate === EMPTY_BOWL;
+  if (eaten && !(holdsDish && guestWaiting)) return { state: { plate: 'none' }, give: dirty };
+  if (state.plate === 'none' || eaten) {
     if (!holdsDish) return { state };
     if (!guestWaiting) return { state, hint: 'kochmod.hint.no_guest' };
-    if (!hasPlate) return { state, hint: 'kochmod.hint.need_plate' };
+    const bowl = servedIn(/** @type {string} */ (held)) === 'bowl';
+    if (!bowl && !hasPlate) return { state, hint: 'kochmod.hint.need_plate' };
     return {
       state: { plate: plateName(/** @type {string} */ (held)) },
       take: true,
       serve: /** @type {string} */ (held),
       sound: 'kochmod.plate',
-      consumePlate: true,
-      ...(state.plate === 'empty' ? { give: DIRTY_PLATE } : {}),
+      consumePlate: !bowl,
+      ...(eaten ? { give: dirty } : {}),
     };
   }
   if (holdsDish) return { state, hint: 'kochmod.hint.table_busy' };

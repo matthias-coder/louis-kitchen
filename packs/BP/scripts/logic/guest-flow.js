@@ -1,6 +1,6 @@
 import {
   WALK_TIMEOUT, EAT_TICKS, LEAVE_TICKS,
-  withinRadius, offset, seatDirection, availableDishes, pickWish, spawnDelay, rate, seatStillValid,
+  withinRadius, offset, seatDirection, availableDishes, pickWish, spawnDelay, rate, seatStillValid, leftover,
 } from './restaurant.js';
 import { locKey, parseLocKey } from './store.js';
 import { DISHES, FAILED } from './recipes.js';
@@ -317,7 +317,7 @@ function stepGuest(seat, entry, dt, io, rnd) {
       guest.look({ mood: happy ? 'happy' : 'grumpy' });
       guest.react(happy);
       if (emeralds > 0) io.payout(table, emeralds);
-      io.setPlate(table, 'empty');
+      io.setPlate(table, leftover(d.served));
       guest.update({ phase: 'leaving', timer: LEAVE_TICKS });
       return keep;
     }

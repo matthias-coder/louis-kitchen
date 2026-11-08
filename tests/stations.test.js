@@ -13,7 +13,7 @@ import {
   SPIT_SLICES, spitInteract, spitTick, spitView, spitDrops,
   trash, TRASH_LID_TICKS, trashInteract, trashTick, trashView, trashDrops,
 } from '../packs/BP/scripts/logic/stations.js';
-import { itemsOf, MULTITOOL } from '../packs/BP/scripts/logic/catalog.js';
+import { itemsOf, MULTITOOL, SOUP_BOWL } from '../packs/BP/scripts/logic/catalog.js';
 import { FAILED } from '../packs/BP/scripts/logic/recipes.js';
 import { CUTTABLE } from '../packs/BP/scripts/logic/processes.js';
 import { BURNT_AT, COOKED_AT } from '../packs/BP/scripts/logic/cooking.js';
@@ -461,7 +461,7 @@ test('pot: tools other than the bowl, dishes, plates and unknown ids change noth
 
 test('pot: empty hand on a filled pot asks for a bowl', () => {
   const s = { items: [k('rice')], ticks: 300 };
-  assert.deepEqual(potInteract(s, null), { state: s, hint: 'kochmod.hint.need_bowl' });
+  assert.deepEqual(potInteract(s, null), { state: s, hint: 'kochmod.hint.need_soup_bowl' });
 });
 
 test('pot: the bowl on an empty pot says it is empty, on an uncooked pot that it is cooking; nothing consumed', () => {
@@ -816,6 +816,13 @@ test('spit: the old knife still cuts, in hand and from the inventory', () => {
 test('spit: raw meat in hand still goes on even with a tool in the inventory', () => {
   assert.deepEqual(spitInteract(INITIAL.spit, MEAT_RAW, carry(MULTITOOL)), { state: { meat: true, ticks: 0, slices: SPIT_SLICES }, take: true });
 });
+test('pot: scoops with the soup bowl from hand or inventory and with the old bowl', () => {
+  const s = { items: [k('potato_cubes'), k('carrot_slices'), k('cream')], ticks: COOKED_AT };
+  assert.deepEqual(potInteract(s, SOUP_BOWL, NO_CARRY), { state: INITIAL.pot, take: true, give: k('potato_soup') });
+  assert.deepEqual(potInteract(s, null, carry(SOUP_BOWL)), { state: INITIAL.pot, consume: SOUP_BOWL, give: k('potato_soup') });
+  assert.deepEqual(potInteract(s, null, carry(k('bowl'))), { state: INITIAL.pot, consume: k('bowl'), give: k('potato_soup') });
+});
+
 test('pot: a bowl from the inventory scoops and is consumed; a held ingredient still goes in', () => {
   const s = { items: [k('rice')], ticks: COOKED_AT };
   assert.deepEqual(potInteract(s, null, carry(k('bowl'))), { state: INITIAL.pot, consume: k('bowl'), give: k('cooked_rice') });

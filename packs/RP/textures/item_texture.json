@@ -95,6 +95,9 @@
     "kochmod_cream": {
       "textures": "textures/items/cream"
     },
+    "kochmod_dirty_bowl": {
+      "textures": "textures/items/dirty_bowl"
+    },
     "kochmod_dirty_plate": {
       "textures": "textures/items/dirty_plate"
     },
@@ -167,6 +170,9 @@
     "kochmod_pita": {
       "textures": "textures/items/pita"
     },
+    "kochmod_pizza_box": {
+      "textures": "textures/items/pizza_box"
+    },
     "kochmod_pizza_margherita": {
       "textures": "textures/items/pizza_margherita"
     },
@@ -214,6 +220,9 @@
     },
     "kochmod_salmon_strips": {
       "textures": "textures/items/salmon_strips"
+    },
+    "kochmod_soup_bowl": {
+      "textures": "textures/items/soup_bowl"
     },
     "kochmod_soy_sauce": {
       "textures": "textures/items/soy_sauce"

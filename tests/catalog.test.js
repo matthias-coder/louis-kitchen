@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { ITEMS, MULTITOOL, itemsOf, itemsFrom, isDish, plateName } from '../packs/BP/scripts/logic/catalog.js';
+import { ITEMS, MULTITOOL, SOUP_BOWL, DIRTY_BOWL, PIZZA_BOX, itemsOf, itemsFrom, isDish, plateName } from '../packs/BP/scripts/logic/catalog.js';
 import { RECIPES, DISHES, FAILED } from '../packs/BP/scripts/logic/recipes.js';
 import { CRATES, ALL_BLOCKS } from '../packs/BP/scripts/logic/crates.js';
 import { CUTTABLE, TIMED, ASSEMBLY, POT, WOK } from '../packs/BP/scripts/logic/processes.js';
@@ -32,7 +32,14 @@ test('itemsFrom lists what each crate supplies, in catalog order', () => {
   assert.deepEqual(itemsFrom('pantry'), k('bun', 'potato', 'onion', 'carrot',
     'tomato_sauce', 'noodles', 'cooked_rice', 'broth', 'nori', 'pita', 'soy_sauce'));
   assert.deepEqual(ITEMS[k('rice')], { kind: 'ingredient', stack: 64, menu: false });
-  assert.deepEqual(itemsFrom('tools'), [MULTITOOL, ...k('bowl', 'recipe_book', 'clean_plate')]);
+  assert.deepEqual(itemsFrom('tools'), [MULTITOOL, ...k('recipe_book', 'clean_plate')]);
+});
+
+test('soup bowl, dirty bowl and pizza box are plate items; the old bowl is a tool that leaves the crates', () => {
+  assert.deepEqual(ITEMS[SOUP_BOWL], { kind: 'plate', stack: 64 });
+  assert.deepEqual(ITEMS[DIRTY_BOWL], { kind: 'plate', stack: 64, menu: false });
+  assert.deepEqual(ITEMS[PIZZA_BOX], { kind: 'plate', stack: 64 });
+  assert.deepEqual(ITEMS[k('bowl')], { kind: 'tool', stack: 1, menu: false });
 });
 
 test('itemsOf, isDish and plateName', () => {
@@ -92,5 +99,5 @@ test('multitool: tool from the tools crate, stack 1; the four old tools stay as 
     assert.equal(ITEMS[old].source, undefined);
     assert.equal(ITEMS[old].menu, false);
   }
-  assert.deepEqual(itemsFrom('tools'), [MULTITOOL, ...k('bowl', 'recipe_book', 'clean_plate')]);
+  assert.deepEqual(itemsFrom('tools'), [MULTITOOL, ...k('recipe_book', 'clean_plate')]);
 });

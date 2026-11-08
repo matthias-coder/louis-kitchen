@@ -1,4 +1,4 @@
-import { ITEMS, MULTITOOL } from './catalog.js';
+import { ITEMS, MULTITOOL, SOUP_BOWL } from './catalog.js';
 
 /**
  * @typedef {{ item: string, station: string, tool?: string, result?: string, parts?: string[] }} Step
@@ -85,11 +85,11 @@ export const POT = [
 /** @type {PotDef} */
 export const POT_DEF = {
   recipes: POT,
-  tools: ['kochmod:bowl'],
-  tool: 'kochmod:bowl',
+  tools: [SOUP_BOWL, 'kochmod:bowl'],
+  tool: SOUP_BOWL,
   consumesTool: true,
   max: 6,
-  hints: { full: 'kochmod.hint.pot_full', cooking: 'kochmod.hint.pot_cooking', needTool: 'kochmod.hint.need_bowl', empty: 'kochmod.hint.pot_empty' },
+  hints: { full: 'kochmod.hint.pot_full', cooking: 'kochmod.hint.pot_cooking', needTool: 'kochmod.hint.need_soup_bowl', empty: 'kochmod.hint.pot_empty' },
   sound: 'kochmod.bubble',
 };
 /** @type {DishRecipe[]} wok recipes */

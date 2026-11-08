@@ -11,6 +11,11 @@ const PREFIX = 'kochmod:';
 /** The one kitchen tool that replaces knife, spatula, pizza peel and wok spatula. */
 export const MULTITOOL = 'kochmod:multitool';
 
+/** Dishes for the pot dishes and pizza; taken from the cupboard, not the crates. */
+export const SOUP_BOWL = 'kochmod:soup_bowl';
+export const DIRTY_BOWL = 'kochmod:dirty_bowl';
+export const PIZZA_BOX = 'kochmod:pizza_box';
+
 /**
  * Catalog order is the crate_all menu order. `menu: false` keeps an item out of crate_all.
  * @type {Record<string, ItemDef>} keyed by namespaced id
@@ -55,7 +60,7 @@ export const ITEMS = {
   'kochmod:multitool': { kind: 'tool', source: 'tools', stack: 1 },
   'kochmod:knife': { kind: 'tool', stack: 1, menu: false },
   'kochmod:spatula': { kind: 'tool', stack: 1, menu: false },
-  'kochmod:bowl': { kind: 'tool', source: 'tools', stack: 1 },
+  'kochmod:bowl': { kind: 'tool', stack: 1, menu: false },
   'kochmod:pizza_peel': { kind: 'tool', stack: 1, menu: false },
   'kochmod:wok_spatula': { kind: 'tool', stack: 1, menu: false },
   'kochmod:recipe_book': { kind: 'tool', source: 'tools', stack: 1 },
@@ -71,6 +76,9 @@ export const ITEMS = {
   'kochmod:fried_noodles': { kind: 'dish', stack: 64 },
   'kochmod:clean_plate': { kind: 'plate', source: 'tools', stack: 64 },
   'kochmod:dirty_plate': { kind: 'plate', stack: 64, menu: false },
+  'kochmod:soup_bowl': { kind: 'plate', stack: 64 },
+  'kochmod:dirty_bowl': { kind: 'plate', stack: 64, menu: false },
+  'kochmod:pizza_box': { kind: 'plate', stack: 64 },
   // stage 1 Baukasten: hidden alias of kit_classic so old worlds keep working
   'kochmod:restaurant_kit': { kind: 'misc', stack: 1, menu: false },
   'kochmod:kit_burger': { kind: 'misc', stack: 1 },

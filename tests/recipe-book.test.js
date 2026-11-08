@@ -74,7 +74,7 @@ test('bookPages: ramen lists its four ingredients, then the pot with the bowl', 
     '2. Nudeln ➜ Vorratsschrank',
     '3. Ei ➜ Kühlschrank',
     '4. Frühlingszwiebel ➜ Kühlschrank',
-    '5. Ramen ➜ Suppentopf (Schüssel)',
+    '5. Ramen ➜ Suppentopf (Suppenschüssel)',
   ]);
   assert.equal(bookPages('kochmod:ramen').buttons[4].icon, 'textures/items/ramen');
 });

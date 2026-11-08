@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { ITEMS, MULTITOOL } from '../packs/BP/scripts/logic/catalog.js';
+import { ITEMS, MULTITOOL, SOUP_BOWL } from '../packs/BP/scripts/logic/catalog.js';
 import { stepsFor, stationsFor, CUTTABLE, TIMED, POT, POT_DEF, WOK, WOK_DEF, SPIT, ASSEMBLY, CUT_TOOLS } from '../packs/BP/scripts/logic/processes.js';
 
 const k = (/** @type {string} */ id) => `kochmod:${id}`;
@@ -90,18 +90,25 @@ test('pot recipes: ramen, potato soup and cooked rice', () => {
 test('pot def: recipes, bowl (consumed: it becomes the dish container), six items, hints and the bubble sound', () => {
   assert.deepEqual(POT_DEF, {
     recipes: POT,
-    tools: [k('bowl')],
-    tool: k('bowl'),
+    tools: [SOUP_BOWL, k('bowl')],
+    tool: SOUP_BOWL,
     consumesTool: true,
     max: 6,
-    hints: { full: 'kochmod.hint.pot_full', cooking: 'kochmod.hint.pot_cooking', needTool: 'kochmod.hint.need_bowl', empty: 'kochmod.hint.pot_empty' },
+    hints: { full: 'kochmod.hint.pot_full', cooking: 'kochmod.hint.pot_cooking', needTool: 'kochmod.hint.need_soup_bowl', empty: 'kochmod.hint.pot_empty' },
     sound: 'kochmod.bubble',
   });
 });
 
+test('pot def: soup bowl (consumed), the old bowl still works, hint names the soup bowl', () => {
+  assert.equal(POT_DEF.tool, SOUP_BOWL);
+  assert.deepEqual(POT_DEF.tools, [SOUP_BOWL, k('bowl')]);
+  assert.equal(POT_DEF.consumesTool, true);
+  assert.equal(POT_DEF.hints.needTool, 'kochmod.hint.need_soup_bowl');
+});
+
 test('ramen steps: only the pot step with the bowl (all parts come from fridge and pantry)', () => {
   assert.deepEqual(stepsFor(k('ramen')), [
-    { item: k('ramen'), station: 'pot', tool: k('bowl'), parts: ['broth', 'noodles', 'egg', 'spring_onion'].map(k) },
+    { item: k('ramen'), station: 'pot', tool: SOUP_BOWL, parts: ['broth', 'noodles', 'egg', 'spring_onion'].map(k) },
   ]);
   assert.deepEqual(stationsFor(k('ramen')), ['pot']);
 });
@@ -110,7 +117,7 @@ test('potato soup steps: cut potato and carrot, then the pot step with the bowl'
   assert.deepEqual(stepsFor(k('potato_soup')), [
     { item: k('potato'), station: 'cutting_board', tool: MULTITOOL, result: k('potato_cubes') },
     { item: k('carrot'), station: 'cutting_board', tool: MULTITOOL, result: k('carrot_slices') },
-    { item: k('potato_soup'), station: 'pot', tool: k('bowl'), parts: ['potato_cubes', 'carrot_slices', 'cream'].map(k) },
+    { item: k('potato_soup'), station: 'pot', tool: SOUP_BOWL, parts: ['potato_cubes', 'carrot_slices', 'cream'].map(k) },
   ]);
   assert.deepEqual(stationsFor(k('potato_soup')), ['cutting_board', 'pot']);
 });
@@ -180,8 +187,7 @@ test('every station lists the multitool first and its old tool second; the book 
   assert.deepEqual(SPIT.tools, [MULTITOOL, k('knife')]);
   assert.deepEqual(CUT_TOOLS, [MULTITOOL, k('knife')]);
   assert.deepEqual(WOK_DEF.tools, [MULTITOOL, k('wok_spatula')]);
-  assert.deepEqual(POT_DEF.tools, [k('bowl')]);
-  for (const def of [TIMED.grill, TIMED.oven, SPIT, WOK_DEF]) assert.equal(def.tool, MULTITOOL);
+    for (const def of [TIMED.grill, TIMED.oven, SPIT, WOK_DEF]) assert.equal(def.tool, MULTITOOL);
   assert.equal(TIMED.grill.hintTool, 'kochmod.hint.need_multitool');
   assert.deepEqual(stepsFor(k('hamburger'))[0], { item: k('raw_patty'), station: 'grill', tool: MULTITOOL, result: k('cooked_patty') });
 });

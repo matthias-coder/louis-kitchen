@@ -573,6 +573,25 @@ export const bowl = paint('bowl', BOWL, (c) => {
   c.ellipse(8, 6, 6, 1.6, 'e').rect(2, 6, 12, 1, 'r');
 });
 
+const SOUP = { b: '#eef2f6', r: '#ffffff', s: '#b4bfcc', h: '#ffffff', e: '#f6e7b0' };
+export const soup_bowl = paint('soup_bowl', SOUP, (c) => {
+  bowlBody(c);
+  c.ellipse(8, 6, 6, 1.6, 'e').rect(2, 6, 12, 1, 'r');
+});
+
+export const dirty_bowl = paint('dirty_bowl', { ...SOUP, e: '#7a5a34', m: '#8a5a2b' }, (c) => {
+  bowlBody(c);
+  c.ellipse(8, 6, 6, 1.6, 'e').rect(2, 6, 12, 1, 'r');
+  for (const [x, y] of [[5, 9], [6, 10], [10, 8], [9, 11], [7, 12], [11, 10]]) c.dot(x, y, 'm');
+  c.dot(4, 6, 'm').dot(11, 6, 'm');
+});
+
+export const pizza_box = paint('pizza_box', { b: '#c89a5a', d: '#8f6a35', l: '#e2bd84', r: '#d6452b', y: '#f0c040' }, (c) => {
+  c.rect(1, 4, 14, 9, 'b').rect(1, 12, 14, 1, 'd').rect(1, 4, 14, 1, 'l').rect(1, 4, 1, 9, 'd').rect(14, 4, 1, 9, 'd');
+  c.ellipse(8, 8.5, 3.6, 3.2, 'y').ellipse(8, 8.5, 2.6, 2.2, 'r');
+  for (const [x, y] of [[7, 8], [9, 9], [8, 10]]) c.dot(x, y, 'y');
+});
+
 export const cooked_rice = paint('cooked_rice', { ...BOWL, w: '#fbfaf2', g: '#aeb0a4' }, (c) => {
   bowlBody(c);
   c.ellipse(8, 6, 5.8, 4.6, 'w');

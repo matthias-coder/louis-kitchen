@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { ITEMS, itemsOf, itemsFrom, isDish, plateName } from '../packs/BP/scripts/logic/catalog.js';
+import { ITEMS, MULTITOOL, itemsOf, itemsFrom, isDish, plateName } from '../packs/BP/scripts/logic/catalog.js';
 import { RECIPES, DISHES, FAILED } from '../packs/BP/scripts/logic/recipes.js';
 import { CRATES, ALL_BLOCKS } from '../packs/BP/scripts/logic/crates.js';
 import { CUTTABLE, TIMED, ASSEMBLY, POT, WOK } from '../packs/BP/scripts/logic/processes.js';
@@ -31,7 +31,7 @@ test('itemsFrom lists what each crate supplies, in catalog order', () => {
     'salami', 'egg', 'salmon', 'cream', 'onion', 'carrot', 'potato', 'spring_onion', 'doner_meat_raw'));
   assert.deepEqual(itemsFrom('pantry'), k('bun',
     'dough', 'tomato_sauce', 'noodles', 'rice', 'broth', 'nori', 'pita', 'doner_sauce', 'soy_sauce'));
-  assert.deepEqual(itemsFrom('tools'), k('knife', 'spatula', 'bowl', 'pizza_peel', 'wok_spatula', 'recipe_book', 'clean_plate'));
+  assert.deepEqual(itemsFrom('tools'), [MULTITOOL, ...k('bowl', 'recipe_book', 'clean_plate')]);
 });
 
 test('itemsOf, isDish and plateName', () => {
@@ -82,4 +82,14 @@ test('six Baukasten items: misc, stack 1, in the menu; the old restaurant_kit st
     assert.deepEqual(ITEMS[`kochmod:kit_${id}`], { kind: 'misc', stack: 1 }, id);
   }
   assert.deepEqual(ITEMS['kochmod:restaurant_kit'], { kind: 'misc', stack: 1, menu: false });
+});
+
+test('multitool: tool from the tools crate, stack 1; the four old tools stay as items but leave the crates', () => {
+  assert.deepEqual(ITEMS[MULTITOOL], { kind: 'tool', source: 'tools', stack: 1 });
+  for (const old of ['knife', 'spatula', 'pizza_peel', 'wok_spatula'].flatMap((i) => k(i))) {
+    assert.equal(ITEMS[old].kind, 'tool');
+    assert.equal(ITEMS[old].source, undefined);
+    assert.equal(ITEMS[old].menu, false);
+  }
+  assert.deepEqual(itemsFrom('tools'), [MULTITOOL, ...k('bowl', 'recipe_book', 'clean_plate')]);
 });

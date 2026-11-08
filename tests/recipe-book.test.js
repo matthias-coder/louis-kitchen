@@ -50,7 +50,7 @@ test('bookPages: cheeseburger shows every ingredient with its crate before the s
   assert.deepEqual(labels('kochmod:cheeseburger'), [
     '1. Brötchen ➜ Vorratsschrank',
     '2. Rohe Frikadelle ➜ Kühlschrank',
-    '3. Rohe Frikadelle ➜ Grill (Pfannenwender)',
+    '3. Rohe Frikadelle ➜ Grill (Küchen-Multitool)',
     '4. Salat ➜ Kühlschrank',
     '5. Tomate ➜ Kühlschrank',
     '6. Tomate ➜ Schneidebrett (Messer)',

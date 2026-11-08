@@ -8,6 +8,9 @@
 
 const PREFIX = 'kochmod:';
 
+/** The one kitchen tool that replaces knife, spatula, pizza peel and wok spatula. */
+export const MULTITOOL = 'kochmod:multitool';
+
 /**
  * Catalog order is the crate_all menu order. `menu: false` keeps an item out of crate_all.
  * @type {Record<string, ItemDef>} keyed by namespaced id
@@ -48,11 +51,12 @@ export const ITEMS = {
   'kochmod:raw_pizza_margherita': { kind: 'prepared', stack: 64 },
   'kochmod:raw_salami_pizza': { kind: 'prepared', stack: 64 },
   'kochmod:burnt_pizza': { kind: 'prepared', stack: 64 },
-  'kochmod:knife': { kind: 'tool', source: 'tools', stack: 1 },
-  'kochmod:spatula': { kind: 'tool', source: 'tools', stack: 1 },
+  'kochmod:multitool': { kind: 'tool', source: 'tools', stack: 1 },
+  'kochmod:knife': { kind: 'tool', stack: 1, menu: false },
+  'kochmod:spatula': { kind: 'tool', stack: 1, menu: false },
   'kochmod:bowl': { kind: 'tool', source: 'tools', stack: 1 },
-  'kochmod:pizza_peel': { kind: 'tool', source: 'tools', stack: 1 },
-  'kochmod:wok_spatula': { kind: 'tool', source: 'tools', stack: 1 },
+  'kochmod:pizza_peel': { kind: 'tool', stack: 1, menu: false },
+  'kochmod:wok_spatula': { kind: 'tool', stack: 1, menu: false },
   'kochmod:recipe_book': { kind: 'tool', source: 'tools', stack: 1 },
   'kochmod:hamburger': { kind: 'dish', stack: 64 },
   'kochmod:cheeseburger': { kind: 'dish', stack: 64 },

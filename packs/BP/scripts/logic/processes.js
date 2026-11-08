@@ -1,4 +1,4 @@
-import { ITEMS } from './catalog.js';
+import { ITEMS, MULTITOOL } from './catalog.js';
 
 /**
  * @typedef {{ item: string, station: string, tool?: string, result?: string, parts?: string[] }} Step
@@ -19,13 +19,14 @@ export const CUTTABLE = {
 
 /**
  * Stations that cook by time. `accepts`: raw item -> cooked / burnt result.
- * @type {Record<string, { accepts: Record<string, { cooked: string, burnt: string }>, tool: string, hintTool: string, hintFull: string, sound: string }>}
+ * @type {Record<string, { accepts: Record<string, { cooked: string, burnt: string }>, tools: string[], tool: string, hintTool: string, hintFull: string, sound: string }>}
  */
 export const TIMED = {
   grill: {
     accepts: { 'kochmod:raw_patty': { cooked: 'kochmod:cooked_patty', burnt: 'kochmod:burnt_patty' } },
-    tool: 'kochmod:spatula',
-    hintTool: 'kochmod.hint.need_spatula',
+    tools: [MULTITOOL, 'kochmod:spatula'],
+    tool: MULTITOOL,
+    hintTool: 'kochmod.hint.need_multitool',
     hintFull: 'kochmod.hint.grill_full',
     sound: 'kochmod.sizzle',
   },
@@ -34,8 +35,9 @@ export const TIMED = {
       'kochmod:raw_pizza_margherita': { cooked: 'kochmod:pizza_margherita', burnt: 'kochmod:burnt_pizza' },
       'kochmod:raw_salami_pizza': { cooked: 'kochmod:salami_pizza', burnt: 'kochmod:burnt_pizza' },
     },
-    tool: 'kochmod:pizza_peel',
-    hintTool: 'kochmod.hint.need_peel',
+    tools: [MULTITOOL, 'kochmod:pizza_peel'],
+    tool: MULTITOOL,
+    hintTool: 'kochmod.hint.need_multitool',
     hintFull: 'kochmod.hint.oven_full',
     sound: 'kochmod.oven',
   },
@@ -43,9 +45,12 @@ export const TIMED = {
 
 /**
  * The doner spit roasts one cone of raw meat; the knife cuts the cooked meat off it.
- * @type {{ raw: string, cooked: string, tool: string, station: string }}
+ * @type {{ raw: string, cooked: string, tools: string[], tool: string, station: string }}
  */
-export const SPIT = { raw: 'kochmod:doner_meat_raw', cooked: 'kochmod:doner_meat', tool: 'kochmod:knife', station: 'spit' };
+export const SPIT = { raw: 'kochmod:doner_meat_raw', cooked: 'kochmod:doner_meat', tools: [MULTITOOL, 'kochmod:knife'], tool: MULTITOOL, station: 'spit' };
+
+/** Tools that cut on the cutting board: the multitool, or the old knife. */
+export const CUT_TOOLS = [MULTITOOL, 'kochmod:knife'];
 
 const BASE = ['kochmod:bun', 'kochmod:cooked_patty', 'kochmod:lettuce', 'kochmod:tomato_slices'];
 
@@ -74,12 +79,13 @@ export const POT = [
  * A station that cooks a mix of items by time and is emptied with a tool (pot, wok).
  * hints: lang keys for full, still cooking, empty hand on a filled station, tool on an empty station.
  * consumesTool: whether scooping uses up the tool (the pot's bowl becomes the dish container; the wok spatula stays).
- * @typedef {{ recipes: DishRecipe[], tool: string, consumesTool: boolean, max: number,
+ * @typedef {{ recipes: DishRecipe[], tools: string[], tool: string, consumesTool: boolean, max: number,
  *   hints: { full: string, cooking: string, needTool: string, empty: string }, sound: string }} PotDef
  */
 /** @type {PotDef} */
 export const POT_DEF = {
   recipes: POT,
+  tools: ['kochmod:bowl'],
   tool: 'kochmod:bowl',
   consumesTool: true,
   max: 6,
@@ -93,10 +99,11 @@ export const WOK = [
 /** @type {PotDef} */
 export const WOK_DEF = {
   recipes: WOK,
-  tool: 'kochmod:wok_spatula',
+  tools: [MULTITOOL, 'kochmod:wok_spatula'],
+  tool: MULTITOOL,
   consumesTool: false,
   max: 6,
-  hints: { full: 'kochmod.hint.wok_full', cooking: 'kochmod.hint.pot_cooking', needTool: 'kochmod.hint.need_wok_spatula', empty: 'kochmod.hint.pot_empty' },
+  hints: { full: 'kochmod.hint.wok_full', cooking: 'kochmod.hint.pot_cooking', needTool: 'kochmod.hint.need_multitool', empty: 'kochmod.hint.pot_empty' },
   sound: 'kochmod.sizzle',
 };
 

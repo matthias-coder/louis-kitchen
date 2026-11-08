@@ -196,6 +196,32 @@ export const knife = {
 };
 
 /** @type {Sprite} */
+export const multitool = {
+  name: 'multitool',
+  palette: {
+    k: '#2a2f38', s: '#e8edf2', m: '#aab4c0', d: '#76808e', h: '#40464f', b: '#6b3d17', B: '#a0622a',
+  },
+  rows: [
+    '................',
+    '.kk......kkkkkk.',
+    '.ksk....ksssssmk',
+    '.kssk...kshsshmk',
+    '..kssk..kshsshdk',
+    '..kssmk.kssssddk',
+    '...ksmdk.kddddk.',
+    '...kmmdk..kmmk..',
+    '....kdkk..kmk...',
+    '.....kkkkkkk....',
+    '.......kBk......',
+    '......kBBbk.....',
+    '......kBBbk.....',
+    '......kBBbk.....',
+    '......kBbbk.....',
+    '.......kkk......',
+  ],
+};
+
+/** @type {Sprite} */
 export const spatula = {
   name: 'spatula',
   palette: {

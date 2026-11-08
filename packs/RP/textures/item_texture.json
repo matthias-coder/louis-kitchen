@@ -149,6 +149,9 @@
     "kochmod_lettuce": {
       "textures": "textures/items/lettuce"
     },
+    "kochmod_multitool": {
+      "textures": "textures/items/multitool"
+    },
     "kochmod_noodles": {
       "textures": "textures/items/noodles"
     },

@@ -128,7 +128,7 @@ test('board: empty + any cuttable item takes it', () => {
 });
 test('board: the multitool cuts every cuttable item', () => {
   for (const [raw, cut] of CUT_PAIRS) {
-    const r = boardInteract({ item: raw }, k('knife'));
+    const r = boardInteract({ item: raw }, MULTITOOL);
     assert.deepEqual(r.state, { item: cut });
     assert.equal(r.sound, 'kochmod.chop');
   }
@@ -136,7 +136,7 @@ test('board: the multitool cuts every cuttable item', () => {
 test('board: already cut or unknown item + multitool unchanged', () => {
   for (const item of [k('tomato_slices'), k('onion_rings'), k('lettuce'), 'kochmod:from_the_future']) {
     const s = { item };
-    assert.deepEqual(boardInteract(s, k('knife')), { state: s });
+    assert.deepEqual(boardInteract(s, MULTITOOL), { state: s });
   }
 });
 test('board: occupied + empty hand gives item', () => {
@@ -169,6 +169,9 @@ test('board: view and drops', () => {
   }
   assert.equal(boardView({ item: 'kochmod:from_the_future' }), 'whole');
   assert.deepEqual(boardDrops(INITIAL.board), []);
+});
+test('board: a whole tomato is cut while the hand holds an onion and the multitool is in the inventory', () => {
+  assert.deepEqual(boardInteract({ item: k('tomato') }, k('onion'), carry(MULTITOOL)), { state: { item: k('tomato_slices') }, sound: 'kochmod.chop' });
 });
 
 // ---- Counter
@@ -825,7 +828,4 @@ test('wok: the multitool from the inventory scoops and stays; the old wok spatul
   assert.deepEqual(wokInteract(s, k('wok_spatula')), { state: INITIAL.wok, give: FAILED });
   assert.deepEqual(wokInteract(s, null, carry(k('wok_spatula'))), { state: INITIAL.wok, give: FAILED });
   assert.deepEqual(wokInteract(s, null, NO_CARRY), { state: s, hint: 'kochmod.hint.need_multitool' });
-});
-test('board: a whole tomato is cut while the hand holds an onion and the multitool is in the inventory', () => {
-  assert.deepEqual(boardInteract({ item: k('tomato') }, k('onion'), carry(MULTITOOL)), { state: { item: k('tomato_slices') }, sound: 'kochmod.chop' });
 });

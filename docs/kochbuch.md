@@ -34,7 +34,7 @@ Für Louis und Papa. Alles passiert durch **Antippen**: Zutat in der Hand → St
 3. Frikadelle auf den Grill. Warte, bis sie braun ist, dann mit leerer Hand herunternehmen (Multitool im Rucksack).
 4. Salat aus dem Kühlschrank.
 5. Tomate aus dem Kühlschrank.
-6. Tomate aufs Schneidebrett, mit leerer Hand antippen (Multitool im Rucksack) schneidet, danach die Tomatenscheiben mit leerer Hand nehmen.
+6. Tomate aufs Schneidebrett legen, mit leerer Hand antippen (Multitool im Rucksack): schneidet. Danach die Tomatenscheiben mit leerer Hand nehmen.
 7. Brötchen, gebratene Frikadelle, Salat und Tomatenscheiben auf die Anrichte legen. Mit leerer Hand antippen: **Hamburger**!
 
 ## Cheeseburger
@@ -72,9 +72,9 @@ Wie der Hamburger, plus:
 ## Kartoffelsuppe
 
 1. Kartoffel aus dem Kühlschrank.
-2. Kartoffel aufs Schneidebrett, mit leerer Hand antippen (Multitool im Rucksack): Kartoffelwürfel.
+2. Kartoffel aufs Schneidebrett legen, mit leerer Hand antippen (Multitool im Rucksack): schneidet. Das gibt Kartoffelwürfel.
 3. Karotte aus dem Kühlschrank.
-4. Karotte aufs Schneidebrett, schneiden: Karottenscheiben.
+4. Karotte aufs Schneidebrett legen, mit leerer Hand antippen (Multitool im Rucksack): schneidet. Das gibt Karottenscheiben.
 5. Sahne aus dem Kühlschrank.
 6. Kartoffelwürfel, Karottenscheiben und Sahne in den Suppentopf. Nach 8 Sekunden mit der Schüssel antippen: **Kartoffelsuppe**!
 
@@ -85,9 +85,9 @@ Wie der Hamburger, plus:
 3. Rohes Dönerfleisch an den Dönerspieß hängen. Nach 8 Sekunden mit leerer Hand antippen (Multitool im Rucksack): eine Scheibe Dönerfleisch (bis zu 6 Scheiben pro Spieß).
 4. Salat aus dem Kühlschrank.
 5. Tomate aus dem Kühlschrank.
-6. Tomate aufs Schneidebrett, schneiden: Tomatenscheiben.
+6. Tomate aufs Schneidebrett legen, mit leerer Hand antippen (Multitool im Rucksack): schneidet. Das gibt Tomatenscheiben.
 7. Zwiebel aus dem Kühlschrank.
-8. Zwiebel aufs Schneidebrett, schneiden: Zwiebelringe.
+8. Zwiebel aufs Schneidebrett legen, mit leerer Hand antippen (Multitool im Rucksack): schneidet. Das gibt Zwiebelringe.
 9. Dönersoße aus dem Vorratsschrank.
 10. Dönertasche, Dönerfleisch, Salat, Tomatenscheiben, Zwiebelringe und Dönersoße auf die Anrichte. Leere Hand: **Döner**!
 
@@ -97,7 +97,7 @@ Wie der Hamburger, plus:
 2. Reis aus dem Vorratsschrank.
 3. Reis in den Suppentopf. Nach 8 Sekunden mit der Schüssel antippen: Gekochter Reis.
 4. Lachs aus dem Kühlschrank.
-5. Lachs aufs Schneidebrett, schneiden: Lachsstreifen.
+5. Lachs aufs Schneidebrett legen, mit leerer Hand antippen (Multitool im Rucksack): schneidet. Das gibt Lachsstreifen.
 6. Algenblatt, gekochten Reis und Lachsstreifen auf die Anrichte. Leere Hand: **Sushi**!
 
 ## Bratnudeln
@@ -105,7 +105,7 @@ Wie der Hamburger, plus:
 1. Nudeln aus dem Vorratsschrank.
 2. Ei aus dem Kühlschrank.
 3. Karotte aus dem Kühlschrank.
-4. Karotte aufs Schneidebrett, schneiden: Karottenscheiben.
+4. Karotte aufs Schneidebrett legen, mit leerer Hand antippen (Multitool im Rucksack): schneidet. Das gibt Karottenscheiben.
 5. Frühlingszwiebel aus dem Kühlschrank.
 6. Sojasoße aus dem Vorratsschrank.
 7. Nudeln, Ei, Karottenscheiben, Frühlingszwiebel und Sojasoße in den Wok. Nach 8 Sekunden mit leerer Hand antippen (Multitool im Rucksack): **Bratnudeln**!

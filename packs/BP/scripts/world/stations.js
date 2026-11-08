@@ -10,7 +10,7 @@ import {
 } from '../logic/stations.js';
 import { locKey } from '../logic/store.js';
 import { interactStation, breakStation, tickTimedStation, tickDishwashers } from '../logic/station-flow.js';
-import { worldStore, applyResult, heldItemId, dropItems, loadedBlock } from './effects.js';
+import { worldStore, applyResult, heldItemId, playerHasItem, dropItems, loadedBlock } from './effects.js';
 
 /** @typedef {import('@minecraft/server').Block} Block */
 /** @typedef {import('@minecraft/server').BlockComponentRegistry} BlockComponentRegistry */
@@ -254,7 +254,7 @@ function stationComponent(kind, def) {
       const key = keyOf(block);
       // a migrated state needs no extra view refresh: interactStation sets the view anyway
       const state = loadState(def, key).state ?? def.initial;
-      interactStation(def.interact, def.states, state, heldItemId(player), {
+      interactStation(def.interact, def.states, state, heldItemId(player), (id) => playerHasItem(player, id), {
         setView: (states) => setStates(block, def.typeId, states),
         save: (next) => {
           worldStore.save(key, next);

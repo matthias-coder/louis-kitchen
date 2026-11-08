@@ -4,6 +4,7 @@ import { BELL, CHAIR, TABLE, freeBell } from '../logic/guest-flow.js';
 import { locKey } from '../logic/store.js';
 import { interactStation } from '../logic/station-flow.js';
 import { worldStore, applyResult, heldItemId, playerHasItem, removeOneItem } from './effects.js';
+import { NO_CARRY } from '../logic/stations.js';
 import { forgetBell, hasWaitingGuest, onTableServed, ringBell, setPlate } from './guests.js';
 
 /** @typedef {import('@minecraft/server').Block} Block */
@@ -130,7 +131,7 @@ const tableComponent = {
       serve = result.serve;
       consumePlate = result.consumePlate === true;
       return result;
-    }, (s) => s.plate, state, heldItemId(player), {
+    }, (s) => s.plate, state, heldItemId(player), NO_CARRY, {
       setView: (plate) => { if (plate !== state.plate) setPlate(key, plate); },
       save: (next) => {
         worldStore.save(key, next);

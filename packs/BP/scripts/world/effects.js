@@ -120,6 +120,7 @@ export function dropItems(dimension, location, itemIds) {
  */
 export function applyResult(result, player, block) {
   if (result.take) consumeHeld(player);
+  if (result.consume) removeOneItem(player, result.consume);
   if (result.give) give(player, result.give, result.count ?? 1);
   if (result.hint) player.onScreenDisplay.setActionBar({ translate: result.hint });
   if (result.sound) block.dimension.playSound(result.sound, block.center());

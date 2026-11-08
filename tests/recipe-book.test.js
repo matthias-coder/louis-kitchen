@@ -53,7 +53,7 @@ test('bookPages: cheeseburger shows every ingredient with its crate before the s
     '3. Rohe Frikadelle ➜ Grill (Küchen-Multitool)',
     '4. Salat ➜ Kühlschrank',
     '5. Tomate ➜ Kühlschrank',
-    '6. Tomate ➜ Schneidebrett (Messer)',
+    '6. Tomate ➜ Schneidebrett (Küchen-Multitool)',
     '7. Käse ➜ Kühlschrank',
     '8. Cheeseburger ➜ Anrichte',
   ]);

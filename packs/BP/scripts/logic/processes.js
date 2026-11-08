@@ -121,7 +121,7 @@ export const TIMED_RECIPES = Object.values(TIMED).flatMap((def) => (
  */
 function processStep(item) {
   for (const [raw, cut] of Object.entries(CUTTABLE)) {
-    if (cut === item) return { item: raw, station: 'cutting_board', tool: 'kochmod:knife', result: cut };
+    if (cut === item) return { item: raw, station: 'cutting_board', tool: MULTITOOL, result: cut };
   }
   if (item === SPIT.cooked) return { item: SPIT.raw, station: SPIT.station, tool: SPIT.tool, result: item };
   for (const [station, def] of Object.entries(TIMED)) {

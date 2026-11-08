@@ -10,14 +10,15 @@ import { INITIAL, grill, dishwasherTick, dishwasherView } from './stations.js';
  * state is saved, then side effects run. If setting the view throws, nothing
  * is saved and no item is taken or given.
  * @template S, V
- * @param {(state: S, held: string | null) => import('./stations.js').Result<S>} interact
+ * @param {(state: S, held: string | null, carried: import('./stations.js').Carried) => import('./stations.js').Result<S>} interact
  * @param {(state: S) => V} view
  * @param {S} state
  * @param {string | null} held
+ * @param {import('./stations.js').Carried} carried
  * @param {{ setView(view: V): void, save(state: S): void, apply(result: import('./stations.js').Result<S>): void }} io
  */
-export function interactStation(interact, view, state, held, io) {
-  const result = interact(state, held);
+export function interactStation(interact, view, state, held, carried, io) {
+  const result = interact(state, held, carried);
   io.setView(view(result.state));
   io.save(result.state);
   io.apply(result);

@@ -1,15 +1,16 @@
 import { BURNT_AT, COOKED_AT, cookStage } from './cooking.js';
 import { evaluateAssembly, evaluateFor, FAILED } from './recipes.js';
 import { ITEMS } from './catalog.js';
-import { CUTTABLE, TIMED, POT_DEF, WOK_DEF, SPIT } from './processes.js';
+import { CUTTABLE, CUT_TOOLS, TIMED, POT_DEF, WOK_DEF, SPIT } from './processes.js';
 
 /**
  * take: consume one held item. give: item id handed to the player, `count` of them
  * as one stack (default 1). hint: lang key for the action bar. sound: sound id to play at the block.
- * particle: particle id spawned just above the block.
+ * particle: particle id spawned just above the block. consume: remove one of this item from any inventory slot.
  * @template S
- * @typedef {{ state: S, take?: boolean, give?: string, count?: number, hint?: string, sound?: string, particle?: string }} Result
+ * @typedef {{ state: S, take?: boolean, consume?: string, give?: string, count?: number, hint?: string, sound?: string, particle?: string }} Result
  */
+/** Whether the player carries the item in any inventory slot. @typedef {(id: string) => boolean} Carried */
 /** item: what lies on the station (null when empty); ticks: cooking time so far. @typedef {{ item: string | null, ticks: number }} TimedState */
 /** @typedef {TimedState} GrillState */
 /** items: what is in the pot, in order; ticks: cooking time so far. @typedef {{ items: string[], ticks: number }} PotState */
@@ -40,9 +41,25 @@ export const WASH_TICKS = 200;
 export const DISHWASHER_MAX = 4;
 export const CABINET_MAX = 8;
 
+/** A player who carries nothing: only the held item counts. */
+export const NO_CARRY = (/** @type {string} */ _id) => false;
+
+/**
+ * The first of `tools` that is in hand, else the first the inventory carries.
+ * @param {string | null} held
+ * @param {Carried} carried
+ * @param {string[]} tools
+ * @returns {{ id: string, inHand: boolean } | null}
+ */
+export function findTool(held, carried, tools) {
+  const inHand = tools.find((t) => t === held);
+  if (inHand !== undefined) return { id: inHand, inHand: true };
+  const inBag = tools.find((t) => carried(t));
+  return inBag === undefined ? null : { id: inBag, inHand: false };
+}
+
 const ID = {
   rawPatty: 'kochmod:raw_patty', // what a stage 1 grill was cooking
-  knife: 'kochmod:knife',
   dirtyPlate: 'kochmod:dirty_plate',
   cleanPlate: 'kochmod:clean_plate',
 };
@@ -75,15 +92,16 @@ export function timedStation(def) {
     /**
      * @param {TimedState} state
      * @param {string | null} held
+     * @param {Carried} [carried]
      * @returns {Result<TimedState>}
      */
-    interact(state, held) {
+    interact(state, held, carried = NO_CARRY) {
       if (state.item === null) {
         if (accepted(held)) return { state: { item: /** @type {string} */ (held), ticks: 0 }, take: true, sound: def.sound };
         return { state };
       }
-      if (held === def.tool) return { state: { item: null, ticks: 0 }, give: resultOf(state.item, state.ticks) };
       if (accepted(held)) return { state, hint: def.hintFull };
+      if (findTool(held, carried, def.tools)) return { state: { item: null, ticks: 0 }, give: resultOf(state.item, state.ticks) };
       return { state, hint: def.hintTool };
     },
     /**
@@ -136,15 +154,18 @@ export function potStation(def) {
     /**
      * @param {PotState} state
      * @param {string | null} held
+     * @param {Carried} [carried]
      * @returns {Result<PotState>}
      */
-    interact(state, held) {
+    interact(state, held, carried = NO_CARRY) {
       const { items, ticks } = state;
-      if (held === def.tool) {
+      const tool = isFood(held ?? '') ? null : findTool(held, carried, def.tools);
+      if (tool) {
         if (items.length === 0) return { state, hint: def.hints.empty };
         if (ticks < COOKED_AT) return { state, hint: def.hints.cooking };
         const give = cookStage(ticks) === 'burnt' ? FAILED : evaluateFor(def.recipes, items);
-        return def.consumesTool ? { state: initial, take: true, give } : { state: initial, give };
+        if (!def.consumesTool) return { state: initial, give };
+        return tool.inHand ? { state: initial, take: true, give } : { state: initial, consume: tool.id, give };
       }
       if (held === null) return items.length === 0 ? { state } : { state, hint: def.hints.needTool };
       if (!isFood(held)) return { state };
@@ -207,14 +228,15 @@ const SPIT_EMPTY = { meat: false, ticks: 0, slices: 0 };
  * Raw meat goes on an empty spit; the knife cuts cooked meat off, one slice at a time.
  * @param {SpitState} state
  * @param {string | null} held
+ * @param {Carried} [carried]
  * @returns {Result<SpitState>}
  */
-export function spitInteract(state, held) {
+export function spitInteract(state, held, carried = NO_CARRY) {
   if (held === SPIT.raw) {
     if (state.meat) return { state, hint: 'kochmod.hint.spit_busy' };
     return { state: { meat: true, ticks: 0, slices: SPIT_SLICES }, take: true };
   }
-  if (held !== SPIT.tool) return { state };
+  if (!findTool(held, carried, SPIT.tools)) return { state };
   if (!state.meat) return { state, hint: 'kochmod.hint.spit_empty' };
   if (state.ticks < COOKED_AT) return { state, hint: 'kochmod.hint.spit_raw' };
   const slices = state.slices - 1;
@@ -273,18 +295,19 @@ export const INITIAL = {
 /**
  * @param {BoardState} state
  * @param {string | null} held
+ * @param {Carried} [carried]
  * @returns {Result<BoardState>}
  */
-export function boardInteract(state, held) {
+export function boardInteract(state, held, carried = NO_CARRY) {
   const cuttable = held !== null && Object.hasOwn(CUTTABLE, held);
   if (state.item === null) {
     if (cuttable) return { state: { item: held }, take: true };
     return { state };
   }
-  if (held === null) return { state: { item: null }, give: state.item };
-  if (held === ID.knife && Object.hasOwn(CUTTABLE, state.item)) {
+  if (Object.hasOwn(CUTTABLE, state.item) && findTool(held, carried, CUT_TOOLS)) {
     return { state: { item: CUTTABLE[state.item] }, sound: 'kochmod.chop' };
   }
+  if (held === null) return { state: { item: null }, give: state.item };
   if (cuttable) return { state, hint: 'kochmod.hint.board_full' };
   return { state };
 }
@@ -313,9 +336,10 @@ export function boardDrops(state) {
 /**
  * @param {CounterState} state
  * @param {string | null} held
+ * @param {Carried} [_carried] ignored: same signature as every station
  * @returns {Result<CounterState>}
  */
-export function counterInteract(state, held) {
+export function counterInteract(state, held, _carried = NO_CARRY) {
   if (held === null) {
     if (state.items.length === 0) return { state };
     return { state: { items: [] }, give: evaluateAssembly(state.items), sound: 'kochmod.plate' };
@@ -351,9 +375,10 @@ export function counterDrops(state) {
 /**
  * @param {DishwasherState} state
  * @param {string | null} held
+ * @param {Carried} [_carried] ignored: same signature as every station
  * @returns {Result<DishwasherState>}
  */
-export function dishwasherInteract(state, held) {
+export function dishwasherInteract(state, held, _carried = NO_CARRY) {
   if (held === ID.dirtyPlate) {
     if (state.plates >= DISHWASHER_MAX) return { state, hint: 'kochmod.hint.dishwasher_full' };
     return { state: { plates: state.plates + 1, ticks: 0 }, take: true, sound: 'kochmod.bubble' };
@@ -398,9 +423,10 @@ export function dishwasherDrops(state) {
 /**
  * @param {CabinetState} state
  * @param {string | null} held
+ * @param {Carried} [_carried] ignored: same signature as every station
  * @returns {Result<CabinetState>}
  */
-export function cabinetInteract(state, held) {
+export function cabinetInteract(state, held, _carried = NO_CARRY) {
   if (held === ID.cleanPlate) {
     if (state.plates >= CABINET_MAX) return { state, hint: 'kochmod.hint.cabinet_full' };
     return { state: { plates: state.plates + 1 }, take: true, sound: 'kochmod.plate' };
@@ -481,8 +507,8 @@ export function trashDrops(_state) {
 /** The trash can's rules as one station (for the station glue and the tick loop). */
 export const trash = {
   INITIAL: INITIAL.trash,
-  /** @param {TrashState} state @param {string | null} held @returns {Result<TrashState>} */
-  interact: (state, held) => trashInteract(held, state),
+  /** @param {TrashState} state @param {string | null} held @param {Carried} [_carried] @returns {Result<TrashState>} */
+  interact: (state, held, _carried) => trashInteract(held, state),
   tick: trashTick,
   view: trashView,
   drops: trashDrops,

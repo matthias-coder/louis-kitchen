@@ -144,13 +144,13 @@ export function spawnDelay(rnd) {
  * @param {string} served
  * @param {Set<Cuisine>} offered cuisines the kitchen offers now
  * @param {() => number} rnd
- * @returns {{ happy: boolean, emeralds: number }}
+ * @returns {{ happy: boolean, emeralds: number, exact: boolean }} exact: the wished dish itself (a fitting other dish is happy but not exact)
  */
 export function rate(wish, served, offered, rnd) {
-  if (served === FAILED) return { happy: false, emeralds: 0 };
-  if (served === wish) return { happy: true, emeralds: 1 + Math.floor(rnd() * 3) };
-  if (cuisinesOf(served).some((c) => offered.has(c))) return { happy: true, emeralds: 1 };
-  return { happy: false, emeralds: 0 };
+  if (served === FAILED) return { happy: false, emeralds: 0, exact: false };
+  if (served === wish) return { happy: true, emeralds: 1 + Math.floor(rnd() * 3), exact: true };
+  if (cuisinesOf(served).some((c) => offered.has(c))) return { happy: true, emeralds: 1, exact: false };
+  return { happy: false, emeralds: 0, exact: false };
 }
 
 /**

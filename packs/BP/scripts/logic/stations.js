@@ -240,7 +240,7 @@ export function spitInteract(state, held, carried = NO_CARRY) {
     if (state.meat) return { state, hint: 'kochmod.hint.spit_busy' };
     return { state: { meat: true, ticks: 0, slices: SPIT_SLICES }, take: true };
   }
-  if (!findTool(held, carried, SPIT.tools)) return { state };
+  if (!findTool(held, carried, SPIT.tools)) return state.meat ? { state, hint: 'kochmod.hint.need_multitool' } : { state };
   if (!state.meat) return { state, hint: 'kochmod.hint.spit_empty' };
   if (state.ticks < COOKED_AT) return { state, hint: 'kochmod.hint.spit_raw' };
   const slices = state.slices - 1;
@@ -312,7 +312,11 @@ export function boardInteract(state, held, carried = NO_CARRY) {
   if (Object.hasOwn(CUTTABLE, state.item) && findTool(held, carried, CUT_TOOLS)) {
     return { state: { item: CUTTABLE[state.item] }, sound: 'kochmod.chop' };
   }
-  if (held === null) return { state: { item: null }, give: state.item };
+  if (held === null) {
+    // a whole item comes back too (child-friendly), but the hint says what cuts it
+    if (Object.hasOwn(CUTTABLE, state.item)) return { state: { item: null }, give: state.item, hint: 'kochmod.hint.need_multitool' };
+    return { state: { item: null }, give: state.item };
+  }
   if (cuttable) return { state, hint: 'kochmod.hint.board_full' };
   return { state };
 }

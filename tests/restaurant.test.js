@@ -93,12 +93,13 @@ test('spawnDelay', () => {
 });
 
 test('rate', () => {
-  assert.deepEqual(rate(HAM, HAM, new Set(['burger']), () => 0), { happy: true, emeralds: 1 });
-  assert.deepEqual(rate(HAM, HAM, new Set(['burger']), () => 0.999), { happy: true, emeralds: 3 });
-  assert.deepEqual(rate(HAM, CHEESE, new Set(['burger']), () => 0.5), { happy: true, emeralds: 1 });
-  assert.deepEqual(rate(HAM, k('sushi'), new Set(['burger']), () => 0.5), { happy: false, emeralds: 0 });
-  assert.deepEqual(rate(HAM, CHEESE, new Set(), () => 0.5), { happy: false, emeralds: 0 });
-  assert.deepEqual(rate(HAM, FAILED, new Set(['burger']), () => 0.5), { happy: false, emeralds: 0 });
+  assert.deepEqual(rate(HAM, HAM, new Set(['burger']), () => 0), { happy: true, emeralds: 1, exact: true });
+  assert.deepEqual(rate(HAM, HAM, new Set(['burger']), () => 0.999), { happy: true, emeralds: 3, exact: true });
+  assert.deepEqual(rate(HAM, CHEESE, new Set(['burger']), () => 0.5), { happy: true, emeralds: 1, exact: false });
+  assert.deepEqual(rate(HAM, k('sushi'), new Set(['burger']), () => 0.5), { happy: false, emeralds: 0, exact: false });
+  assert.deepEqual(rate(HAM, CHEESE, new Set(), () => 0.5), { happy: false, emeralds: 0, exact: false });
+  assert.deepEqual(rate(HAM, FAILED, new Set(['burger']), () => 0.5), { happy: false, emeralds: 0, exact: false });
+  assert.equal(rate(FAILED, FAILED, new Set(['burger']), () => 0.5).exact, false);
 });
 
 test('seatStillValid only when all three exist', () => {

@@ -192,10 +192,7 @@ function occupied(io) {
  */
 function assess(bellKey, io, rnd) {
   const bell = parseLocKey(bellKey);
-  const near = (/** @type {string} */ key) => {
-    const p = parseLocKey(key);
-    return p.dimensionId === bell.dimensionId && withinRadius(bell, p);
-  };
+  const near = nearBell(bell);
   const dist2 = (/** @type {string} */ key) => {
     const p = parseLocKey(key);
     return (p.x - bell.x) ** 2 + (p.y - bell.y) ** 2 + (p.z - bell.z) ** 2;
@@ -236,17 +233,24 @@ export function wantsTakeaway(state, found, rnd) {
 }
 
 /**
+ * @param {ReturnType<typeof parseLocKey>} bell
+ * @returns {(key: string) => boolean} whether a registry key lies in the bell's dimension and within reach
+ */
+function nearBell(bell) {
+  return (key) => {
+    const p = parseLocKey(key);
+    return p.dimensionId === bell.dimensionId && withinRadius(bell, p);
+  };
+}
+
+/**
  * Station kinds with a registered device within reach of the bell.
  * @param {string} bellKey
  * @param {GuestIo} io
  * @returns {Set<string>}
  */
 export function kindsNear(bellKey, io) {
-  const bell = parseLocKey(bellKey);
-  const near = (/** @type {string} */ key) => {
-    const p = parseLocKey(key);
-    return p.dimensionId === bell.dimensionId && withinRadius(bell, p);
-  };
+  const near = nearBell(parseLocKey(bellKey));
   return new Set(STATION_KINDS.filter((kind) => io.registryList(kind).some(near)));
 }
 
@@ -425,8 +429,8 @@ function stepGuest(seat, entry, dt, io, rnd) {
         guest.update({ timer });
         return keep;
       }
-      const { happy, emeralds } = rate(d.wish, d.served, offeredCuisines(kindsNear(d.bell, io)), rnd);
-      guest.look({ mood: happy ? 'happy' : 'grumpy' });
+      const { happy, emeralds, exact } = rate(d.wish, d.served, offeredCuisines(kindsNear(d.bell, io)), rnd);
+      guest.look({ mood: happy ? (exact ? 'happy' : 'neutral') : 'grumpy' });
       guest.react(happy);
       if (emeralds > 0) io.payout(table, emeralds);
       io.setPlate(table, leftover(d.served));
@@ -615,11 +619,11 @@ export function serveTakeaway(guestId, held, carried, io, rnd = Math.random) {
     return { hint: 'kochmod.hint.takeaway_pizza_only' };
   }
   if (!carried(PIZZA_BOX)) return { hint: 'kochmod.hint.need_pizza_box' };
-  const { happy, emeralds } = rate(d.wish, held, new Set(['italian']), rnd);
-  guest.look({ mood: happy ? 'happy' : 'grumpy', wish: 'none' });
+  const { happy, emeralds, exact } = rate(d.wish, held, new Set(['italian']), rnd);
+  guest.look({ mood: happy ? (exact ? 'happy' : 'neutral') : 'grumpy', wish: 'none' });
   guest.react(happy);
-  guest.pay(emeralds);
   guest.update({ served: held, phase: 'takeaway_leaving', timer: LEAVE_TICKS });
+  guest.pay(emeralds);
   return { take: true, consume: PIZZA_BOX };
 }
 

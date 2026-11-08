@@ -379,6 +379,8 @@ test('a cheeseburger for a hamburger wish pays one emerald; after the grill is g
     return { w, id };
   };
   const a = eat(true);
+  assert.equal(a.w.guests[a.id].look.mood, 'neutral', 'a fitting but different dish: neutral, not happy');
+  assert.ok(a.w.log.some((e) => e[0] === 'react' && e[1] === a.id && e[2] === true));
   assert.ok(a.w.log.some((e) => e[0] === 'react' && e[2] === true));
   assert.ok(a.w.log.some((e) => e[0] === 'payout' && e[2] === 1));
   const b = eat(false);
@@ -893,6 +895,17 @@ test('serveTakeaway: fries are refused, a pizza without a box asks for the box, 
   assert.equal(w.guests[id].removed, true);
   assert.ok(w.log.some((e) => e[0] === 'remove' && e[1] === id && e[2] === true));
   assert.equal(w.bells[BELL_KEY].takeaway, undefined);
+});
+
+test('serveTakeaway: a fitting other pizza pays one emerald, nods, and the guest looks neutral', () => {
+  const w = fakeWorld({ registries: OVEN });
+  ringBell(BELL_KEY, w.io, () => 0.1);
+  const id = w.bells[BELL_KEY].takeaway.guestId;
+  w.guests[id].data.wish = 'kochmod:salami_pizza';
+  assert.deepEqual(serveTakeaway(id, PIZZA, carry(PIZZA_BOX), w.io, zero), { take: true, consume: PIZZA_BOX });
+  assert.deepEqual(w.log.filter((e) => e[0] === 'pay'), [['pay', id, 1]]);
+  assert.ok(w.log.some((e) => e[0] === 'react' && e[1] === id && e[2] === true));
+  assert.equal(w.guests[id].look.mood, 'neutral');
 });
 
 test('serveTakeaway: an empty hand only hints, without a head shake', () => {

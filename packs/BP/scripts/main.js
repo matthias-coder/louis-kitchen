@@ -1,4 +1,4 @@
-import { system, world } from '@minecraft/server';
+import { system, world, Player } from '@minecraft/server';
 import { registerCrates } from './world/crates.js';
 import { registerStations, tickStations, onBlockExploded } from './world/stations.js';
 import { registerFurniture, onFurnitureExploded } from './world/furniture.js';
@@ -28,5 +28,15 @@ world.afterEvents.playerInteractWithEntity.subscribe(({ player, target }) => {
     onGuestInteract(player, target);
   } catch (e) {
     console.warn(`kochmod: takeaway serve failed: ${e}`);
+  }
+});
+
+// On touch devices a tap on an entity is an attack and no interact event fires: serve on the hit too.
+// The guest's damage sensor blocks the damage; serveTakeaway's phase check stops a double serve.
+world.afterEvents.entityHitEntity.subscribe(({ damagingEntity, hitEntity }) => {
+  try {
+    if (damagingEntity instanceof Player && hitEntity.typeId === 'kochmod:guest') onGuestInteract(damagingEntity, hitEntity);
+  } catch (e) {
+    console.warn(`kochmod: takeaway serve (hit) failed: ${e}`);
   }
 });

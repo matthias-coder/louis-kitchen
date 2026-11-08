@@ -139,6 +139,15 @@ test('board: already cut or unknown item + multitool unchanged', () => {
     assert.deepEqual(boardInteract(s, MULTITOOL), { state: s });
   }
 });
+test('board: a whole item + empty hand and no multitool gives it back with the multitool hint', () => {
+  const r = boardInteract({ item: k('salmon') }, null);
+  assert.equal(r.give, k('salmon'));
+  assert.equal(r.hint, 'kochmod.hint.need_multitool');
+  assert.deepEqual(r.state, { item: null });
+});
+test('board: a cut item + empty hand gives it back without a hint', () => {
+  assert.deepEqual(boardInteract({ item: k('tomato_slices') }, null), { state: { item: null }, give: k('tomato_slices') });
+});
 test('board: occupied + empty hand gives item', () => {
   const r = boardInteract({ item: k('salmon') }, null);
   assert.equal(r.give, k('salmon'));
@@ -441,6 +450,11 @@ test('pot: adding to a cooked pot says it is cooking and takes nothing', () => {
   }
 });
 
+test('pot: a finished soup does not take an ingredient and is not scooped, even with a soup bowl in the inventory', () => {
+  const s = { items: RAMEN_PARTS, ticks: COOKED_AT };
+  assert.deepEqual(potInteract(s, k('rice'), carry(SOUP_BOWL)), { state: s, hint: 'kochmod.hint.pot_cooking' });
+});
+
 test('pot: tools other than the bowl, dishes, plates and unknown ids change nothing', () => {
   const s = { items: [k('rice')], ticks: 20 };
   for (const held of [k('knife'), k('spatula'), k('pizza_peel'), k('ramen'), k('failed_dish'), k('clean_plate'), k('dirty_plate'), k('nope')]) {
@@ -635,7 +649,7 @@ test('spit: the multitool on an empty spit asks for doner meat', () => {
 test('spit: other items, an empty hand and unknown ids change nothing', () => {
   for (const s of [SPIT_EMPTY, spitAt(COOKED_AT)]) {
     for (const held of [null, MEAT, k('raw_patty'), k('spatula'), k('bowl'), k('doner'), k('nope')]) {
-      assert.deepEqual(spitInteract(s, held), { state: s }, String(held));
+      assert.deepEqual(spitInteract(s, held), s.meat ? { state: s, hint: 'kochmod.hint.need_multitool' } : { state: s }, String(held));
     }
   }
 });
@@ -786,7 +800,7 @@ test('old tools still work: spatula at the grill, pizza peel at the oven', () =>
 });
 test('board: an empty hand with the multitool in the inventory cuts, without it takes the item back', () => {
   assert.deepEqual(boardInteract({ item: k('tomato') }, null, carry(MULTITOOL)), { state: { item: k('tomato_slices') }, sound: 'kochmod.chop' });
-  assert.deepEqual(boardInteract({ item: k('tomato') }, null, NO_CARRY), { state: { item: null }, give: k('tomato') });
+  assert.deepEqual(boardInteract({ item: k('tomato') }, null, NO_CARRY), { state: { item: null }, give: k('tomato'), hint: 'kochmod.hint.need_multitool' });
   assert.deepEqual(boardInteract({ item: k('tomato_slices') }, null, carry(MULTITOOL)), { state: { item: null }, give: k('tomato_slices') });
 });
 test('board: the old knife still cuts, in hand and from the inventory', () => {
@@ -838,6 +852,7 @@ test('cabinet: empty hand opens the menu; the menu lists plate, bowl and box wit
 });
 test('cabinet: taking plates, bowls and boxes', () => {
   assert.deepEqual(cabinetTake({ plates: 1, bowls: 2 }, 'plate'), { state: { plates: 0, bowls: 2 }, give: k('clean_plate') });
+  assert.deepEqual(cabinetTake({ plates: 1, bowls: 2 }, 'bowl'), { state: { plates: 1, bowls: 1 }, give: SOUP_BOWL });
   assert.deepEqual(cabinetTake({ plates: 0, bowls: 2 }, 'plate'), { state: { plates: 0, bowls: 2 }, hint: 'kochmod.hint.cabinet_empty' });
   assert.deepEqual(cabinetTake({ plates: 0, bowls: 0 }, 'bowl'), { state: { plates: 0, bowls: 0 }, hint: 'kochmod.hint.cabinet_no_bowls' });
   assert.deepEqual(cabinetTake({ plates: 0, bowls: 0 }, 'box'), { state: { plates: 0, bowls: 0 }, give: PIZZA_BOX });

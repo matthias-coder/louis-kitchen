@@ -23,6 +23,11 @@
           "values": ["neutral", "happy", "grumpy"],
           "default": "neutral",
           "client_sync": true
+        },
+        "kochmod:takeaway": {
+          "type": "bool",
+          "default": false,
+          "client_sync": true
         }
       }
     },
@@ -67,6 +72,10 @@
         "add": { "component_groups": ["kochmod:walking"] }
       },
       "kochmod:sit": {
+        "remove": { "component_groups": ["kochmod:walking"] },
+        "add": { "component_groups": ["kochmod:seated"] }
+      },
+      "kochmod:stay": {
         "remove": { "component_groups": ["kochmod:walking"] },
         "add": { "component_groups": ["kochmod:seated"] }
       }

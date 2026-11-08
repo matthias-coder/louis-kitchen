@@ -521,6 +521,12 @@ export const guestModel = [
     pivot: [0, 30, 0],
     cubes: [solid([2, 29.5, -0.5], [1, 1, 1], 'dot'), solid([3.5, 31, -0.75], [1.5, 1.5, 1.5], 'dot')],
   },
+  {
+    name: 'run',
+    parent: 'root',
+    pivot: [0, 40, 0],
+    cubes: [box([-15, 36, -0.05], [10, 10, 0.1], 'run_symbol', 'run_symbol', 'bubble_edge', 'bubble_edge')],
+  },
   ...['hamburger', 'cheeseburger', 'pizza_margherita', 'salami_pizza', 'ramen', 'potato_soup', 'doner', 'sushi', 'fried_noodles', 'fries'].map((wish) => (/** @type {EntityBone} */ ({
     name: `bubble_${wish}`,
     parent: 'bubble',

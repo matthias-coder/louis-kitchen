@@ -185,11 +185,13 @@ test('fried noodle steps: cut the carrot, then the wok with the wok spatula', ()
 test('every station lists the multitool first and its old tool second; the book shows the multitool', () => {
   assert.deepEqual(TIMED.grill.tools, [MULTITOOL, k('spatula')]);
   assert.deepEqual(TIMED.oven.tools, [MULTITOOL, k('pizza_peel')]);
+  assert.deepEqual(TIMED.fryer.tools, [MULTITOOL]);
   assert.deepEqual(SPIT.tools, [MULTITOOL, k('knife')]);
   assert.deepEqual(CUT_TOOLS, [MULTITOOL, k('knife')]);
   assert.deepEqual(WOK_DEF.tools, [MULTITOOL, k('wok_spatula')]);
-    for (const def of [TIMED.grill, TIMED.oven, SPIT, WOK_DEF]) assert.equal(def.tool, MULTITOOL);
+    for (const def of [TIMED.grill, TIMED.oven, TIMED.fryer, SPIT, WOK_DEF]) assert.equal(def.tool, MULTITOOL);
   assert.equal(TIMED.grill.hintTool, 'kochmod.hint.need_multitool');
+  assert.equal(TIMED.fryer.hintTool, 'kochmod.hint.need_multitool');
   assert.deepEqual(stepsFor(k('hamburger'))[0], { item: k('raw_patty'), station: 'grill', tool: MULTITOOL, result: k('cooked_patty') });
 });
 

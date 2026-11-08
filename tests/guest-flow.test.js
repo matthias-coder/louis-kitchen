@@ -67,6 +67,8 @@ function fakeWorld(over = {}) {
       distanceTo: () => g.dist,
       sit: (seat, table) => { log.push(['sit', id, seat, table]); },
       hold: () => { log.push(['hold', id]); },
+      stay: () => { log.push(['stay', id]); },
+      pay: (n) => { log.push(['pay', id, n]); },
       react: (happy) => { log.push(['react', id, happy]); },
       remove: (poof) => { g.removed = true; log.push(['remove', id, poof]); },
     };

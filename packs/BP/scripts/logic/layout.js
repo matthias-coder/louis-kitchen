@@ -271,7 +271,7 @@ function standard(s) {
 
 /**
  * Stage 1 restaurant: every device. The kitchen row fills x = 1 to 11; (12, 1, 9) stays free as the way to
- * the corner crate, so the trash can stands against the left wall at (1, 1, 6), two cells in front of the spit.
+ * the corner crate, so the trash can stands against the left wall at (1, 1, 6), two cells in front of the spit, the fryer beside it at (1, 1, 7).
  */
 const classic = () => standard({
   floor: (x, z) => (z >= 5 ? KITCHEN_FLOOR : FLOOR),
@@ -285,7 +285,7 @@ const classic = () => standard({
   fryerAtWall: 7,
 });
 
-/** Burger-Laden: red/white terracotta, checkered floor. Trash can: (9, 1, 9), right of the dish cabinet. */
+/** Burger-Laden: red/white terracotta, checkered floor. Trash can: (10, 1, 9), right of the fryer. */
 const burger = () => standard({
   floor: checker(mc('black_concrete'), mc('white_concrete')),
   wall: (x, y) => (y === 1 || y === 4 ? mc('red_terracotta') : WALL),
@@ -348,7 +348,7 @@ function doner() {
 /**
  * Mega-Restaurant, 20 x 14 x 9: two storeys of three wall layers each, the upper floor is layer 4.
  * Ground floor: dining room, half-wall, the full kitchen along the back wall, stairs along the left wall.
- * Upper floor: dining only, with its own bell. Trash can: (12, 1, 12), right of the wok.
+ * Upper floor: dining only, with its own bell. Trash can: (13, 1, 12), right of the fryer.
  */
 function mega() {
   const p = plan(20, 14, 9);

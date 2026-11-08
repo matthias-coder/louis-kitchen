@@ -79,6 +79,12 @@ function guestHandle(entity) {
     look(patch) {
       for (const [k, v] of Object.entries(patch)) entity.setProperty(`kochmod:${k}`, v);
     },
+    stay() {
+      entity.triggerEvent('kochmod:stay');
+    },
+    pay(emeralds) {
+      entity.dimension.spawnItem(new ItemStack('minecraft:emerald', emeralds), entity.location);
+    },
     distanceTo(seatKey) {
       return distance(entity.location, seatPos(seatKey));
     },

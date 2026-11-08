@@ -46,7 +46,7 @@ const PREFIX = 'kochmod:';
  * are full item ids (`kochmod:hamburger`).
  * @typedef {{ phase: string, seat: string, table: string, bell: string, timer: number, served: string, wish: string }} GuestData
  */
-/** @typedef {{ wish?: string, pose?: 'stand' | 'sit', mood?: 'neutral' | 'happy' | 'grumpy' }} Look */
+/** @typedef {{ wish?: string, pose?: 'stand' | 'sit', mood?: 'neutral' | 'happy' | 'grumpy', takeaway?: boolean }} Look */
 /**
  * @typedef {{
  *   id: string,
@@ -58,6 +58,8 @@ const PREFIX = 'kochmod:';
  *   hold(seatKey: string, tableKey: string): void,
  *   react(happy: boolean): void,
  *   remove(poof: boolean): void,
+ *   stay(): void,
+ *   pay(emeralds: number): void,
  * }} Guest
  */
 /**

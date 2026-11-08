@@ -486,3 +486,13 @@ test('trash can: name, hints, sound and block sound exist', () => {
   const rpBlocks = JSON.parse(fs.readFileSync(path.join(RP, 'blocks.json'), 'utf8'));
   assert.equal(rpBlocks['kochmod:trash_can']?.sound, 'metal');
 });
+
+test('guest: takeaway property, run bone and render line', () => {
+  const guest = JSON.parse(fs.readFileSync(path.join(BP, 'entities', 'guest.json'), 'utf8'))['minecraft:entity'];
+  assert.deepEqual(guest.description.properties['kochmod:takeaway'], { type: 'bool', default: false, client_sync: true });
+  assert.ok(guest.events['kochmod:stay']);
+  const geo = JSON.parse(fs.readFileSync(path.join(root, 'packs/RP/models/entity/guest.geo.json'), 'utf8'))['minecraft:geometry'][0];
+  assert.ok(geo.bones.some((b) => b.name === 'run'));
+  const rc = JSON.parse(fs.readFileSync(path.join(root, 'packs/RP/render_controllers/guest.render_controllers.json'), 'utf8'));
+  assert.ok(rc.render_controllers['controller.render.kochmod.guest'].part_visibility.some((p) => p.run === "q.property('kochmod:takeaway')"));
+});

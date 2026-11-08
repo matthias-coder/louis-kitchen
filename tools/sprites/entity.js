@@ -47,6 +47,7 @@ export const guestLayout = {
   bubble_sushi: [104, 24, 20, 20],
   bubble_fried_noodles: [104, 44, 20, 20],
   bubble_fries: [128, 0, 20, 20],
+  run_symbol: [128, 20, 12, 12],
   bubble_edge: [104, 0, 1, 1],
   dot: [106, 0, 2, 2],
 };
@@ -134,6 +135,27 @@ function drawBubble(p, r, dish) {
   pixelsOf(dish).forEach((row, y) => row.forEach((c, x) => { if (c) p.px(r, 2 + x, 2 + y, c); }));
 }
 
+/**
+ * White sign with a running stick figure: the guest takes the dish away.
+ * @param {ReturnType<typeof painter>} p
+ * @param {Region} r 12x12
+ */
+function drawRunSymbol(p, r) {
+  p.fill(r, C.bubble);
+  const n = r[2];
+  for (let i = 0; i < n; i++) {
+    p.px(r, i, 0, C.outline); p.px(r, i, n - 1, C.outline);
+    p.px(r, 0, i, C.outline); p.px(r, n - 1, i, C.outline);
+  }
+  const dots = [
+    [6, 2], [7, 2], [6, 3], [7, 3], // head
+    [5, 4], [6, 4], [7, 5], [8, 5], [4, 5], // arms and shoulders
+    [5, 5], [5, 6], [6, 6], // torso
+    [4, 7], [7, 7], [3, 8], [8, 8], [2, 9], [8, 9], // legs
+  ];
+  for (const [x, y] of dots) p.px(r, x, y, C.outline);
+}
+
 function drawGuest() {
   const L = guestLayout;
   const px = blank(GUEST_TEXTURE.width, GUEST_TEXTURE.height);
@@ -208,6 +230,7 @@ function drawGuest() {
   drawBubble(p, L.bubble_sushi, items.sushi);
   drawBubble(p, L.bubble_fried_noodles, items.fried_noodles);
   drawBubble(p, L.bubble_fries, items.fries);
+  drawRunSymbol(p, L.run_symbol);
   p.fill(L.bubble_edge, C.outline);
   p.fill(L.dot, C.bubble);
   return px;

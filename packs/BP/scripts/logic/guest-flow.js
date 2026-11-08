@@ -257,7 +257,8 @@ export function kindsNear(bellKey, io) {
  * @returns {GuestAvailability}
  */
 export function guestAvailability(bellKey, io) {
-  const { status } = assess(bellKey, io, () => 0);
+  const { status, free } = assess(bellKey, io, () => 0);
+  if (status === 'ok' && free.length === 0 && loadBell(bellKey, io)?.takeaway) return 'no_seat'; // only the takeaway guest was possible, and it waits
   return status === 'full' ? 'no_seat' : status;
 }
 
@@ -347,6 +348,17 @@ function cleanup(entry, guest, tableExists, io) {
 }
 
 /**
+ * The guest entity was not found this step.
+ * @template {{ missing?: number }} E
+ * @param {E} entry
+ * @returns {E | null} the entry with one more miss, or null when the grace period is over
+ */
+function missed(entry) {
+  const missing = (entry.missing ?? 0) + 1;
+  return missing >= MISSING_GRACE ? null : { ...entry, missing };
+}
+
+/**
  * One step of the takeaway guest: it waits at the bell; after paying it leaves.
  * @param {{ guestId: string, missing?: number }} entry
  * @param {number} dt
@@ -356,10 +368,7 @@ function cleanup(entry, guest, tableExists, io) {
  */
 function stepTakeaway(entry, dt, io, _rnd) {
   const guest = io.getGuest(entry.guestId);
-  if (!guest) {
-    const missing = (entry.missing ?? 0) + 1;
-    return missing >= MISSING_GRACE ? null : { ...entry, missing };
-  }
+  if (!guest) return missed(entry);
   const d = guest.data();
   if (d.phase !== 'takeaway_leaving') return { guestId: entry.guestId };
   const timer = d.timer - dt;
@@ -390,10 +399,7 @@ function stepGuest(seat, entry, dt, io, rnd) {
   if (!seatStillValid({ bellExists: true, chairExists: chairType === CHAIR, tableExists })) {
     return cleanup(entry, guest, tableExists, io);
   }
-  if (!guest) {
-    const missing = (entry.missing ?? 0) + 1;
-    return missing >= MISSING_GRACE ? cleanup(entry, undefined, tableExists, io) : { ...entry, missing };
-  }
+  if (!guest) return missed(entry) ?? cleanup(entry, undefined, tableExists, io);
   /** @type {SeatEntry} */
   const keep = { guestId, table };
   const d = guest.data();
@@ -525,15 +531,16 @@ function tickBell(bellKey, dt, io, rnd) {
       io.warn(`kochmod: guest step failed at seat ${seat} of bell ${bellKey}: ${e}`);
     }
   }
-  const cooldown = left && !state.pending ? spawnDelay(rnd) : state.cooldown;
   let takeaway = state.takeaway;
   if (loaded.takeaway) {
     try {
       takeaway = stepTakeaway(loaded.takeaway, dt, io, rnd) ?? undefined;
+      if (!takeaway) left = true;
     } catch (e) {
       io.warn(`kochmod: takeaway guest step failed at bell ${bellKey}: ${e}`);
     }
   }
+  const cooldown = left && !state.pending ? spawnDelay(rnd) : state.cooldown;
   const { takeaway: _t, ...base } = state;
   io.saveBell(bellKey, takeaway ? { ...base, guests, cooldown, takeaway } : { ...base, guests, cooldown });
 }

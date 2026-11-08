@@ -950,3 +950,24 @@ test('a missing takeaway guest is dropped after the grace period', () => {
   tick(w, 1);
   assert.equal(w.bells[BELL_KEY].takeaway, undefined);
 });
+
+test('after the takeaway guest leaves the bell gets a fresh spawn delay, so no new one comes within RETRY_TICKS', () => {
+  const w = fakeWorld({ registries: OVEN });
+  w.seatGuest({ phase: 'eating', timer: 100000, served: HAM });
+  w.guests.tk = { data: { phase: 'takeaway_leaving', seat: '', table: '', bell: BELL_KEY, timer: 10, served: PIZZA, wish: PIZZA }, look: {}, dist: 0, removed: false };
+  w.bells[BELL_KEY] = { ...w.bells[BELL_KEY], cooldown: 500, takeaway: { guestId: 'tk' } };
+  tick(w, 10);
+  assert.equal(w.guests.tk.removed, true);
+  assert.equal(w.bells[BELL_KEY].takeaway, undefined);
+  assert.ok(w.bells[BELL_KEY].cooldown >= SPAWN_MIN, `cooldown ${w.bells[BELL_KEY].cooldown}`);
+  tick(w, RETRY_TICKS);
+  assert.equal(Object.keys(w.guests).length, 2, 'no new guest yet');
+});
+
+test('guestAvailability: seats full and a takeaway guest waiting is no_seat; seats full without one is ok', () => {
+  const w = fakeWorld({ registries: OVEN });
+  w.seatGuest({ phase: 'eating', timer: 400, served: HAM });
+  assert.equal(guestAvailability(BELL_KEY, w.io), 'ok');
+  ringBell(BELL_KEY, w.io, () => 0.9);
+  assert.equal(guestAvailability(BELL_KEY, w.io), 'no_seat');
+});

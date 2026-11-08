@@ -88,6 +88,11 @@ export const CUISINES = /** @type {Record<Cuisine, { station: string, dishes: st
   classic: { station: 'pot', dishes: [dish('potato_soup')] },
 });
 
+/** Chance that a ring calls the takeaway guest (when none waits yet and the oven is near). */
+export const TAKEAWAY_CHANCE = 1 / 3;
+/** The only dishes a takeaway guest wants (served in a pizza box). */
+export const PIZZA_DISHES = CUISINES.italian.dishes;
+
 /**
  * @param {string} dishId
  * @returns {Cuisine[]}

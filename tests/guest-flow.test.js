@@ -2,10 +2,12 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   BELL, CHAIR, TABLE, RETRY_TICKS, MISSING_GRACE, RING_STAGGER,
-  tickBells, guestAvailability, serveTable, findWaitingGuest, releaseBell, sweepOrphans, ringBell, migrateBellState,
+  tickBells, guestAvailability, serveTable, findWaitingGuest, releaseBell, sweepOrphans, ringBell, migrateBellState, serveTakeaway,
 } from '../packs/BP/scripts/logic/guest-flow.js';
 import { WALK_TIMEOUT, EAT_TICKS, LEAVE_TICKS, SPAWN_MIN } from '../packs/BP/scripts/logic/restaurant.js';
 import { locKey } from '../packs/BP/scripts/logic/store.js';
+import { PIZZA_BOX } from '../packs/BP/scripts/logic/catalog.js';
+import { NO_CARRY } from '../packs/BP/scripts/logic/stations.js';
 
 const D = 'minecraft:overworld';
 /** @param {number} x @param {number} y @param {number} z */
@@ -834,4 +836,117 @@ test('after a soup the table keeps an empty bowl, after a burger an empty plate'
     tick(w);
     assert.equal(w.plates[TABLE_KEY], left, served);
   }
+});
+
+// ---- takeaway guests
+
+const PIZZA = 'kochmod:pizza_margherita';
+const FRIES = 'kochmod:fries';
+const OVEN = { oven: [K(8, 64, 5)] };
+/** @param {string} id */
+const carry = (id) => (/** @type {string} */ c) => c === id;
+
+test('with an oven nearby a ring may call a takeaway guest who stands at the bell with a pizza wish', () => {
+  const w = fakeWorld({ registries: OVEN });
+  assert.deepEqual(ringBell(BELL_KEY, w.io, () => 0.1), { status: 'ok', spawned: 1 });
+  const id = w.bells[BELL_KEY].takeaway.guestId;
+  assert.equal(id, 'g1');
+  assert.deepEqual(w.guests[id].data, {
+    phase: 'takeaway_waiting', seat: '', table: '', bell: BELL_KEY, timer: 0, served: '', wish: PIZZA,
+  });
+  assert.equal(w.guests[id].look.takeaway, true);
+  assert.equal(w.guests[id].look.wish, 'pizza_margherita');
+  assert.ok(w.log.some((e) => e[0] === 'stay' && e[1] === id));
+  assert.deepEqual(w.bells[BELL_KEY].guests, {});
+});
+
+test('no second takeaway guest while one waits; a table guest still comes', () => {
+  const w = fakeWorld({ registries: OVEN });
+  ringBell(BELL_KEY, w.io, () => 0.1);
+  assert.deepEqual(ringBell(BELL_KEY, w.io, () => 0.1), { status: 'ok', spawned: 1 });
+  assert.equal(w.bells[BELL_KEY].takeaway.guestId, 'g1');
+  assert.equal(w.guests.g2.data.phase, 'walking');
+  assert.equal(w.guests.g2.data.seat, CHAIR_KEY);
+  assert.equal(Object.keys(w.guests).length, 2);
+  // seat taken now and the takeaway guest waits: nobody else comes
+  assert.deepEqual(ringBell(BELL_KEY, w.io, () => 0.1), { status: 'full', spawned: 0 });
+  assert.equal(Object.keys(w.guests).length, 2);
+});
+
+test('serveTakeaway: fries are refused, a pizza without a box asks for the box, pizza plus box pays and the guest leaves', () => {
+  const w = fakeWorld({ registries: OVEN });
+  ringBell(BELL_KEY, w.io, () => 0.1);
+  const id = w.bells[BELL_KEY].takeaway.guestId;
+  assert.deepEqual(serveTakeaway(id, FRIES, NO_CARRY, w.io), { hint: 'kochmod.hint.takeaway_pizza_only' });
+  assert.ok(w.log.some((e) => e[0] === 'react' && e[1] === id && e[2] === false));
+  assert.deepEqual(serveTakeaway(id, PIZZA, NO_CARRY, w.io), { hint: 'kochmod.hint.need_pizza_box' });
+  assert.equal(w.guests[id].data.phase, 'takeaway_waiting');
+  assert.deepEqual(serveTakeaway(id, PIZZA, carry(PIZZA_BOX), w.io, zero), { take: true, consume: PIZZA_BOX });
+  assert.deepEqual(w.log.filter((e) => e[0] === 'pay'), [['pay', id, 1]]);
+  assert.equal(w.guests[id].data.phase, 'takeaway_leaving');
+  assert.equal(w.guests[id].data.served, PIZZA);
+  assert.equal(w.guests[id].data.timer, LEAVE_TICKS);
+  assert.equal(w.guests[id].look.mood, 'happy');
+  assert.equal(w.guests[id].look.wish, 'none');
+  assert.equal(serveTakeaway(id, PIZZA, carry(PIZZA_BOX), w.io, zero), null, 'already served');
+  tick(w, LEAVE_TICKS);
+  assert.equal(w.guests[id].removed, true);
+  assert.ok(w.log.some((e) => e[0] === 'remove' && e[1] === id && e[2] === true));
+  assert.equal(w.bells[BELL_KEY].takeaway, undefined);
+});
+
+test('serveTakeaway: an unknown guest id gets null', () => {
+  const w = fakeWorld({ registries: OVEN });
+  assert.equal(serveTakeaway('nobody', PIZZA, carry(PIZZA_BOX), w.io), null);
+  const seated = w.seatGuest({ phase: 'waiting' });
+  assert.equal(serveTakeaway(seated, PIZZA, carry(PIZZA_BOX), w.io), null);
+});
+
+test('a takeaway guest comes even when every seat is taken', () => {
+  const w = fakeWorld({ registries: OVEN });
+  w.seatGuest({ phase: 'eating', timer: 400, served: HAM });
+  assert.equal(guestAvailability(BELL_KEY, w.io), 'ok');
+  assert.deepEqual(ringBell(BELL_KEY, w.io, () => 0.9), { status: 'ok', spawned: 1 });
+  assert.equal(w.bells[BELL_KEY].takeaway.guestId, 'g2');
+  assert.equal(w.guests.g2.data.phase, 'takeaway_waiting');
+  assert.deepEqual(ringBell(BELL_KEY, w.io, () => 0.9), { status: 'full', spawned: 0 });
+});
+
+test('the spawner retries later when no seat is free and the takeaway guest already waits', () => {
+  const w = fakeWorld({ registries: OVEN, bells: { [BELL_KEY]: { guests: {}, cooldown: 0, takeaway: { guestId: 'g1' } } } });
+  w.seatGuest({ phase: 'eating', timer: 400, served: HAM });
+  w.guests.tk = { data: { phase: 'takeaway_waiting', seat: '', table: '', bell: BELL_KEY, timer: 0, served: '', wish: PIZZA }, look: {}, dist: 0, removed: false };
+  tick(w, 1);
+  assert.equal(w.bells[BELL_KEY].cooldown, RETRY_TICKS);
+  assert.equal(Object.keys(w.guests).length, 2);
+});
+
+test('migrateBellState keeps a takeaway entry and drops a broken one', () => {
+  assert.deepEqual(
+    migrateBellState({ guests: {}, cooldown: 5, takeaway: { guestId: 'g4', missing: 1 } }),
+    { guests: {}, cooldown: 5, takeaway: { guestId: 'g4', missing: 1 } },
+  );
+  assert.deepEqual(migrateBellState({ guests: {}, cooldown: 5, takeaway: { guestId: 'g4' } }).takeaway, { guestId: 'g4' });
+  assert.deepEqual(migrateBellState({ guests: {}, cooldown: 5, takeaway: { guestId: 7 } }), FREE(5));
+  assert.deepEqual(migrateBellState({ guests: {}, cooldown: 5, takeaway: 'x' }), FREE(5));
+});
+
+test('releaseBell removes the takeaway guest; sweepOrphans keeps a listed takeaway guest', () => {
+  const w = fakeWorld({ registries: OVEN });
+  ringBell(BELL_KEY, w.io, () => 0.1);
+  const id = w.bells[BELL_KEY].takeaway.guestId;
+  sweepOrphans([w.handle(id)], w.io);
+  assert.equal(w.guests[id].removed, false);
+  releaseBell(BELL_KEY, w.io);
+  assert.equal(w.guests[id].removed, true);
+  assert.deepEqual(w.log.filter((e) => e[0] === 'remove'), [['remove', id, false]]);
+  assert.equal(w.bells[BELL_KEY], undefined);
+});
+
+test('a missing takeaway guest is dropped after the grace period', () => {
+  const w = fakeWorld({ registries: OVEN, bells: { [BELL_KEY]: { guests: {}, cooldown: 500, takeaway: { guestId: 'gone' } } } });
+  for (let i = 0; i < MISSING_GRACE - 1; i++) tick(w, 1);
+  assert.equal(w.bells[BELL_KEY].takeaway.guestId, 'gone');
+  tick(w, 1);
+  assert.equal(w.bells[BELL_KEY].takeaway, undefined);
 });

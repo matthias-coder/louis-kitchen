@@ -28,9 +28,10 @@ test('DISHES equals the dishes of RECIPES in order and excludes the failed dish'
 
 test('itemsFrom lists what each crate supplies, in catalog order', () => {
   assert.deepEqual(itemsFrom('fridge'), k('tomato', 'lettuce', 'raw_patty', 'cheese',
-    'salami', 'egg', 'salmon', 'cream', 'onion', 'carrot', 'potato', 'spring_onion', 'doner_meat_raw'));
-  assert.deepEqual(itemsFrom('pantry'), k('bun',
-    'dough', 'tomato_sauce', 'noodles', 'rice', 'broth', 'nori', 'pita', 'doner_sauce', 'soy_sauce'));
+    'salami', 'egg', 'salmon', 'cream', 'spring_onion', 'doner_meat_raw', 'dough', 'doner_sauce'));
+  assert.deepEqual(itemsFrom('pantry'), k('bun', 'potato', 'onion', 'carrot',
+    'tomato_sauce', 'noodles', 'cooked_rice', 'broth', 'nori', 'pita', 'soy_sauce'));
+  assert.deepEqual(ITEMS[k('rice')], { kind: 'ingredient', stack: 64, menu: false });
   assert.deepEqual(itemsFrom('tools'), [MULTITOOL, ...k('bowl', 'recipe_book', 'clean_plate')]);
 });
 
@@ -38,7 +39,7 @@ test('itemsOf, isDish and plateName', () => {
   assert.deepEqual(itemsOf('dish'), k('hamburger', 'cheeseburger', 'failed_dish',
     'pizza_margherita', 'salami_pizza', 'ramen', 'potato_soup', 'doner', 'sushi', 'fried_noodles'));
   assert.deepEqual(itemsOf('prepared'), k('cooked_patty', 'burnt_patty', 'tomato_slices',
-    'onion_rings', 'carrot_slices', 'potato_cubes', 'salmon_strips', 'doner_meat', 'cooked_rice',
+    'onion_rings', 'carrot_slices', 'potato_cubes', 'salmon_strips', 'doner_meat',
     'raw_pizza_margherita', 'raw_salami_pizza', 'burnt_pizza'));
   assert.equal(isDish('kochmod:hamburger'), true);
   assert.equal(isDish('kochmod:bun'), false);

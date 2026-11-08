@@ -281,11 +281,11 @@ const EVERY_THEME = ['fridge', 'pantry', 'crate_tools', 'crate_all', 'crate_kits
 const dishIds = (/** @type {string[]} */ ...ids) => ids.map((i) => `kochmod:${i}`);
 /** What guests may wish for at each theme (RECIPES order). */
 const MENUS = {
-  burger: dishIds('hamburger', 'cheeseburger'),
-  // pot + cutting board + counter is also the sushi kitchen (RECIPES: sushi needs pot, cutting_board, counter)
+  // interim (stage 3): sushi needs only cutting board + counter, so it shows up wherever both exist
+  burger: dishIds('hamburger', 'cheeseburger', 'sushi'),
   italian: dishIds('sushi', 'pizza_margherita', 'salami_pizza', 'ramen', 'potato_soup'),
   japanese: dishIds('sushi', 'ramen', 'potato_soup', 'fried_noodles'),
-  doner: dishIds('doner'),
+  doner: dishIds('doner', 'sushi'),
   classic: DISHES,
   mega: DISHES,
 };

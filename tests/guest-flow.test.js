@@ -170,10 +170,10 @@ test('guestAvailability: a seat taken by another bell gives no_seat', () => {
 });
 
 test('guestAvailability: a missing station gives no_kitchen', () => {
-  for (const kind of ['grill', 'cutting_board', 'counter']) {
+  for (const kind of ['cutting_board', 'counter']) {
     assert.equal(guestAvailability(BELL_KEY, fakeWorld({ registries: { [kind]: [] } }).io), 'no_kitchen', kind);
   }
-  assert.equal(guestAvailability(BELL_KEY, fakeWorld({ registries: { grill: [K(50, 64, 5)] } }).io), 'no_kitchen');
+  assert.equal(guestAvailability(BELL_KEY, fakeWorld({ registries: { cutting_board: [K(50, 64, 5)] } }).io), 'no_kitchen');
 });
 
 test('guestAvailability: the seat is checked before the kitchen', () => {
@@ -182,7 +182,7 @@ test('guestAvailability: the seat is checked before the kitchen', () => {
 });
 
 test('the spawn step spawns nothing unless availability is ok', () => {
-  for (const registries of [{ chair: [] }, { grill: [] }]) {
+  for (const registries of [{ chair: [] }, { cutting_board: [] }]) {
     const w = fakeWorld({ registries, bells: { [BELL_KEY]: FREE(0) } });
     tick(w);
     assert.equal(Object.keys(w.guests).length, 0);
@@ -192,12 +192,12 @@ test('the spawn step spawns nothing unless availability is ok', () => {
 
 test('the wish is picked from the available dishes', () => {
   const w = fakeWorld({ bells: { [BELL_KEY]: FREE(0) } });
-  tickBells([BELL_KEY], 20, w.io, () => 0.99);
+  tickBells([BELL_KEY], 20, w.io, () => 0.6);
   assert.equal(w.guests.g1.data.wish, CHEESE);
 });
 
-test('no guest without a grill nearby: retry later', () => {
-  const w = fakeWorld({ bells: { [BELL_KEY]: FREE(0) }, registries: { grill: [] } });
+test('no guest without a cutting board nearby: retry later', () => {
+  const w = fakeWorld({ bells: { [BELL_KEY]: FREE(0) }, registries: { cutting_board: [] } });
   tick(w);
   assert.deepEqual(w.bells[BELL_KEY], FREE(RETRY_TICKS));
   assert.equal(Object.keys(w.guests).length, 0);
@@ -205,7 +205,7 @@ test('no guest without a grill nearby: retry later', () => {
 
 test('stations out of radius or in another dimension do not count', () => {
   for (const grill of [K(17, 64, 0), locKey('minecraft:nether', { x: 5, y: 64, z: 5 })]) {
-    const w = fakeWorld({ bells: { [BELL_KEY]: FREE(0) }, registries: { grill: [grill] } });
+    const w = fakeWorld({ bells: { [BELL_KEY]: FREE(0) }, registries: { cutting_board: [grill] } });
     tick(w);
     assert.equal(w.bells[BELL_KEY].cooldown, RETRY_TICKS, grill);
     assert.equal(Object.keys(w.guests).length, 0, grill);
@@ -605,7 +605,7 @@ test('ringing: seats taken by another bell count as full; no seat and no kitchen
     bells: { [other]: { guests: { [CHAIR_KEY]: { guestId: 'x', table: TABLE_KEY } }, cooldown: 0 } },
   });
   assert.deepEqual(ringBell(BELL_KEY, w.io, zero), { status: 'full', spawned: 0 });
-  for (const [registries, status] of /** @type {const} */ ([[{ chair: [] }, 'no_seat'], [{ grill: [] }, 'no_kitchen']])) {
+  for (const [registries, status] of /** @type {const} */ ([[{ chair: [] }, 'no_seat'], [{ cutting_board: [] }, 'no_kitchen']])) {
     const v = fakeWorld({ registries });
     assert.deepEqual(ringBell(BELL_KEY, v.io, zero), { status, spawned: 0 }, status);
     assert.equal(spawned(v).length, 0, status);

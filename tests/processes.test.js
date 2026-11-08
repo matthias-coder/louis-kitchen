@@ -158,13 +158,12 @@ test('doner steps: meat from the spit, cut tomato and onion, then the counter', 
   assert.deepEqual(stationsFor(k('doner')), ['spit', 'cutting_board', 'counter']);
 });
 
-test('sushi steps: rice in the pot, cut salmon, then the counter', () => {
+test('sushi steps: cut the salmon, then the counter; the rice comes cooked from the pantry', () => {
   assert.deepEqual(stepsFor(k('sushi')), [
-    { item: k('cooked_rice'), station: 'pot', tool: k('bowl'), parts: [k('rice')] },
     { item: k('salmon'), station: 'cutting_board', tool: MULTITOOL, result: k('salmon_strips') },
     { item: k('sushi'), station: 'counter', parts: ['nori', 'cooked_rice', 'salmon_strips'].map(k) },
   ]);
-  assert.deepEqual(stationsFor(k('sushi')), ['pot', 'cutting_board', 'counter']);
+  assert.deepEqual(stationsFor(k('sushi')), ['cutting_board', 'counter']);
 });
 
 test('fried noodle steps: cut the carrot, then the wok with the wok spatula', () => {

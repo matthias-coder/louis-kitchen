@@ -6,13 +6,13 @@ Für Louis und Papa. Alles passiert durch **Antippen**: Zutat in der Hand → St
 
 | Station | Was sie macht | Werkzeug |
 |---|---|---|
-| Kühlschrank | gibt frische Zutaten (Tomate, Salat, Frikadelle, Käse, Salami, Ei, Lachs, Sahne, Zwiebel, Karotte, Kartoffel, Frühlingszwiebel, Dönerfleisch) | – |
-| Vorratsschrank | gibt trockene Zutaten (Brötchen, Pizzateig, Tomatensoße, Nudeln, Reis, Brühe, Algenblatt, Dönertasche, Dönersoße, Sojasoße) | – |
+| Kühlschrank | gibt gekühlte Zutaten (Tomate, Salat, Frikadelle, Käse, Salami, Ei, Lachs, Sahne, Frühlingszwiebel, Dönerfleisch, Pizzateig, Dönersoße) | – |
+| Vorratsschrank | gibt trockene Zutaten (Brötchen, Kartoffel, Zwiebel, Karotte, Tomatensoße, Nudeln, gekochter Reis, Brühe, Algenblatt, Dönertasche, Sojasoße) | – |
 | Werkzeugkiste | Küchen-Multitool, Schüssel, Rezeptbuch, saubere Teller | – |
 | Schneidebrett | schneidet Tomate, Zwiebel, Karotte, Kartoffel, Lachs | Küchen-Multitool (im Rucksack) |
 | Grill | brät die Frikadelle: roh → braun (8 Sekunden) → schwarz (nach weiteren 30 Sekunden) | Küchen-Multitool (im Rucksack) |
 | Pizzaofen | backt die rohe Pizza: 8 Sekunden bis fertig, dann wird sie schwarz | Küchen-Multitool (im Rucksack) |
-| Suppentopf | kocht Suppen und Reis (bis zu 6 Zutaten); nach 8 Sekunden fertig, zu lange = misslungen | Schüssel (wird mit der Suppe verbraucht) |
+| Suppentopf | kocht Suppen (bis zu 6 Zutaten); nach 8 Sekunden fertig, zu lange = misslungen | Schüssel (wird mit der Suppe verbraucht) |
 | Dönerspieß | grillt das Dönerfleisch; nach 8 Sekunden kannst du 6 Scheiben abschneiden. Brennt nie an. | Küchen-Multitool (im Rucksack) |
 | Wok | brät die Bratnudeln (bis zu 6 Zutaten) | Küchen-Multitool (im Rucksack) |
 | Anrichte | legt Zutaten zusammen; leere Hand macht das Gericht fertig. Reihenfolge egal! | leere Hand |
@@ -46,7 +46,7 @@ Wie der Hamburger, plus:
 
 ## Pizza Margherita
 
-1. Pizzateig aus dem Vorratsschrank.
+1. Pizzateig aus dem Kühlschrank.
 2. Tomatensoße aus dem Vorratsschrank.
 3. Käse aus dem Kühlschrank.
 4. Teig, Soße und Käse auf die Anrichte. Leere Hand: **Pizza Margherita (roh)**.
@@ -54,7 +54,7 @@ Wie der Hamburger, plus:
 
 ## Salamipizza
 
-1. Pizzateig aus dem Vorratsschrank.
+1. Pizzateig aus dem Kühlschrank.
 2. Tomatensoße aus dem Vorratsschrank.
 3. Käse aus dem Kühlschrank.
 4. Salami aus dem Kühlschrank.
@@ -71,9 +71,9 @@ Wie der Hamburger, plus:
 
 ## Kartoffelsuppe
 
-1. Kartoffel aus dem Kühlschrank.
+1. Kartoffel aus dem Vorratsschrank.
 2. Kartoffel aufs Schneidebrett legen, mit leerer Hand antippen (Multitool im Rucksack): schneidet. Das gibt Kartoffelwürfel.
-3. Karotte aus dem Kühlschrank.
+3. Karotte aus dem Vorratsschrank.
 4. Karotte aufs Schneidebrett legen, mit leerer Hand antippen (Multitool im Rucksack): schneidet. Das gibt Karottenscheiben.
 5. Sahne aus dem Kühlschrank.
 6. Kartoffelwürfel, Karottenscheiben und Sahne in den Suppentopf. Nach 8 Sekunden mit der Schüssel antippen: **Kartoffelsuppe**!
@@ -86,25 +86,24 @@ Wie der Hamburger, plus:
 4. Salat aus dem Kühlschrank.
 5. Tomate aus dem Kühlschrank.
 6. Tomate aufs Schneidebrett legen, mit leerer Hand antippen (Multitool im Rucksack): schneidet. Das gibt Tomatenscheiben.
-7. Zwiebel aus dem Kühlschrank.
+7. Zwiebel aus dem Vorratsschrank.
 8. Zwiebel aufs Schneidebrett legen, mit leerer Hand antippen (Multitool im Rucksack): schneidet. Das gibt Zwiebelringe.
-9. Dönersoße aus dem Vorratsschrank.
+9. Dönersoße aus dem Kühlschrank.
 10. Dönertasche, Dönerfleisch, Salat, Tomatenscheiben, Zwiebelringe und Dönersoße auf die Anrichte. Leere Hand: **Döner**!
 
 ## Sushi
 
 1. Algenblatt aus dem Vorratsschrank.
-2. Reis aus dem Vorratsschrank.
-3. Reis in den Suppentopf. Nach 8 Sekunden mit der Schüssel antippen: Gekochter Reis.
-4. Lachs aus dem Kühlschrank.
-5. Lachs aufs Schneidebrett legen, mit leerer Hand antippen (Multitool im Rucksack): schneidet. Das gibt Lachsstreifen.
-6. Algenblatt, gekochten Reis und Lachsstreifen auf die Anrichte. Leere Hand: **Sushi**!
+2. Gekochter Reis aus dem Vorratsschrank.
+3. Lachs aus dem Kühlschrank.
+4. Lachs aufs Schneidebrett legen, mit leerer Hand antippen (Multitool im Rucksack): schneidet. Das gibt Lachsstreifen.
+5. Algenblatt, gekochten Reis und Lachsstreifen auf die Anrichte. Leere Hand: **Sushi**!
 
 ## Bratnudeln
 
 1. Nudeln aus dem Vorratsschrank.
 2. Ei aus dem Kühlschrank.
-3. Karotte aus dem Kühlschrank.
+3. Karotte aus dem Vorratsschrank.
 4. Karotte aufs Schneidebrett legen, mit leerer Hand antippen (Multitool im Rucksack): schneidet. Das gibt Karottenscheiben.
 5. Frühlingszwiebel aus dem Kühlschrank.
 6. Sojasoße aus dem Vorratsschrank.

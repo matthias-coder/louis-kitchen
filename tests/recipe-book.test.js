@@ -150,3 +150,9 @@ test('bookPages: labels stay unique per page', () => {
     assert.equal(new Set(all).size, all.length, dish);
   }
 });
+
+test('bookPages: sushi fetches the cooked rice from the pantry instead of cooking it', () => {
+  const l = labels('kochmod:sushi');
+  assert.ok(l.includes('2. Gekochter Reis ➜ Vorratsschrank'), l.join(' | '));
+  assert.ok(!l.some((x) => x.includes('Suppentopf')));
+});

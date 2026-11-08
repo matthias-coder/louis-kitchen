@@ -9,6 +9,7 @@ import {
 
 const HAM = 'kochmod:hamburger';
 const CHEESE = 'kochmod:cheeseburger';
+const SUSHI = 'kochmod:sushi';
 const FAILED = 'kochmod:failed_dish';
 const O = { x: 0, y: 0, z: 0 };
 
@@ -44,14 +45,14 @@ test('seatDirection: east table, first in order, none', () => {
 });
 
 test('availableDishes', () => {
-  assert.deepEqual(availableDishes(new Set(['grill', 'cutting_board', 'counter'])), [HAM, CHEESE]);
-  assert.deepEqual(availableDishes(new Set(['cutting_board', 'counter'])), []);
+  assert.deepEqual(availableDishes(new Set(['grill', 'cutting_board', 'counter'])), [HAM, CHEESE, SUSHI]);
+  assert.deepEqual(availableDishes(new Set(['cutting_board', 'counter'])), [SUSHI]);
 });
 
 test('availableDishes: pizzas need the oven (and the counter)', () => {
   const PIZZAS = ['kochmod:pizza_margherita', 'kochmod:salami_pizza'];
   assert.deepEqual(availableDishes(new Set(['counter', 'oven'])), PIZZAS);
-  assert.deepEqual(availableDishes(new Set(['grill', 'cutting_board', 'counter', 'oven'])), [HAM, CHEESE, ...PIZZAS]);
+  assert.deepEqual(availableDishes(new Set(['grill', 'cutting_board', 'counter', 'oven'])), [HAM, CHEESE, SUSHI, ...PIZZAS]);
   assert.deepEqual(availableDishes(new Set(['oven'])), []);
 });
 
@@ -167,8 +168,8 @@ test('tableView: any served dish shows as food, the failed dish as failed', () =
   assert.equal(tableView('no_such_dish'), 'none', 'unknown stored values show no plate');
 });
 
-test('availableDishes: doner needs spit, cutting board and counter; sushi pot, cutting board and counter; fried noodles the wok', () => {
-  assert.deepEqual(availableDishes(new Set(['spit', 'cutting_board', 'counter'])), ['kochmod:doner']);
+test('availableDishes: doner needs spit, cutting board and counter; sushi cutting board and counter; fried noodles the wok', () => {
+  assert.deepEqual(availableDishes(new Set(['spit', 'cutting_board', 'counter'])), ['kochmod:doner', 'kochmod:sushi']);
   assert.deepEqual(availableDishes(new Set(['spit', 'counter'])), []);
   assert.deepEqual(availableDishes(new Set(['pot', 'cutting_board', 'counter'])), ['kochmod:sushi', 'kochmod:ramen', 'kochmod:potato_soup']);
   assert.deepEqual(availableDishes(new Set(['wok', 'cutting_board'])), ['kochmod:fried_noodles']);

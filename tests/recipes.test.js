@@ -5,6 +5,10 @@ import { POT, WOK } from '../packs/BP/scripts/logic/processes.js';
 
 const k = (/** @type {string[]} */ ...ids) => ids.map((i) => `kochmod:${i}`);
 
+test('RECIPES lists every dish once even when a dish has a legacy recipe', () => {
+  assert.equal(new Set(DISHES).size, DISHES.length);
+});
+
 test('FAILED id', () => assert.equal(FAILED, 'kochmod:failed_dish'));
 
 test('hamburger in any order', () => {
@@ -30,7 +34,7 @@ test('recipes list stations', () => {
   assert.equal(RECIPES.length, 9);
   for (const r of RECIPES.slice(0, 2)) assert.deepEqual(r.stations, ['grill', 'cutting_board', 'counter']);
   assert.deepEqual(RECIPES[2].stations, ['spit', 'cutting_board', 'counter']);
-  assert.deepEqual(RECIPES[3].stations, ['pot', 'cutting_board', 'counter']);
+  assert.deepEqual(RECIPES[3].stations, ['cutting_board', 'counter']);
   for (const r of RECIPES.slice(4, 6)) assert.deepEqual(r.stations, ['counter', 'oven']);
   assert.deepEqual(RECIPES[6].stations, ['pot']);
   assert.deepEqual(RECIPES[7].stations, ['cutting_board', 'pot']);

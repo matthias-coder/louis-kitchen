@@ -13,6 +13,9 @@
   "kochmod:counter": {
     "sound": "wood"
   },
+  "kochmod:fryer": {
+    "sound": "metal"
+  },
   "kochmod:oven": {
     "sound": "stone"
   },

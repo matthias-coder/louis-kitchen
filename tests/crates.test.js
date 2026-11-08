@@ -37,7 +37,7 @@ test('tools come singly, ingredients in fours, and no crate is empty', () => {
 
 test('crate_all lists every item and every block exactly once, in order', () => {
   assert.deepEqual(ALL.entries.map((e) => e.item), [...ALL_ITEM_IDS, ...ALL_BLOCK_IDS].map((i) => `kochmod:${i}`));
-  assert.equal(ALL.entries.length, 55 + ALL_BLOCK_IDS.length);
+  assert.equal(ALL.entries.length, 57 + ALL_BLOCK_IDS.length);
   for (const e of ALL.entries) {
     const kind = ITEMS[e.item]?.kind;
     assert.equal(e.count, ['ingredient', 'prepared', 'plate'].includes(kind) ? 4 : 1, e.item);

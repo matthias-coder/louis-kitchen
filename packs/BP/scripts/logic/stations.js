@@ -141,6 +141,7 @@ export const grillView = grill.view;
 export const grillDrops = grill.drops;
 
 export const oven = timedStation(TIMED.oven);
+export const fryer = timedStation(TIMED.fryer);
 
 // ---- Pot stations (soup pot, wok)
 
@@ -279,10 +280,11 @@ export function spitDrops(state) {
 /** The spit's rules as one station (for the tick loop). */
 export const spit = { INITIAL: SPIT_EMPTY, interact: spitInteract, tick: spitTick, view: spitView, drops: spitDrops };
 
-/** @type {{ grill: GrillState, oven: TimedState, pot: PotState, wok: PotState, spit: SpitState, board: BoardState, counter: CounterState, dishwasher: DishwasherState, cabinet: CabinetState, trash: TrashState }} */
+/** @type {{ grill: GrillState, oven: TimedState, fryer: TimedState, pot: PotState, wok: PotState, spit: SpitState, board: BoardState, counter: CounterState, dishwasher: DishwasherState, cabinet: CabinetState, trash: TrashState }} */
 export const INITIAL = {
   grill: grill.INITIAL,
   oven: oven.INITIAL,
+  fryer: fryer.INITIAL,
   pot: pot.INITIAL,
   wok: wok.INITIAL,
   spit: SPIT_EMPTY,
@@ -589,6 +591,7 @@ const validPot = (/** @type {Record<string, unknown>} */ s) => Array.isArray(s.i
 const VALID = {
   grill: validTimed,
   oven: validTimed,
+  fryer: validTimed,
   pot: validPot,
   wok: validPot,
   spit: (s) => typeof s.meat === 'boolean' && isCount(s.ticks) && isCount(s.slices) && Number.isInteger(s.slices)

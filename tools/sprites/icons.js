@@ -93,6 +93,26 @@ export const block_counter = icon('counter', {
   rect(6, 1, 9, 1, 'b');
 });
 
+export const block_fryer = icon('fryer', {
+  s: '#aeb4ba', S: '#8f969d', k: '#5a6068', d: '#2f3338', l: '#dde2e6', r: '#c0392b', R: '#ff6b5a',
+  o: '#e3a92f', O: '#c4881c', b: '#2a2d31', w: '#8a9096', y: '#e8b83c', Y: '#c98e2a',
+}, ({ rect, px }) => {
+  rect(1, 7, 14, 15, 's');
+  rect(1, 15, 14, 15, 'k');
+  rect(1, 7, 14, 7, 'l');
+  rect(3, 9, 12, 12, 'd');
+  px(4, 10, 'R'); px(5, 10, 'r'); px(10, 10, 'R'); px(11, 10, 'r');
+  px(7, 10, 'o'); px(8, 10, 'o');
+  rect(1, 5, 14, 6, 'S');
+  rect(2, 5, 13, 5, 'o');
+  rect(3, 3, 7, 5, 'b');
+  rect(8, 3, 12, 5, 'b');
+  for (const x of [4, 6, 9, 11]) px(x, 4, 'w');
+  rect(4, 2, 6, 3, 'y');
+  px(5, 2, 'Y');
+  rect(1, 1, 1, 1, 'k');
+});
+
 export const block_oven = icon('oven', {
   s: '#9a9a9a', k: '#5e5e5e', b: '#b5654a', B: '#8f4a35', m: '#d8c8b0', r: '#9c5640',
   h: '#241812', o: '#8a1f0a', e: '#ff7a1a', E: '#ffc04d', D: '#e6cc94', R: '#d33a2a',

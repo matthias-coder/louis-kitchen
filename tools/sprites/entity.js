@@ -13,7 +13,7 @@ export const folder = 'entity';
 /** @typedef {import('./util.js').Sprite} Sprite */
 /** @typedef {[number, number, number, number]} Region u, v, width, height */
 
-export const GUEST_TEXTURE = { width: 128, height: 64 };
+export const GUEST_TEXTURE = { width: 160, height: 64 };
 
 /** @type {Record<string, Region>} */
 export const guestLayout = {
@@ -46,6 +46,7 @@ export const guestLayout = {
   bubble_doner: [104, 4, 20, 20],
   bubble_sushi: [104, 24, 20, 20],
   bubble_fried_noodles: [104, 44, 20, 20],
+  bubble_fries: [128, 0, 20, 20],
   bubble_edge: [104, 0, 1, 1],
   dot: [106, 0, 2, 2],
 };
@@ -206,6 +207,7 @@ function drawGuest() {
   drawBubble(p, L.bubble_doner, items.doner);
   drawBubble(p, L.bubble_sushi, items.sushi);
   drawBubble(p, L.bubble_fried_noodles, items.fried_noodles);
+  drawBubble(p, L.bubble_fries, items.fries);
   p.fill(L.bubble_edge, C.outline);
   p.fill(L.dot, C.bubble);
   return px;

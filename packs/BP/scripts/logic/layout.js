@@ -177,12 +177,12 @@ function kitchenRow(p, devices, { z, x0, y = 1 }) {
 }
 
 /**
- * The trash can on a free kitchen floor cell against the left wall, for kitchens whose back row runs up to
- * the crates: there the last free row cell must stay free, it is the way to the back crate.
- * @param {Plan} p @param {number} z
+ * A device on a free kitchen floor cell (default: against the left wall, x = 1), for kitchens whose back row
+ * runs up to the crates: there the last free row cell must stay free, it is the way to the back crate.
+ * @param {Plan} p @param {string} id @param {number} z @param {number} [x]
  */
-function trashCanAtWall(p, z) {
-  p.put(1, 1, z, 'kochmod:trash_can');
+function deviceAtWall(p, id, z, x = 1) {
+  p.put(x, 1, z, `kochmod:${id}`);
 }
 
 /** The three crates in a column from the back wall forward: all, tools, kits. @param {Plan} p @param {number} x @param {number} zBack */
@@ -238,7 +238,7 @@ const FULL_KITCHEN = ['spit', 'pot', 'fridge', 'pantry', 'grill', 'cutting_board
  *   halfWall: string, worktop: string,
  *   tables: { xs: number[], zs: number[] },
  *   kitchen: string[], kitchenX0: number,
- *   trashAtWall?: number,
+ *   trashAtWall?: number, fryerAtWall?: number,
  *   decorate?: (p: Plan) => void,
  * }} StandardSpec
  */
@@ -262,7 +262,8 @@ function standard(s) {
   bellCounter(p, { x: 6, y: 2, z: 4 }, s.halfWall);
   diningGrid(p, s.tables);
   kitchenRow(p, s.kitchen, { z: 9, x0: s.kitchenX0 });
-  if (s.trashAtWall !== undefined) trashCanAtWall(p, s.trashAtWall);
+  if (s.trashAtWall !== undefined) deviceAtWall(p, 'trash_can', s.trashAtWall);
+  if (s.fryerAtWall !== undefined) deviceAtWall(p, 'fryer', s.fryerAtWall);
   crates(p, 13, 9);
   s.decorate?.(p);
   return p.finish({ xs: door, z: 0 });
@@ -281,6 +282,7 @@ const classic = () => standard({
   kitchen: FULL_KITCHEN,
   kitchenX0: 1,
   trashAtWall: 6,
+  fryerAtWall: 7,
 });
 
 /** Burger-Laden: red/white terracotta, checkered floor. Trash can: (9, 1, 9), right of the dish cabinet. */
@@ -290,7 +292,7 @@ const burger = () => standard({
   halfWall: mc('red_terracotta'),
   worktop: WORKTOP,
   tables: { xs: [2, 5, 10, 13], zs: [3] },
-  kitchen: ['fridge', 'pantry', 'grill', 'cutting_board', 'counter', 'dishwasher', 'dish_cabinet', 'trash_can'],
+  kitchen: ['fridge', 'pantry', 'grill', 'fryer', 'cutting_board', 'counter', 'dishwasher', 'dish_cabinet', 'trash_can'],
   kitchenX0: 2,
 });
 
@@ -323,7 +325,7 @@ const japanese = () => standard({
 
 /**
  * Döner-Imbiss: a small, bright, tiled stand, 11 x 10 x 6, three tables. (8, 1, 8) stays free as the way to
- * the corner crate; the trash can stands against the left wall at (1, 1, 6), two cells in front of the fridge.
+ * the corner crate; the trash can stands against the left wall at (1, 1, 6), two cells in front of the fridge, the fryer beside it at (2, 1, 6).
  */
 function doner() {
   const p = plan(11, 10, 6);
@@ -337,7 +339,8 @@ function doner() {
   bellCounter(p, { x: 4, y: 2, z: 4 }, tile);
   diningGrid(p, { xs: [2, 3, 8], zs: [3] });
   kitchenRow(p, ['fridge', 'pantry', 'spit', 'cutting_board', 'counter', 'dishwasher', 'dish_cabinet'], { z: 8, x0: 1 });
-  trashCanAtWall(p, 6);
+  deviceAtWall(p, 'trash_can', 6);
+  deviceAtWall(p, 'fryer', 6, 2); // z = 7 would wall in the row's end cells: the fridge at x = 1 could not be reached on foot
   crates(p, 9, 8);
   return p.finish({ xs: door, z: 0 });
 }
@@ -363,7 +366,7 @@ function mega() {
   halfWall(p, { z: 8, x0: 2, x1: 18, gap: door, block: HALF_WALL, top: WORKTOP });
   bellCounter(p, { x: 8, y: 2, z: 7 }, HALF_WALL);
   diningGrid(p, { xs: [4, 7, 13, 16], zs: [5] });
-  kitchenRow(p, [...FULL_KITCHEN, 'trash_can'], { z: 12, x0: 1 });
+  kitchenRow(p, [...FULL_KITCHEN, 'fryer', 'trash_can'], { z: 12, x0: 1 });
   crates(p, 18, 12);
   bellCounter(p, { x: 10, y: 6, z: 7 }, HALF_WALL);
   diningGrid(p, { xs: [6, 14], zs: [4, 10], y: 5 });

@@ -81,10 +81,10 @@ const dish = (/** @type {string} */ name) => `kochmod:${name}`;
 
 /** Each cuisine has a signature device (`station`); a kitchen offers the cuisines whose device stands nearby. */
 export const CUISINES = /** @type {Record<Cuisine, { station: string, dishes: string[] }>} */ ({
-  burger: { station: 'grill', dishes: [dish('hamburger'), dish('cheeseburger')] },
+  burger: { station: 'grill', dishes: [dish('hamburger'), dish('cheeseburger'), dish('fries')] },
   italian: { station: 'oven', dishes: [dish('pizza_margherita'), dish('salami_pizza')] },
   japanese: { station: 'wok', dishes: [dish('sushi'), dish('ramen'), dish('fried_noodles')] },
-  doner: { station: 'spit', dishes: [dish('doner')] },
+  doner: { station: 'spit', dishes: [dish('doner'), dish('fries')] },
   classic: { station: 'pot', dishes: [dish('potato_soup')] },
 });
 

@@ -32,6 +32,9 @@
     "kochmod_block_fridge": {
       "textures": "textures/items/block_fridge"
     },
+    "kochmod_block_fryer": {
+      "textures": "textures/items/block_fryer"
+    },
     "kochmod_block_grill": {
       "textures": "textures/items/block_grill"
     },
@@ -64,6 +67,9 @@
     },
     "kochmod_bun": {
       "textures": "textures/items/bun"
+    },
+    "kochmod_burnt_fries": {
+      "textures": "textures/items/burnt_fries"
     },
     "kochmod_burnt_patty": {
       "textures": "textures/items/burnt_patty"
@@ -124,6 +130,9 @@
     },
     "kochmod_fried_noodles": {
       "textures": "textures/items/fried_noodles"
+    },
+    "kochmod_fries": {
+      "textures": "textures/items/fries"
     },
     "kochmod_hamburger": {
       "textures": "textures/items/hamburger"
@@ -187,6 +196,9 @@
     },
     "kochmod_potato_soup": {
       "textures": "textures/items/potato_soup"
+    },
+    "kochmod_potato_sticks": {
+      "textures": "textures/items/potato_sticks"
     },
     "kochmod_ramen": {
       "textures": "textures/items/ramen"

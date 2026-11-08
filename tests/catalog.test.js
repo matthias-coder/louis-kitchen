@@ -21,7 +21,7 @@ test('every id used by recipes, crates and processes exists in ITEMS', () => {
 
 test('DISHES equals the dishes of RECIPES in order and excludes the failed dish', () => {
   assert.deepEqual(DISHES, RECIPES.map((r) => r.dish));
-  assert.deepEqual(DISHES, k('hamburger', 'cheeseburger', 'doner', 'sushi', 'pizza_margherita', 'salami_pizza', 'ramen', 'potato_soup', 'fried_noodles'));
+  assert.deepEqual(DISHES, k('hamburger', 'cheeseburger', 'doner', 'sushi', 'pizza_margherita', 'salami_pizza', 'fries', 'ramen', 'potato_soup', 'fried_noodles'));
   assert.ok(isDish(FAILED));
   assert.ok(!DISHES.includes(FAILED));
 });
@@ -44,9 +44,9 @@ test('soup bowl, dirty bowl and pizza box are plate items; the old bowl is a too
 
 test('itemsOf, isDish and plateName', () => {
   assert.deepEqual(itemsOf('dish'), k('hamburger', 'cheeseburger', 'failed_dish',
-    'pizza_margherita', 'salami_pizza', 'ramen', 'potato_soup', 'doner', 'sushi', 'fried_noodles'));
+    'pizza_margherita', 'salami_pizza', 'fries', 'ramen', 'potato_soup', 'doner', 'sushi', 'fried_noodles'));
   assert.deepEqual(itemsOf('prepared'), k('cooked_patty', 'burnt_patty', 'tomato_slices',
-    'onion_rings', 'carrot_slices', 'potato_cubes', 'salmon_strips', 'doner_meat',
+    'onion_rings', 'carrot_slices', 'potato_sticks', 'potato_cubes', 'burnt_fries', 'salmon_strips', 'doner_meat',
     'raw_pizza_margherita', 'raw_salami_pizza', 'burnt_pizza'));
   assert.equal(isDish('kochmod:hamburger'), true);
   assert.equal(isDish('kochmod:bun'), false);

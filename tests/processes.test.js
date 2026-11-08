@@ -29,10 +29,10 @@ test('process tables for stage 1', () => {
     [k('tomato')]: k('tomato_slices'),
     [k('onion')]: k('onion_rings'),
     [k('carrot')]: k('carrot_slices'),
-    [k('potato')]: k('potato_cubes'),
+    [k('potato')]: k('potato_sticks'),
     [k('salmon')]: k('salmon_strips'),
   });
-  assert.deepEqual(Object.keys(TIMED), ['grill', 'oven']);
+  assert.deepEqual(Object.keys(TIMED), ['grill', 'oven', 'fryer']);
   assert.deepEqual(TIMED.grill.accepts, { [k('raw_patty')]: { cooked: k('cooked_patty'), burnt: k('burnt_patty') } });
   assert.equal(TIMED.grill.tool, MULTITOOL);
 });
@@ -81,6 +81,7 @@ test('every CUTTABLE key and value is a catalog item', () => {
 test('pot recipes: ramen, potato soup and cooked rice', () => {
   assert.deepEqual(POT, [
     { dish: k('ramen'), parts: ['broth', 'noodles', 'egg', 'spring_onion'].map(k) },
+    { dish: k('potato_soup'), parts: ['potato_sticks', 'carrot_slices', 'cream'].map(k) },
     { dish: k('potato_soup'), parts: ['potato_cubes', 'carrot_slices', 'cream'].map(k) },
     { dish: k('cooked_rice'), parts: [k('rice')] },
   ]);
@@ -115,9 +116,9 @@ test('ramen steps: only the pot step with the bowl (all parts come from fridge a
 
 test('potato soup steps: cut potato and carrot, then the pot step with the bowl', () => {
   assert.deepEqual(stepsFor(k('potato_soup')), [
-    { item: k('potato'), station: 'cutting_board', tool: MULTITOOL, result: k('potato_cubes') },
+    { item: k('potato'), station: 'cutting_board', tool: MULTITOOL, result: k('potato_sticks') },
     { item: k('carrot'), station: 'cutting_board', tool: MULTITOOL, result: k('carrot_slices') },
-    { item: k('potato_soup'), station: 'pot', tool: SOUP_BOWL, parts: ['potato_cubes', 'carrot_slices', 'cream'].map(k) },
+    { item: k('potato_soup'), station: 'pot', tool: SOUP_BOWL, parts: ['potato_sticks', 'carrot_slices', 'cream'].map(k) },
   ]);
   assert.deepEqual(stationsFor(k('potato_soup')), ['cutting_board', 'pot']);
 });
@@ -190,4 +191,11 @@ test('every station lists the multitool first and its old tool second; the book 
     for (const def of [TIMED.grill, TIMED.oven, SPIT, WOK_DEF]) assert.equal(def.tool, MULTITOOL);
   assert.equal(TIMED.grill.hintTool, 'kochmod.hint.need_multitool');
   assert.deepEqual(stepsFor(k('hamburger'))[0], { item: k('raw_patty'), station: 'grill', tool: MULTITOOL, result: k('cooked_patty') });
+});
+
+test('the potato is cut into sticks; the soup takes sticks (cubes still work); fries come from the fryer', () => {
+  assert.equal(CUTTABLE[k('potato')], k('potato_sticks'));
+  assert.deepEqual(stepsFor(k('fries')).map((s) => s.station), ['cutting_board', 'fryer']);
+  assert.deepEqual(stepsFor(k('potato_soup')).map((s) => s.item), [k('potato'), k('carrot'), k('potato_soup')]);
+  assert.equal(TIMED.fryer.accepts[k('potato_sticks')].cooked, k('fries'));
 });

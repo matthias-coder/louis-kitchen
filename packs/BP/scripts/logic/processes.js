@@ -13,7 +13,7 @@ export const CUTTABLE = {
   'kochmod:tomato': 'kochmod:tomato_slices',
   'kochmod:onion': 'kochmod:onion_rings',
   'kochmod:carrot': 'kochmod:carrot_slices',
-  'kochmod:potato': 'kochmod:potato_cubes',
+  'kochmod:potato': 'kochmod:potato_sticks',
   'kochmod:salmon': 'kochmod:salmon_strips',
 };
 
@@ -40,6 +40,14 @@ export const TIMED = {
     hintTool: 'kochmod.hint.need_multitool',
     hintFull: 'kochmod.hint.oven_full',
     sound: 'kochmod.oven',
+  },
+  fryer: {
+    accepts: { 'kochmod:potato_sticks': { cooked: 'kochmod:fries', burnt: 'kochmod:burnt_fries' } },
+    tools: [MULTITOOL],
+    tool: MULTITOOL,
+    hintTool: 'kochmod.hint.need_multitool',
+    hintFull: 'kochmod.hint.fryer_full',
+    sound: 'kochmod.sizzle',
   },
 };
 
@@ -71,6 +79,8 @@ export const ASSEMBLY = [
 /** @type {DishRecipe[]} pot recipes; a result need not be a dish (cooked rice is a prepared item) */
 export const POT = [
   { dish: 'kochmod:ramen', parts: ['kochmod:broth', 'kochmod:noodles', 'kochmod:egg', 'kochmod:spring_onion'] },
+  { dish: 'kochmod:potato_soup', parts: ['kochmod:potato_sticks', 'kochmod:carrot_slices', 'kochmod:cream'] },
+  // legacy: soups cooked from the old cubes still count (RECIPES keeps the first entry per dish)
   { dish: 'kochmod:potato_soup', parts: ['kochmod:potato_cubes', 'kochmod:carrot_slices', 'kochmod:cream'] },
   { dish: 'kochmod:cooked_rice', parts: ['kochmod:rice'] },
 ];

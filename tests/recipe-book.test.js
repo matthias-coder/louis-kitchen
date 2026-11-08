@@ -38,7 +38,7 @@ const labels = (dish) => bookPages(dish).buttons.slice(0, -1).map((b) => render(
 test('bookIndex: one button per dish in DISHES order with name and picture', () => {
   const index = bookIndex();
   assert.deepEqual(index.title, { translate: 'kochmod.book.title' });
-  assert.equal(index.buttons.length, 9);
+  assert.equal(index.buttons.length, 10);
   assert.deepEqual(index.buttons.map((b) => b.dish), DISHES);
   for (const b of index.buttons) {
     assert.deepEqual(b.label, { translate: `item.${b.dish}` });

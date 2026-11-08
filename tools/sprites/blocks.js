@@ -259,6 +259,25 @@ export const layouts = {
     pizza_burnt_top: /** @type {Region} */ ([16, 32, 7, 7]),
     pizza_burnt_side: /** @type {Region} */ ([16, 40, 7, 1]),
   },
+  fryer: {
+    body_side: /** @type {Region} */ ([0, 0, 16, 10]),
+    body_front: /** @type {Region} */ ([0, 10, 16, 10]),
+    body_top: /** @type {Region} */ ([16, 0, 16, 16]),
+    body_bottom: /** @type {Region} */ ([32, 0, 16, 16]),
+    rim_top: /** @type {Region} */ ([48, 0, 16, 12]),
+    rim_side: /** @type {Region} */ ([48, 12, 16, 2]),
+    oil_top: /** @type {Region} */ ([0, 20, 12, 12]),
+    oil_side: /** @type {Region} */ ([0, 32, 12, 2]),
+    basket_top: /** @type {Region} */ ([16, 20, 5, 8]),
+    basket_side: /** @type {Region} */ ([24, 20, 8, 2]),
+    handle: /** @type {Region} */ ([24, 24, 4, 4]),
+    fries_raw_top: /** @type {Region} */ ([0, 36, 4, 6]),
+    fries_raw_side: /** @type {Region} */ ([8, 36, 6, 2]),
+    fries_cooked_top: /** @type {Region} */ ([16, 36, 4, 6]),
+    fries_cooked_side: /** @type {Region} */ ([24, 36, 6, 2]),
+    fries_burnt_top: /** @type {Region} */ ([32, 36, 4, 6]),
+    fries_burnt_side: /** @type {Region} */ ([40, 36, 6, 2]),
+  },
   pot: {
     stove_side: /** @type {Region} */ ([0, 0, 14, 6]),
     stove_front: /** @type {Region} */ ([0, 6, 14, 6]),
@@ -1099,6 +1118,85 @@ export const oven = {
     x: '#1a1614', X: '#2e2723', a: '#4a403b',
   },
   rows: drawOven(),
+};
+
+// ---- Deep fryer: stainless steel tank with a control panel, golden oil, two wire baskets, fries in the left one
+
+/**
+ * @param {ReturnType<typeof canvas>} c
+ * @param {Region} top 4x6
+ * @param {Region} side 6x2
+ * @param {string} a main colour
+ * @param {string} b second colour
+ * @param {string} dot specks
+ * @param {number} seed
+ */
+function drawFries(c, top, side, a, b, dot, seed) {
+  c.fill(top, a);
+  c.speckle(top, a, b, 0.35, seed);
+  for (const [x, y] of [[0, 1], [2, 3], [3, 5], [1, 4]]) c.px(top, x, y, dot);
+  c.fill(side, b);
+}
+
+function drawFryer() {
+  const L = layouts.fryer;
+  const c = canvas();
+  // tank walls: brushed steel with a vertical highlight
+  c.fill(L.body_side, 's');
+  c.speckle(L.body_side, 's', 'S', 0.2, 41);
+  c.row(L.body_side, 0, 'l');
+  c.row(L.body_side, 9, 'k');
+  for (const y of [1, 2, 3, 4, 5, 6, 7, 8]) c.px(L.body_side, 2, y, 'l');
+  // front: control panel with two red knobs and a display
+  c.fill(L.body_front, 's');
+  c.speckle(L.body_front, 's', 'S', 0.2, 42);
+  c.row(L.body_front, 0, 'l');
+  c.row(L.body_front, 9, 'k');
+  for (let y = 2; y <= 6; y++) for (let x = 2; x <= 13; x++) c.px(L.body_front, x, y, 'd');
+  for (const x0 of [3, 10]) {
+    c.px(L.body_front, x0, 3, 'R'); c.px(L.body_front, x0 + 1, 3, 'r');
+    c.px(L.body_front, x0, 4, 'r'); c.px(L.body_front, x0 + 1, 4, 'Q');
+  }
+  for (let x = 6; x <= 9; x++) c.px(L.body_front, x, 3, 'g');
+  c.px(L.body_front, 7, 5, 'e');
+  c.fill(L.body_top, 's');
+  c.border(L.body_top, 'k');
+  c.fill(L.body_bottom, 'k');
+  c.fill(L.rim_top, 'l');
+  c.border(L.rim_top, 's');
+  c.fill(L.rim_side, 'S');
+  c.row(L.rim_side, 0, 'l');
+  // oil
+  c.fill(L.oil_top, 'o');
+  c.speckle(L.oil_top, 'o', 'O', 0.25, 43);
+  c.speckle(L.oil_top, 'o', 'h', 0.06, 44);
+  c.fill(L.oil_side, 'O');
+  // wire baskets: dark mesh, steel frame, black grips
+  c.fill(L.basket_top, 'b');
+  for (let y = 0; y < 8; y += 2) c.row(L.basket_top, y, 'w');
+  for (let x = 0; x < 5; x += 2) for (let y = 0; y < 8; y++) c.px(L.basket_top, x, y, 'w');
+  c.fill(L.basket_side, 'b');
+  c.row(L.basket_side, 0, 'w');
+  c.fill(L.handle, 'd');
+  c.row(L.handle, 0, 'k');
+  drawFries(c, L.fries_raw_top, L.fries_raw_side, 'p', 'P', 'h', 45);
+  drawFries(c, L.fries_cooked_top, L.fries_cooked_side, 'y', 'Y', 'h', 46);
+  drawFries(c, L.fries_burnt_top, L.fries_burnt_side, 'x', 'X', 'a', 47);
+  return c.rows();
+}
+
+/** @type {Sprite} */
+export const fryer = {
+  name: 'fryer',
+  palette: {
+    s: '#aeb4ba', S: '#8f969d', k: '#5a6068', d: '#2f3338', l: '#dde2e6', g: '#7ad06a',
+    r: '#c0392b', R: '#ff6b5a', Q: '#7a1f16', e: '#ff7a1a',
+    o: '#e3a92f', O: '#c4881c', h: '#fff0a8',
+    b: '#2a2d31', w: '#8a9096',
+    p: '#f0e2a0', P: '#d4c07a', y: '#e8b83c', Y: '#c98e2a',
+    x: '#3a2616', X: '#241810', a: '#5a4030',
+  },
+  rows: drawFryer(),
 };
 
 // ---- Soup pot: small black stove with knobs and a burner, grey iron pot with handles, lid pushed to the back

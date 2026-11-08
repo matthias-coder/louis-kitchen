@@ -12,6 +12,7 @@ Für Louis und Papa. Alles passiert durch **Antippen**: Zutat in der Hand → St
 | Schneidebrett | schneidet Tomate, Zwiebel, Karotte, Kartoffel, Lachs | Küchen-Multitool (im Rucksack) |
 | Grill | brät die Frikadelle: roh → braun (8 Sekunden) → schwarz (nach weiteren 30 Sekunden) | Küchen-Multitool (im Rucksack) |
 | Pizzaofen | backt die rohe Pizza: 8 Sekunden bis fertig, dann wird sie schwarz | Küchen-Multitool (im Rucksack) |
+| Fritteuse | frittiert Kartoffelstifte: 8 Sekunden bis fertig, dann werden sie schwarz | Küchen-Multitool (im Rucksack) |
 | Suppentopf | kocht Suppen (bis zu 6 Zutaten); nach 8 Sekunden fertig, zu lange = misslungen | Schüssel (wird mit der Suppe verbraucht) |
 | Dönerspieß | grillt das Dönerfleisch; nach 8 Sekunden kannst du 6 Scheiben abschneiden. Brennt nie an. | Küchen-Multitool (im Rucksack) |
 | Wok | brät die Bratnudeln (bis zu 6 Zutaten) | Küchen-Multitool (im Rucksack) |
@@ -72,11 +73,18 @@ Wie der Hamburger, plus:
 ## Kartoffelsuppe
 
 1. Kartoffel aus dem Vorratsschrank.
-2. Kartoffel aufs Schneidebrett legen, mit leerer Hand antippen (Multitool im Rucksack): schneidet. Das gibt Kartoffelwürfel.
+2. Kartoffel aufs Schneidebrett legen, mit leerer Hand antippen (Multitool im Rucksack): schneidet. Das gibt Kartoffelstifte.
 3. Karotte aus dem Vorratsschrank.
 4. Karotte aufs Schneidebrett legen, mit leerer Hand antippen (Multitool im Rucksack): schneidet. Das gibt Karottenscheiben.
 5. Sahne aus dem Kühlschrank.
-6. Kartoffelwürfel, Karottenscheiben und Sahne in den Suppentopf. Nach 8 Sekunden mit der Schüssel antippen: **Kartoffelsuppe**!
+6. Kartoffelstifte, Karottenscheiben und Sahne in den Suppentopf. Nach 8 Sekunden mit der Schüssel antippen: **Kartoffelsuppe**!
+
+## Pommes
+
+1. Kartoffel aus dem Vorratsschrank.
+2. Kartoffel aufs Schneidebrett legen, mit leerer Hand antippen (Multitool im Rucksack): schneidet. Das gibt Kartoffelstifte.
+3. Kartoffelstifte in die Fritteuse. Nach 8 Sekunden mit leerer Hand herausholen (Multitool im Rucksack): **Pommes**! (Zu lange drin = Verbrannte Pommes, ab in den Mülleimer.)
+4. Pommes auf einem sauberen Teller servieren.
 
 ## Döner
 
@@ -113,14 +121,14 @@ Wie der Hamburger, plus:
 
 ## Welches Restaurant kann was?
 
-Jede Küche hat ein Kennzeichen-Gerät: Burger = Grill, Pizzeria = Pizzaofen, Japanisch = Wok, Döner = Dönerspieß, Klassisch = Suppentopf. Steht das Gerät in der Nähe der Klingel, bietet das Restaurant diese Küche an. Gäste wünschen sich nur Gerichte angebotener Küchen, die die Küche auch kochen kann.
+Jede Küche hat ein Kennzeichen-Gerät: Burger = Grill (Pommes gehören dazu), Pizzeria = Pizzaofen, Japanisch = Wok, Döner = Dönerspieß (auch mit Pommes), Klassisch = Suppentopf. Steht das Gerät in der Nähe der Klingel, bietet das Restaurant diese Küche an. Gäste wünschen sich nur Gerichte angebotener Küchen, die die Küche auch kochen kann.
 
 Der Gast nimmt jedes Gericht, das zu einer angebotenen Küche passt: das Wunschgericht bringt 1 bis 3 Smaragde, ein anderes passendes Gericht 1 Smaragd, ein Gericht einer fremden Küche oder ein misslungenes Gericht 0.
 
 | Restaurant (Baukasten aus der Restaurant-Kiste) | Geräte | Gerichte |
 |---|---|---|
-| Burger-Laden | Grill, Schneidebrett, Anrichte | Hamburger, Cheeseburger |
+| Burger-Laden | Grill, Fritteuse, Schneidebrett, Anrichte | Hamburger, Cheeseburger, Pommes |
 | Pizzeria | Pizzaofen, Suppentopf, Schneidebrett, Anrichte | Pizza Margherita, Salamipizza, Kartoffelsuppe |
 | Sushi-Bar | Suppentopf, Wok, Schneidebrett, Anrichte | Sushi, Ramen, Kartoffelsuppe, Bratnudeln |
-| Döner-Imbiss | Dönerspieß, Schneidebrett, Anrichte | Döner |
-| Restaurant und Mega-Restaurant | alle Geräte | alle neun Gerichte |
+| Döner-Imbiss | Dönerspieß, Fritteuse, Schneidebrett, Anrichte | Döner, Pommes |
+| Restaurant und Mega-Restaurant | alle Geräte | alle zehn Gerichte |

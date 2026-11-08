@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   RADIUS, SPAWN_MIN, SPAWN_MAX, DIRECTIONS,
-  withinRadius, offset, seatDirection, availableDishes, pickWish, offeredCuisines, CUISINES,
+  withinRadius, offset, seatDirection, availableDishes, cuisinesOf, pickWish, offeredCuisines, CUISINES,
   spawnDelay, rate, seatStillValid, tableInteract, tableView,
   servedIn, leftover, EMPTY_BOWL, DIRTY_PLATE,
 } from '../packs/BP/scripts/logic/restaurant.js';
@@ -208,3 +208,5 @@ test('availableDishes: cookable and of an offered cuisine (sushi needs the wok n
   assert.deepEqual(availableDishes(new Set(['grill', 'cutting_board', 'counter'])), [HAM, CHEESE]);
   assert.deepEqual(availableDishes(new Set(['pot', 'wok', 'cutting_board', 'counter'])), [k('sushi'), k('ramen'), k('potato_soup'), k('fried_noodles')]);
 });
+
+test('fries belong to the burger and the doner cuisine', () => { assert.deepEqual(cuisinesOf(k('fries')), ['burger', 'doner']); });

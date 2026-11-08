@@ -43,6 +43,9 @@
     "kochmod_fridge": {
       "textures": "textures/blocks/fridge"
     },
+    "kochmod_fryer": {
+      "textures": "textures/blocks/fryer"
+    },
     "kochmod_grill": {
       "textures": "textures/blocks/grill"
     },

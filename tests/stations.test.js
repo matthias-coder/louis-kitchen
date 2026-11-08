@@ -7,7 +7,7 @@ import {
   cabinetInteract, cabinetView, cabinetDrops, cabinetMenu, cabinetTake,
   boardInteract, boardView, boardDrops,
   counterInteract, counterView, counterDrops,
-  timedStation, grill, oven, migrateStationState, COUNTER_LAYERS,
+  timedStation, grill, oven, fryer, migrateStationState, COUNTER_LAYERS,
   pot, POT_MAX, potInteract, potTick, potView, potDrops,
   wok, WOK_MAX, wokInteract, wokTick, wokView, wokDrops,
   SPIT_SLICES, spitInteract, spitTick, spitView, spitDrops,
@@ -421,7 +421,7 @@ test('pot: INITIAL and POT_MAX', () => {
 });
 
 test('pot: ingredients and prepared items go in while not cooked, ticks unchanged, with the bubble sound', () => {
-  for (const held of [k('rice'), k('broth'), k('potato_cubes'), k('cooked_rice')]) {
+  for (const held of [k('rice'), k('broth'), k('potato_sticks'), k('cooked_rice')]) {
     assert.deepEqual(potInteract(POT_EMPTY, held), { state: { items: [held], ticks: 0 }, take: true, sound: 'kochmod.bubble' });
   }
   const s = { items: [k('broth')], ticks: COOKED_AT - 1 };
@@ -464,7 +464,7 @@ test('pot: the bowl on an empty pot says it is empty, on an uncooked pot that it
 for (const [parts, ticks, out] of /** @type {[string[], number, string][]} */ ([
   [RAMEN_PARTS, COOKED_AT, k('ramen')],
   [['spring_onion', 'egg', 'broth', 'noodles'].map(k), BURNT_AT - 1, k('ramen')],
-  [['potato_cubes', 'carrot_slices', 'cream'].map(k), 400, k('potato_soup')],
+  [['potato_sticks', 'carrot_slices', 'cream'].map(k), 400, k('potato_soup')],
   [[k('rice')], COOKED_AT, k('cooked_rice')],
   [[k('rice'), k('rice')], COOKED_AT, k('failed_dish')],
   [['potato', 'carrot', 'cream'].map(k), COOKED_AT, k('failed_dish')],
@@ -808,7 +808,7 @@ test('spit: raw meat in hand still goes on even with a tool in the inventory', (
   assert.deepEqual(spitInteract(INITIAL.spit, MEAT_RAW, carry(MULTITOOL)), { state: { meat: true, ticks: 0, slices: SPIT_SLICES }, take: true });
 });
 test('pot: scoops with the soup bowl from hand or inventory and with the old bowl', () => {
-  const s = { items: [k('potato_cubes'), k('carrot_slices'), k('cream')], ticks: COOKED_AT };
+  const s = { items: [k('potato_sticks'), k('carrot_slices'), k('cream')], ticks: COOKED_AT };
   assert.deepEqual(potInteract(s, SOUP_BOWL, NO_CARRY), { state: INITIAL.pot, take: true, give: k('potato_soup') });
   assert.deepEqual(potInteract(s, null, carry(SOUP_BOWL)), { state: INITIAL.pot, consume: SOUP_BOWL, give: k('potato_soup') });
   assert.deepEqual(potInteract(s, null, carry(k('bowl'))), { state: INITIAL.pot, consume: k('bowl'), give: k('potato_soup') });
@@ -855,4 +855,10 @@ test('dishwasher: plates and bowls share the four slots and come back sorted', (
   const done = dishwasherTick(s, WASH_TICKS);
   assert.deepEqual(dishwasherInteract(done, null), { state: INITIAL.dishwasher, gives: [{ item: k('clean_plate'), count: 1 }, { item: SOUP_BOWL, count: 1 }] });
   assert.deepEqual(dishwasherDrops(done), [k('clean_plate'), SOUP_BOWL]);
+});
+
+test('fryer: sticks in, fries out with the multitool, burnt after BURNT_AT', () => {
+  const s = fryer.interact(INITIAL.fryer, k('potato_sticks')).state;
+  assert.deepEqual(fryer.interact(fryer.tick(s, COOKED_AT), null, carry(MULTITOOL)).give, k('fries'));
+  assert.deepEqual(fryer.interact(fryer.tick(s, BURNT_AT), null, carry(MULTITOOL)).give, k('burnt_fries'));
 });

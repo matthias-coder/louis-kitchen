@@ -4,7 +4,7 @@
     {
       "description": {
         "identifier": "geometry.kochmod.guest",
-        "texture_width": 128,
+        "texture_width": 160,
         "texture_height": 64,
         "visible_bounds_width": 2,
         "visible_bounds_height": 3.5,
@@ -1493,6 +1493,91 @@
                   "uv": [
                     104,
                     44
+                  ],
+                  "uv_size": [
+                    20,
+                    20
+                  ]
+                },
+                "east": {
+                  "uv": [
+                    104,
+                    0
+                  ],
+                  "uv_size": [
+                    1,
+                    1
+                  ]
+                },
+                "west": {
+                  "uv": [
+                    104,
+                    0
+                  ],
+                  "uv_size": [
+                    1,
+                    1
+                  ]
+                },
+                "up": {
+                  "uv": [
+                    104,
+                    0
+                  ],
+                  "uv_size": [
+                    1,
+                    1
+                  ]
+                },
+                "down": {
+                  "uv": [
+                    104,
+                    0
+                  ],
+                  "uv_size": [
+                    1,
+                    1
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "bubble_fries",
+          "parent": "bubble",
+          "pivot": [
+            0,
+            40,
+            0
+          ],
+          "cubes": [
+            {
+              "origin": [
+                -7,
+                33,
+                -0.05
+              ],
+              "size": [
+                14,
+                14,
+                0.1
+              ],
+              "uv": {
+                "north": {
+                  "uv": [
+                    128,
+                    0
+                  ],
+                  "uv_size": [
+                    20,
+                    20
+                  ]
+                },
+                "south": {
+                  "uv": [
+                    128,
+                    0
                   ],
                   "uv_size": [
                     20,

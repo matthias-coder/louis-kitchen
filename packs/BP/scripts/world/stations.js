@@ -1,7 +1,7 @@
 import { BlockPermutation, system } from '@minecraft/server';
 import { ActionFormData } from '@minecraft/server-ui';
 import {
-  migrateStationState, grill as grillStation, oven as ovenStation, pot as potStation, wok as wokStation,
+  migrateStationState, grill as grillStation, oven as ovenStation, fryer as fryerStation, pot as potStation, wok as wokStation,
   spit as spitStation,
   boardInteract, boardView, boardDrops,
   counterInteract, counterView, counterDrops,
@@ -38,8 +38,8 @@ import { worldStore, applyResult, heldItemId, playerHasItem, dropItems, loadedBl
 /** @typedef {import('../logic/station-flow.js').CookingStation} CookingStation */
 
 /**
- * A cooking station block (grill, oven): block state `kochmod:content` shows the view.
- * @param {'grill' | 'oven'} kind registry name and saved-state kind
+ * A cooking station block (grill, oven, fryer): block state `kochmod:content` shows the view.
+ * @param {'grill' | 'oven' | 'fryer'} kind registry name and saved-state kind
  * @param {CookingStation} station
  * @returns {StationDef<TimedState>}
  */
@@ -54,9 +54,10 @@ const cookingDef = (kind, station) => ({
 
 const grill = cookingDef('grill', grillStation);
 const oven = cookingDef('oven', ovenStation);
+const fryer = cookingDef('fryer', fryerStation);
 
 /** Cooking stations ticked by tickStations: registry kind, block def, rules. @type {[string, StationDef<TimedState>, CookingStation][]} */
-const COOKING = [['grill', grill, grillStation], ['oven', oven, ovenStation]];
+const COOKING = [['grill', grill, grillStation], ['oven', oven, ovenStation], ['fryer', fryer, fryerStation]];
 
 /** @typedef {import('../logic/stations.js').PotState} PotState */
 /** @typedef {ReturnType<typeof import('../logic/stations.js').potStation>} PotStation */
@@ -357,6 +358,7 @@ function cabinetComponent() {
 const BY_TYPE = {
   [grill.typeId]: ['grill', grill],
   [oven.typeId]: ['oven', oven],
+  [fryer.typeId]: ['fryer', fryer],
   [pot.typeId]: ['pot', pot],
   [wok.typeId]: ['wok', wok],
   [spit.typeId]: ['spit', spit],

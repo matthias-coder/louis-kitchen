@@ -114,21 +114,21 @@ export function dropItems(dimension, location, itemIds) {
 
 /**
  * Applies the side effects of a reducer result (the new state is saved by the caller).
- * @param {import('../logic/stations.js').Result<unknown>} result
+ * @param {Omit<import('../logic/stations.js').Result<unknown>, 'state'>} result
  * @param {Player} player
- * @param {Block} block
+ * @param {{ dimension: import('@minecraft/server').Dimension, center(): import('@minecraft/server').Vector3 }} at where sound and particles happen (a Block fits)
  */
-export function applyResult(result, player, block) {
+export function applyResult(result, player, at) {
   if (result.take) consumeHeld(player);
   if (result.consume) removeOneItem(player, result.consume);
   if (result.give) give(player, result.give, result.count ?? 1);
   for (const stack of result.gives ?? []) give(player, stack.item, stack.count);
   if (result.hint) player.onScreenDisplay.setActionBar({ translate: result.hint });
-  if (result.sound) block.dimension.playSound(result.sound, block.center());
+  if (result.sound) at.dimension.playSound(result.sound, at.center());
   if (result.particle) {
-    const { x, y, z } = block.center();
+    const { x, y, z } = at.center();
     try {
-      block.dimension.spawnParticle(result.particle, { x, y: y + 0.6, z });
+      at.dimension.spawnParticle(result.particle, { x, y: y + 0.6, z });
     } catch (e) {
       console.warn(`kochmod: particle ${result.particle} failed: ${e}`); // decoration only, never blocks the action
     }

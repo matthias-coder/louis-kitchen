@@ -119,6 +119,18 @@ Wie der Hamburger, plus:
 
 ---
 
+## Pizza zum Mitnehmen
+
+Manchmal steht ein Gast mit einem Läufer-Zeichen und einer Pizza in der Denkblase neben der Klingel. Er setzt sich nicht hin, er will die Pizza mitnehmen.
+
+1. Back die Pizza, die er sich wünscht.
+2. Nimm einen Pizzakarton aus dem Geschirrschrank in deinen Rucksack.
+3. Halte die Pizza in der Hand und tippe den Gast an: er bezahlt und geht.
+
+Hast du keinen Karton, erinnert dich der Gast daran. Er nimmt nur Pizza mit, andere Gerichte mag er nicht. Solche Gäste kommen nur, wenn das Restaurant einen Pizzaofen hat.
+
+---
+
 ## Welches Restaurant kann was?
 
 Jede Küche hat ein Kennzeichen-Gerät: Burger = Grill (Pommes gehören dazu), Pizzeria = Pizzaofen, Japanisch = Wok, Döner = Dönerspieß (auch mit Pommes), Klassisch = Suppentopf. Steht das Gerät in der Nähe der Klingel, bietet das Restaurant diese Küche an. Gäste wünschen sich nur Gerichte angebotener Küchen, die die Küche auch kochen kann.

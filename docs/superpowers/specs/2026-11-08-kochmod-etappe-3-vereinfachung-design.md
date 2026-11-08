@@ -40,7 +40,7 @@ Leitsatz bleibt: Das Restaurant-Gefühl ist wichtiger als Kochdetails. Weniger F
 
 Neues Werkzeug-Item `kochmod:multitool` („Küchen-Multitool“). Es ersetzt Messer, Pfannenwender, Pizzaschieber und Wokwender an allen Stationen: Schneidebrett, Grill, Ofen, Wok, Dönerspieß.
 
-- Die Werkzeugkiste gibt aus: Multitool, Rezeptbuch. Die Schüssel entfällt dort (siehe 5.6). [Festlegung]
+- Die Werkzeugkiste gibt aus: Multitool, Rezeptbuch, saubere Teller (als Reserve, falls der Schrank leer ist). Die Schüssel entfällt dort (siehe 5.6). [Festlegung]
 - Die vier alten Werkzeuge bleiben als Items im Pack, damit alte Welten laden, aber sie verschwinden aus allen Kisten und aus dem Rezeptbuch. Jede Station akzeptiert zusätzlich das alte passende Werkzeug, damit niemand etwas wegwerfen muss. [Festlegung]
 - Das Rezeptbuch zeigt in den Schritten das Multitool statt der Einzelwerkzeuge.
 - Textur: eine Kombination aus Messer und Wender, eigenständig erkennbar, im Stil der vorhandenen 16×16-Sprites (Generator in `tools/sprites/items.js`). [Festlegung]
@@ -96,7 +96,7 @@ Jedes Gericht gehört zu einer oder mehreren Küchen: [Festlegung, mit dem Vater
 | Döner | Döner, Pommes |
 | Klassisch | Kartoffelsuppe |
 
-Die Küchen eines Restaurants ergeben sich aus seinen Geräten: Eine Küche wird angeboten, wenn mindestens ein Gericht, das **nur** zu dieser Küche gehört, mit den vorhandenen Stationen kochbar ist. Pommes allein (Schneidebrett + Fritteuse) machen also noch keine Burgerküche; erst der Grill tut das. Das Mega-Restaurant bietet alles. Gäste wünschen sich weiterhin nur Gerichte, die kochbar sind. [Festlegung nach Prüfer-Rückfrage]
+Jede Küche hat ein Kennzeichen-Gerät: Burger = Grill, Italienisch = Pizzaofen, Japanisch = Wok, Döner = Dönerspieß, Klassisch = Suppentopf. Eine Küche wird angeboten, wenn ihr Kennzeichen-Gerät in Reichweite der Glocke steht. Gäste wünschen sich nur Gerichte, die kochbar sind **und** zu einer angebotenen Küche gehören. Folge: Sushi (nur noch Schneidebrett + Anrichte) wird nur gewünscht, wo ein Wok steht; Pommes allein machen keine Burgerküche. Das Mega-Restaurant bietet alles. [Festlegung bei der Planung; ersetzt die Regel „ein exklusives Gericht kochbar“, die nach dem Reis-Umbau Sushi in jedem Laden erlaubt hätte]
 
 Ein Gast wünscht sich weiter ein konkretes Gericht (Blase). Beim Servieren gilt:
 
@@ -130,8 +130,8 @@ Vorbedingung: Das Restaurant hat einen Ofen (also die italienische Küche im Ang
 Ablauf: [Wunsch, Details Festlegung]
 
 1. Beim Klingeln entsteht mit einer Wahrscheinlichkeit von etwa einem Drittel statt eines Tisch-Gastes ein Mitnahme-Gast, aber nur wenn italienische Küche angeboten wird und noch kein Mitnahme-Gast an dieser Glocke wartet. Gibt es keinen freien Tisch, kann trotzdem ein Mitnahme-Gast kommen.
-2. Der Gast geht durch die Tür zu einem Platz neben der Glocke (eine freie Bodenzelle neben dem Glocken-Block, nicht die Zelle vor der Tür) und bleibt dort stehen. Über ihm: Lauf-Symbol (kleines laufendes Männchen) und in der Blase eine der beiden Pizzen.
-3. Der Spieler klickt den Gast mit der fertigen Pizza im Karton an. Der Gast nickt, zahlt wie ein Tischgast (5.5 gilt: Margherita statt Salami gibt 1 Smaragd) und geht zur Tür hinaus und verschwindet.
+2. Der Gast erscheint wie alle Gäste neben der Glocke und bleibt dort stehen (eine freie Bodenzelle neben dem Glocken-Block, nicht die Zelle vor der Tür) und bleibt dort stehen. Über ihm: Lauf-Symbol (kleines laufendes Männchen) und in der Blase eine der beiden Pizzen.
+3. Der Spieler klickt den Gast mit der fertigen Pizza in der Hand und einem Pizzakarton im Inventar an; beides wird genommen. Der Gast nickt, zahlt wie ein Tischgast (5.5 gilt: Margherita statt Salami gibt 1 Smaragd) und verschwindet nach kurzer Zeit mit derselben Wolke wie Tischgäste. [Festlegung: kein Hinauslaufen, das wäre eine eigene Wegfindung]
 4. Pizza ohne Karton: Hinweis „Pizza bitte in den Karton packen!“, nichts passiert.
 5. Anderes Gericht (auch Pommes oder Burger): Gast schüttelt den Kopf, zahlt nichts, bleibt stehen und wartet weiter. Der Mitnahme-Gast nimmt nur Pizza; die Großzügigkeit aus 5.5 gilt bei ihm nur zwischen den beiden Pizzen. [Festlegung nach Prüfer-Rückfrage]
 6. Der Gast wartet geduldig wie Tischgäste. Wird die Glocke abgebaut, verschwindet er wie die anderen.
@@ -144,7 +144,7 @@ Technisch: ein weiterer Gast-Zustand neben „walking / seated / …“, ein neu
 - Neue Zutat aus der Kartoffel: **Kartoffelstifte** (`potato_sticks`) am Schneidebrett. Die Kartoffel wird damit zweideutig (Würfel für Suppe, Stifte für Pommes). Lösung: Das Schneidebrett fragt nicht, sondern die Kartoffel wird zu Stiften geschnitten, und die Kartoffelsuppe nimmt künftig **Kartoffelstifte** statt Würfel. Die Würfel entfallen. Ein Schnitt-Ergebnis pro Zutat bleibt so erhalten. [Festlegung]
 - Neue Station **Fritteuse** (`fryer`): Zeitstation wie Grill und Ofen. Nimmt Kartoffelstifte an, macht nach der Garzeit **Pommes** (`fries`), bei zu langem Warten **verbrannte Pommes** (`burnt_fries`) für den Mülleimer. Abnehmen mit Multitool im Inventar. Blockmodell: Edelstahlkasten mit zwei Körben, Blubber-Partikel und Brutzel-Ton wie der Grill. Fassungsvermögen wie der Grill. [Festlegung]
 - **Pommes** sind ein eigenes Gericht, werden auf dem Teller serviert, erscheinen als Gästewunsch und im Rezeptbuch. Küche: Burger und Döner.
-- Die Fritteuse kommt in den Burger-Bausatz, den Döner-Bausatz und ins Mega-Restaurant (Küchenreihe), dazu in die Kochmod-Kiste. Die anderen Bausätze bleiben unverändert. Das Kochbuch (`docs/kochbuch.md`) bekommt den Pommes-Eintrag. [Wunsch]
+- Die Fritteuse kommt in den Burger-Bausatz, den Döner-Bausatz, das klassische Restaurant (damit „alle Geräte“ wahr bleibt; an der linken Wand neben dem Mülleimer, wo die Küchenreihe voll ist) und ins Mega-Restaurant (Küchenreihe), dazu in die Kochmod-Kiste. Pizzeria und Sushi-Bar bleiben unverändert. Das Kochbuch (`docs/kochbuch.md`) bekommt den Pommes-Eintrag. [Wunsch]
 
 ## 6. Alte Welten
 

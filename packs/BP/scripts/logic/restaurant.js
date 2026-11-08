@@ -75,12 +75,45 @@ export function seatDirection(chair, isTableAt) {
   return DIRECTIONS.find((d) => isTableAt(offset(chair, d))) ?? null;
 }
 
+/** @typedef {'burger' | 'italian' | 'japanese' | 'doner' | 'classic'} Cuisine */
+
+const dish = (/** @type {string} */ name) => `kochmod:${name}`;
+
+/** Each cuisine has a signature device (`station`); a kitchen offers the cuisines whose device stands nearby. */
+export const CUISINES = /** @type {Record<Cuisine, { station: string, dishes: string[] }>} */ ({
+  burger: { station: 'grill', dishes: [dish('hamburger'), dish('cheeseburger')] },
+  italian: { station: 'oven', dishes: [dish('pizza_margherita'), dish('salami_pizza')] },
+  japanese: { station: 'wok', dishes: [dish('sushi'), dish('ramen'), dish('fried_noodles')] },
+  doner: { station: 'spit', dishes: [dish('doner')] },
+  classic: { station: 'pot', dishes: [dish('potato_soup')] },
+});
+
 /**
+ * @param {string} dishId
+ * @returns {Cuisine[]}
+ */
+export function cuisinesOf(dishId) {
+  return /** @type {Cuisine[]} */ (Object.keys(CUISINES)).filter((c) => CUISINES[c].dishes.includes(dishId));
+}
+
+/**
+ * @param {Set<string>} kinds station kinds near the bell
+ * @returns {Set<Cuisine>}
+ */
+export function offeredCuisines(kinds) {
+  return new Set(/** @type {Cuisine[]} */ (Object.keys(CUISINES)).filter((c) => kinds.has(CUISINES[c].station)));
+}
+
+/**
+ * Dishes the kitchen can cook and that belong to an offered cuisine.
  * @param {Set<string>} kinds
  * @returns {string[]}
  */
 export function availableDishes(kinds) {
-  return RECIPES.filter((r) => r.stations.every((s) => kinds.has(s))).map((r) => r.dish);
+  const offered = offeredCuisines(kinds);
+  return RECIPES
+    .filter((r) => r.stations.every((s) => kinds.has(s)) && cuisinesOf(r.dish).some((c) => offered.has(c)))
+    .map((r) => r.dish);
 }
 
 /**
@@ -104,12 +137,15 @@ export function spawnDelay(rnd) {
 /**
  * @param {string} wish
  * @param {string} served
+ * @param {Set<Cuisine>} offered cuisines the kitchen offers now
  * @param {() => number} rnd
  * @returns {{ happy: boolean, emeralds: number }}
  */
-export function rate(wish, served, rnd) {
-  if (served === FAILED || served !== wish) return { happy: false, emeralds: 0 };
-  return { happy: true, emeralds: 1 + Math.floor(rnd() * 3) };
+export function rate(wish, served, offered, rnd) {
+  if (served === FAILED) return { happy: false, emeralds: 0 };
+  if (served === wish) return { happy: true, emeralds: 1 + Math.floor(rnd() * 3) };
+  if (cuisinesOf(served).some((c) => offered.has(c))) return { happy: true, emeralds: 1 };
+  return { happy: false, emeralds: 0 };
 }
 
 /**

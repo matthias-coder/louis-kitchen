@@ -113,12 +113,14 @@ Wie der Hamburger, plus:
 
 ## Welches Restaurant kann was?
 
-Gäste wünschen sich nur, was die Küche kochen kann.
+Jede Küche hat ein Kennzeichen-Gerät: Burger = Grill, Pizzeria = Pizzaofen, Japanisch = Wok, Döner = Dönerspieß, Klassisch = Suppentopf. Steht das Gerät in der Nähe der Klingel, bietet das Restaurant diese Küche an. Gäste wünschen sich nur Gerichte angebotener Küchen, die die Küche auch kochen kann.
+
+Der Gast nimmt jedes Gericht, das zu einer angebotenen Küche passt: das Wunschgericht bringt 1 bis 3 Smaragde, ein anderes passendes Gericht 1 Smaragd, ein Gericht einer fremden Küche oder ein misslungenes Gericht 0.
 
 | Restaurant (Baukasten aus der Restaurant-Kiste) | Geräte | Gerichte |
 |---|---|---|
 | Burger-Laden | Grill, Schneidebrett, Anrichte | Hamburger, Cheeseburger |
-| Pizzeria | Pizzaofen, Suppentopf, Schneidebrett, Anrichte | Pizza Margherita, Salamipizza, Ramen, Kartoffelsuppe, Sushi |
+| Pizzeria | Pizzaofen, Suppentopf, Schneidebrett, Anrichte | Pizza Margherita, Salamipizza, Kartoffelsuppe |
 | Sushi-Bar | Suppentopf, Wok, Schneidebrett, Anrichte | Sushi, Ramen, Kartoffelsuppe, Bratnudeln |
 | Döner-Imbiss | Dönerspieß, Schneidebrett, Anrichte | Döner |
 | Restaurant und Mega-Restaurant | alle Geräte | alle neun Gerichte |

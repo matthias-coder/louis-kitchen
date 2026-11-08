@@ -1,6 +1,6 @@
 import {
   WALK_TIMEOUT, EAT_TICKS, LEAVE_TICKS,
-  withinRadius, offset, seatDirection, availableDishes, pickWish, spawnDelay, rate, seatStillValid, leftover,
+  withinRadius, offset, seatDirection, availableDishes, offeredCuisines, pickWish, spawnDelay, rate, seatStillValid, leftover,
 } from './restaurant.js';
 import { locKey, parseLocKey } from './store.js';
 import { DISHES, FAILED } from './recipes.js';
@@ -196,10 +196,24 @@ function assess(bellKey, io, rnd) {
     .filter((s) => !taken.has(s.seat) && !taken.has(s.table))
     .sort((a, b) => dist2(a.seat) - dist2(b.seat));
   if (free.length === 0) return { status: seats.length === 0 ? 'no_seat' : 'full', free };
-  const kinds = new Set(STATION_KINDS.filter((kind) => io.registryList(kind).some(near)));
-  const wish = pickWish(availableDishes(kinds), rnd);
+  const wish = pickWish(availableDishes(kindsNear(bellKey, io)), rnd);
   if (wish === null) return { status: 'no_kitchen', free };
   return { status: 'ok', free, wish };
+}
+
+/**
+ * Station kinds with a registered device within reach of the bell.
+ * @param {string} bellKey
+ * @param {GuestIo} io
+ * @returns {Set<string>}
+ */
+export function kindsNear(bellKey, io) {
+  const bell = parseLocKey(bellKey);
+  const near = (/** @type {string} */ key) => {
+    const p = parseLocKey(key);
+    return p.dimensionId === bell.dimensionId && withinRadius(bell, p);
+  };
+  return new Set(STATION_KINDS.filter((kind) => io.registryList(kind).some(near)));
 }
 
 /**
@@ -313,7 +327,7 @@ function stepGuest(seat, entry, dt, io, rnd) {
         guest.update({ timer });
         return keep;
       }
-      const { happy, emeralds } = rate(d.wish, d.served, rnd);
+      const { happy, emeralds } = rate(d.wish, d.served, offeredCuisines(kindsNear(d.bell, io)), rnd);
       guest.look({ mood: happy ? 'happy' : 'grumpy' });
       guest.react(happy);
       if (emeralds > 0) io.payout(table, emeralds);

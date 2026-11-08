@@ -281,11 +281,10 @@ const EVERY_THEME = ['fridge', 'pantry', 'crate_tools', 'crate_all', 'crate_kits
 const dishIds = (/** @type {string[]} */ ...ids) => ids.map((i) => `kochmod:${i}`);
 /** What guests may wish for at each theme (RECIPES order). */
 const MENUS = {
-  // interim (stage 3): sushi needs only cutting board + counter, so it shows up wherever both exist
-  burger: dishIds('hamburger', 'cheeseburger', 'sushi'),
-  italian: dishIds('sushi', 'pizza_margherita', 'salami_pizza', 'ramen', 'potato_soup'),
+  burger: dishIds('hamburger', 'cheeseburger'),
+  italian: dishIds('pizza_margherita', 'salami_pizza', 'potato_soup'),
   japanese: dishIds('sushi', 'ramen', 'potato_soup', 'fried_noodles'),
-  doner: dishIds('doner', 'sushi'),
+  doner: dishIds('doner'),
   classic: DISHES,
   mega: DISHES,
 };
@@ -386,7 +385,7 @@ test('themeForKit: each kit builds its theme, the old restaurant_kit builds the 
 test('the expected menus follow from RECIPES and the theme table', () => {
   for (const id of THEME_IDS) {
     const devices = THEME_TABLE[id].devices;
-    assert.deepEqual(RECIPES.filter((r) => r.stations.every((s) => devices.includes(s))).map((r) => r.dish), MENUS[id], id);
+    assert.deepEqual(availableDishes(new Set(devices)), MENUS[id], id);
   }
 });
 

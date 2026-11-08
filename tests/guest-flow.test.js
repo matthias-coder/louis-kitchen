@@ -176,6 +176,11 @@ test('guestAvailability: a missing station gives no_kitchen', () => {
   assert.equal(guestAvailability(BELL_KEY, fakeWorld({ registries: { cutting_board: [K(50, 64, 5)] } }).io), 'no_kitchen');
 });
 
+test('guestAvailability: counter and cutting board alone offer no cuisine; a grill alone cooks nothing', () => {
+  assert.equal(guestAvailability(BELL_KEY, fakeWorld({ registries: { grill: [] } }).io), 'no_kitchen');
+  assert.equal(guestAvailability(BELL_KEY, fakeWorld({ registries: { cutting_board: [], counter: [] } }).io), 'no_kitchen');
+});
+
 test('guestAvailability: the seat is checked before the kitchen', () => {
   const w = fakeWorld({ registries: { chair: [], grill: [] } });
   assert.equal(guestAvailability(BELL_KEY, w.io), 'no_seat');
@@ -192,6 +197,7 @@ test('the spawn step spawns nothing unless availability is ok', () => {
 
 test('the wish is picked from the available dishes', () => {
   const w = fakeWorld({ bells: { [BELL_KEY]: FREE(0) } });
+  // burger kitchen offers [hamburger, cheeseburger]; floor(0.6 * 2) = 1 picks the cheeseburger
   tickBells([BELL_KEY], 20, w.io, () => 0.6);
   assert.equal(w.guests.g1.data.wish, CHEESE);
 });
@@ -204,11 +210,11 @@ test('no guest without a cutting board nearby: retry later', () => {
 });
 
 test('stations out of radius or in another dimension do not count', () => {
-  for (const grill of [K(17, 64, 0), locKey('minecraft:nether', { x: 5, y: 64, z: 5 })]) {
-    const w = fakeWorld({ bells: { [BELL_KEY]: FREE(0) }, registries: { cutting_board: [grill] } });
+  for (const board of [K(17, 64, 0), locKey('minecraft:nether', { x: 5, y: 64, z: 5 })]) {
+    const w = fakeWorld({ bells: { [BELL_KEY]: FREE(0) }, registries: { cutting_board: [board] } });
     tick(w);
-    assert.equal(w.bells[BELL_KEY].cooldown, RETRY_TICKS, grill);
-    assert.equal(Object.keys(w.guests).length, 0, grill);
+    assert.equal(w.bells[BELL_KEY].cooldown, RETRY_TICKS, board);
+    assert.equal(Object.keys(w.guests).length, 0, board);
   }
 });
 
@@ -360,8 +366,24 @@ test('eating → leaving, happy: nods, pays emeralds, plate becomes empty', () =
   assert.equal(w.guests[id].data.timer, LEAVE_TICKS);
 });
 
+test('a cheeseburger for a hamburger wish pays one emerald; after the grill is gone it pays nothing', () => {
+  const eat = (/** @type {boolean} */ grillStays) => {
+    const w = fakeWorld({ plates: { [TABLE_KEY]: 'cheeseburger' } });
+    const id = w.seatGuest({ phase: 'eating', timer: 20, wish: HAM, served: CHEESE });
+    if (!grillStays) w.registries.grill = [];
+    tickBells([BELL_KEY], 20, w.io, () => 0.99);
+    return { w, id };
+  };
+  const a = eat(true);
+  assert.ok(a.w.log.some((e) => e[0] === 'react' && e[2] === true));
+  assert.ok(a.w.log.some((e) => e[0] === 'payout' && e[2] === 1));
+  const b = eat(false);
+  assert.ok(b.w.log.some((e) => e[0] === 'react' && e[2] === false));
+  assert.ok(!b.w.log.some((e) => e[0] === 'payout'));
+});
+
 test('eating → leaving, grumpy: wrong dish gives no emeralds, plate becomes empty', () => {
-  for (const served of [CHEESE, 'kochmod:failed_dish']) {
+  for (const served of ['kochmod:sushi', 'kochmod:failed_dish']) {
     const w = fakeWorld({ plates: { [TABLE_KEY]: served.slice('kochmod:'.length) } });
     const id = w.seatGuest({ phase: 'eating', timer: 20, wish: HAM, served });
     tick(w);
